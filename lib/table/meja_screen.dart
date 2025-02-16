@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/screens/home_screen.dart';
 
-class PartisiScreen extends StatefulWidget {
-  const PartisiScreen({super.key});
+class MejaScreen extends StatefulWidget {
+  const MejaScreen({super.key});
 
   @override
-  State<PartisiScreen> createState() => _PartisiScreenState();
+  State<MejaScreen> createState() => _MejaScreenState();
 }
 
-class _PartisiScreenState extends State<PartisiScreen> {
+class _MejaScreenState extends State<MejaScreen> {
   @override
   void initState() {
     super.initState();
@@ -73,7 +73,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
                     ),
                     const SizedBox(width: 10),
                     const Text(
-                      "Partisi",
+                      "Meja Rias",
                       style: TextStyle(
                         color: Color(0xFFFF5252),
                         fontSize: 18,

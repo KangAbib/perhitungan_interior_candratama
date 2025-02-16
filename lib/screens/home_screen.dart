@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/backdrop/backdrop.dart';
+import 'package:ganesha_interior/backdrop_tv/backdrop_tv.dart';
+import 'package:ganesha_interior/kitchen_set/meja_island.dart';
+import 'package:ganesha_interior/kitchen_set/minibar.dart';
+import 'package:ganesha_interior/kitchen_set/tipe_L.dart';
+import 'package:ganesha_interior/kitchen_set/tipe_U.dart';
+import 'package:ganesha_interior/kitchen_set/tipe_straight.dart';
+import 'package:ganesha_interior/lemari/lemari.dart';
+import 'package:ganesha_interior/partisi/partisi.dart';
 import 'package:ganesha_interior/setting/setting_screen.dart';
+import 'package:ganesha_interior/table/meja_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +21,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  double _scale = 1.0;
+  double _opacity = 1.0;
+  double _offsetX = 0.0;
   @override
   void initState() {
     super.initState();
@@ -55,82 +68,41 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  "Selamat Datang",
-                  style: TextStyle(
-                    color: Color(0xFFFF5252),
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.097,
-            left: screenWidth * 0,
-            right: screenWidth * 0,
-            child: Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                height: screenHeight * 0.250,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white,
-                      Color(0xFFD9D9D9),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.098,
-            left: screenWidth * 0,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.21,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
-                      ),
-                      child: Image.asset(
-                        "assets/images/kitchen.jpg",
-                        width: double.infinity,
-                        height: screenHeight * 0.159,
-                        fit: BoxFit.cover,
+                    Text(
+                      "Selamat Datang",
+                      style: TextStyle(
+                        color: Color(0xFFFF5252),
+                        fontSize: MediaQuery.of(context).size.width *
+                            0.045, // Responsive font size
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Kitchen Set",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Image.asset(
+                          "assets/images/keranjang_merah.png",
+                          height: screenHeight * 0.035,
+                          width: screenHeight * 0.035,
+                          fit: BoxFit.contain,
                         ),
-                      ),
+                        Positioned(
+                          top: -4,
+                          right: -4,
+                          child: Container(
+                            width: screenHeight * 0.022,
+                            height: screenHeight * 0.022,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF5252),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -139,146 +111,400 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.098,
-            left: (MediaQuery.of(context).size.width / 2) + 1,
-            right: screenWidth * 0,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.21,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
-                      ),
-                      child: Image.asset(
-                        "assets/images/partisi.jpg",
-                        width: double.infinity,
-                        height: screenHeight * 0.159,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Partisi",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.313,
             left: screenWidth * 0,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.22,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
-                      ),
-                      child: Image.asset(
-                        "assets/images/backdrop_tv.jpg",
-                        width: double.infinity,
-                        height: screenHeight * 0.169,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Backdrop TV",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+            child: GestureDetector(
+              onTapDown: (details) {
+                setState(() {
+                  _scale = 0.95;
+                  _opacity = 0.7;
+                  _offsetX = 10.0;
+                });
+              },
+              onTapUp: (details) {
+                setState(() {
+                  _scale = 1.0;
+                  _opacity = 1.0;
+                  _offsetX = 0.0;
+                });
 
-          Positioned(
-            top: screenHeight * 0.313,
-            right: screenWidth * 0,
-            left: (MediaQuery.of(context).size.width / 2) + 1,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.22,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (_, __, ___) => const Tipe_Straight(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOutQuad;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+
+                      return SlideTransition(
+                          position: offsetAnimation, child: child);
+                    },
+                  ),
+                );
+              },
+              onTapCancel: () {
+                setState(() {
+                  _scale = 1.0;
+                  _opacity = 1.0;
+                  _offsetX = 0.0;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                transform: Matrix4.translationValues(_offsetX, 0, 0)
+                  ..scale(_scale),
+                child: Opacity(
+                  opacity: _opacity,
+                  child: Card(
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Container(
+                      width: (screenWidth / 2) - 4,
+                      height: screenHeight * 0.205,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: Image.asset(
-                        "assets/images/lemari.png",
-                        width: double.infinity,
-                        height: screenHeight * 0.169,
-                        fit: BoxFit.cover,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                            child: Image.asset(
+                              "assets/images/kitchen.jpg",
+                              width: double.infinity,
+                              height: screenHeight * 0.150,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Kitchen Set",
+                                  style: GoogleFonts.manrope(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.035,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                PopupMenuButton<String>(
+                                  padding:
+                                      EdgeInsets.only(left: screenWidth * 0.1),
+                                  onSelected: (value) {
+                                    if (value == "Straight") {
+                                      Navigator.of(context).push(
+                                        PageRouteBuilder(
+                                          transitionDuration:
+                                              const Duration(milliseconds: 500),
+                                          pageBuilder: (_, __, ___) =>
+                                              const Tipe_Straight(),
+                                          transitionsBuilder:
+                                              (_, animation, __, child) {
+                                            const begin = Offset(1.0, 0.0);
+                                            const end = Offset.zero;
+                                            const curve = Curves.easeInOutQuad;
+
+                                            var tween = Tween(
+                                                    begin: begin, end: end)
+                                                .chain(
+                                                    CurveTween(curve: curve));
+                                            var offsetAnimation =
+                                                animation.drive(tween);
+
+                                            return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child);
+                                          },
+                                        ),
+                                      );
+                                    } else if (value == "Letter L") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tipe_L()),
+                                      );
+                                    } else if (value == "Letter U") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tipe_U()),
+                                      );
+                                    } else if (value == "Minibar") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Minibar()),
+                                      );
+                                    } else if (value == "Meja Island") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MejaIsland()),
+                                      );
+                                    }
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  color: Colors.white,
+                                  elevation: 6,
+                                  itemBuilder: (BuildContext context) => [
+                                    PopupMenuItem(
+                                      value: "Straight",
+                                      child: Text(
+                                        "Straight",
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Letter L",
+                                      child: Text(
+                                        "Letter L",
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Letter U",
+                                      child: Text(
+                                        "Letter U",
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Minibar",
+                                      child: Text(
+                                        "Minibar",
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Meja Island",
+                                      child: Text(
+                                        "Meja Island",
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.03,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  child: Image.asset(
+                                    "assets/images/more.png",
+                                    width: screenWidth * 0.06,
+                                    height: screenWidth * 0.06,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Lemari",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-          // card3
+          Positioned(
+            top: screenHeight * 0.098,
+            left: (MediaQuery.of(context).size.width / 2) + 1,
+            right: screenWidth * 0,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PartisiScreen()),
+                );
+              },
+              child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Container(
+                    width: (MediaQuery.of(context).size.width / 2) - 4,
+                    height: screenHeight * 0.205,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                          ),
+                          child: Image.asset(
+                            "assets/images/partisi.jpg",
+                            width: double.infinity,
+                            height: screenHeight * 0.150,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Partisi",
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.03,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.311,
+            left: screenWidth * 0,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BackdropTV()),
+                );
+              },
+              child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Container(
+                    width: (MediaQuery.of(context).size.width / 2) - 4,
+                    height: screenHeight * 0.22,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                          ),
+                          child: Image.asset(
+                            "assets/images/backdrop_tv.jpg",
+                            width: double.infinity,
+                            height: screenHeight * 0.169,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Backdrop TV",
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.311,
+            right: screenWidth * 0,
+            left: (MediaQuery.of(context).size.width / 2) + 1,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LemariScreen()),
+                );
+              },
+              child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Container(
+                    width: (MediaQuery.of(context).size.width / 2) - 4,
+                    height: screenHeight * 0.22,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                          ),
+                          child: Image.asset(
+                            "assets/images/lemari.png",
+                            width: double.infinity,
+                            height: screenHeight * 0.169,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Lemari",
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          ),
           Positioned(
             top: screenHeight * 0.538,
             left: screenWidth * 0,
@@ -310,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           topRight: Radius.circular(10),
                         ),
                         child: Image.asset(
-                          "assets/images/backdrop.jpg",
+                          "assets/images/backdrop2.jpg",
                           width: double.infinity,
                           height: screenHeight * 0.169,
                           fit: BoxFit.cover,
@@ -320,9 +546,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           "Backdrop",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                          style: GoogleFonts.manrope(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            fontWeight: FontWeight.w900,
                             color: Colors.black,
                           ),
                         ),
@@ -337,51 +563,59 @@ class _HomeScreenState extends State<HomeScreen> {
             top: screenHeight * 0.538,
             right: screenWidth * 0,
             left: (MediaQuery.of(context).size.width / 2) + 1,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.22,
-                decoration: BoxDecoration(
-                  color: Colors.white,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MejaScreen()),
+                );
+              },
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
-                      ),
-                      child: Image.asset(
-                        "assets/images/meja1.jpg",
-                        width: double.infinity,
-                        height: screenHeight * 0.169,
-                        fit: BoxFit.cover,
-                      ),
+                child: Container(
+                    width: (MediaQuery.of(context).size.width / 2) - 4,
+                    height: screenHeight * 0.22,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Meja Rias",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                          ),
+                          child: Image.asset(
+                            "assets/images/meja1.jpg",
+                            width: double.infinity,
+                            height: screenHeight * 0.169,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Meja Rias",
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
               ),
             ),
           ),
           Positioned(
-            top: screenHeight * 0.763,
+            top: screenHeight * 0.764,
             left: screenWidth * 0,
             child: Card(
               elevation: 4,
@@ -390,7 +624,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Container(
                 width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.22,
+                height: screenHeight * 0.223,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -419,9 +653,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text(
                             "Custom",
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w900,
                               color: Colors.black,
                             ),
                           ),
@@ -434,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Positioned(
-            top: screenHeight * 0.763,
+            top: screenHeight * 0.764,
             left: (MediaQuery.of(context).size.width / 2) + 4,
             right: screenWidth * 0,
             child: GestureDetector(
@@ -452,7 +687,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Container(
                   width: (MediaQuery.of(context).size.width / 2) - 4,
-                  height: screenHeight * 0.22,
+                  height: screenHeight * 0.223,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -466,6 +701,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
                             "assets/images/setting.jpg",
+                            width: double.infinity,
+                            height: screenHeight * 0.169,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -481,9 +718,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Text(
                               "Setting",
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                              style: GoogleFonts.manrope(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035,
+                                fontWeight: FontWeight.w900,
                                 color: Colors.black,
                               ),
                             ),
