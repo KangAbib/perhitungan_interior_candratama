@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ganesha_interior/Invoice/INV_tipe_straight.dart';
 import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,8 +12,10 @@ class Tipe_Straight extends StatefulWidget {
 }
 
 class _Tipe_StraightState extends State<Tipe_Straight> {
-  TextEditingController hargaAtasController = TextEditingController(text: "Rp ");
-  TextEditingController hargaBawahController = TextEditingController(text: "Rp ");
+  TextEditingController hargaAtasController =
+      TextEditingController(text: "Rp ");
+  TextEditingController hargaBawahController =
+      TextEditingController(text: "Rp ");
   TextEditingController hasilJumlahController =
       TextEditingController(text: "Rp ");
   TextEditingController topTableController = TextEditingController(text: "Rp ");
@@ -101,6 +104,7 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Container(
@@ -141,6 +145,7 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                     Row(
                       children: [
                         GestureDetector(
+                          onTap: () => FocusScope.of(context).unfocus(),
                           onTapDown: _onTapDown,
                           onTapUp: _onTapUp,
                           onTapCancel: _onTapCancel,
@@ -241,9 +246,8 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   SizedBox(height: 5),
                                   TextField(
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth *
-                                          0.04, // Sesuaikan ukuran font
-                                      fontWeight: FontWeight.w400, // Regular
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
                                       hintText: "Masukkan nama",
@@ -272,9 +276,8 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   TextField(
                                     maxLines: 3,
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth *
-                                          0.04, // Sesuaikan ukuran font
-                                      fontWeight: FontWeight.w400, // Regular
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
                                       hintText: "Masukkan alamat lengkap",
@@ -328,7 +331,13 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                        vertical: 22,
+                                                        vertical: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width >
+                                                                600
+                                                            ? 22
+                                                            : 12,
                                                         horizontal: 12),
                                               ),
                                               keyboardType:
@@ -343,7 +352,14 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          SizedBox(height: 40),
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                        .size
+                                                        .width >
+                                                    600
+                                                ? 40
+                                                : 20,
+                                          ),
                                           Text("X",
                                               style: TextStyle(
                                                   fontSize: screenWidth * 0.04,
@@ -371,10 +387,8 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                             TextField(
                                               controller: hargaAtasController,
                                               style: GoogleFonts.manrope(
-                                                fontSize: screenWidth *
-                                                    0.04, // Sesuaikan ukuran font
-                                                fontWeight:
-                                                    FontWeight.w400, // Regular
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -427,10 +441,8 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                             TextField(
                                               controller: hasilJumlahController,
                                               style: GoogleFonts.manrope(
-                                                fontSize: screenWidth *
-                                                    0.04, // Sesuaikan ukuran font
-                                                fontWeight:
-                                                    FontWeight.w400, // Regular
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -497,9 +509,14 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                        vertical: 22,
+                                                        vertical: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width >
+                                                                600
+                                                            ? 22
+                                                            : 12,
                                                         horizontal: 12),
-                
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -513,7 +530,14 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          SizedBox(height: 40),
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                        .size
+                                                        .width >
+                                                    600
+                                                ? 40
+                                                : 20,
+                                          ),
                                           Text("X",
                                               style: TextStyle(
                                                   fontSize: screenWidth * 0.04,
@@ -541,10 +565,8 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                             TextField(
                                               controller: hargaBawahController,
                                               style: GoogleFonts.manrope(
-                                                fontSize: screenWidth *
-                                                    0.04, // Sesuaikan ukuran font
-                                                fontWeight:
-                                                    FontWeight.w400, // Regular
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -598,10 +620,8 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                             TextField(
                                               controller: hasilJumlahController,
                                               style: GoogleFonts.manrope(
-                                                fontSize: screenWidth *
-                                                    0.04, // Sesuaikan ukuran font
-                                                fontWeight:
-                                                    FontWeight.w400, // Regular
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -643,17 +663,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   TextField(
                                     controller: topTableController,
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth *
-                                          0.04, // Sesuaikan ukuran font
-                                      fontWeight: FontWeight.w400, // Regular
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       contentPadding: EdgeInsets.symmetric(
-                                          vertical: 10,
-                                          horizontal: 12), // Tambahkan di sini
+                                          vertical: 10, horizontal: 12),
                                     ),
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) =>
@@ -679,17 +697,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   TextField(
                                     controller: backsplashController,
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth *
-                                          0.04, // Sesuaikan ukuran font
-                                      fontWeight: FontWeight.w400, // Regular
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       contentPadding: EdgeInsets.symmetric(
-                                          vertical: 10,
-                                          horizontal: 12), // Tambahkan di sini
+                                          vertical: 10, horizontal: 12),
                                     ),
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) => formatInput(
@@ -715,17 +731,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   TextField(
                                     controller: aksesorisController,
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth *
-                                          0.04, // Sesuaikan ukuran font
-                                      fontWeight: FontWeight.w400, // Regular
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       contentPadding: EdgeInsets.symmetric(
-                                          vertical: 10,
-                                          horizontal: 12), // Tambahkan di sini
+                                          vertical: 10, horizontal: 12),
                                     ),
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) =>
@@ -751,17 +765,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   TextField(
                                     controller: uangMukaController,
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth *
-                                          0.04, // Sesuaikan ukuran font
-                                      fontWeight: FontWeight.w400, // Regular
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       contentPadding: EdgeInsets.symmetric(
-                                          vertical: 10,
-                                          horizontal: 12), // Tambahkan di sini
+                                          vertical: 10, horizontal: 12),
                                     ),
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) =>
@@ -781,6 +793,69 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
           ),
         ],
       ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00BFA5),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/keranjang_putih.png",
+                      height: MediaQuery.of(context).size.height * 0.035,
+                      width: MediaQuery.of(context).size.height * 0.035,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 1),
+            Expanded(
+  flex: 1,
+  child: ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_TipeStraight(),
+        ),
+      );
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFFFF5252),
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+      ),
+    ),
+    child: Text(
+      'Hitung',
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: MediaQuery.of(context).size.width * 0.052,
+      ),
+    ),
+  ),
+),
+
+          ],
+        ),
+      ),
     );
   }
+
+  dynamic get bottomNavigationBar => bottomNavigationBar;
 }
