@@ -154,30 +154,30 @@ class INV_TipeStraight extends StatelessWidget {
             Padding(
   padding: const EdgeInsets.only(left: 0.0),
   child: Column(
-    crossAxisAlignment: CrossAxisAlignment.end, // Menjaga konten di kanan
+    crossAxisAlignment: CrossAxisAlignment.end, // Semua elemen sejajar ke kanan
     children: [
+      // Uang Muka
+      Text(
+        "Uang Muka : Rp ",
+        style: TextStyle(
+          fontSize: getResponsiveFontSize(context, factor: 0.03),
+        ),
+      ),
+
+      // Row untuk Garis dan Tanda Minus
       Row(
-        mainAxisAlignment: MainAxisAlignment.end, // Menempatkan konten di kanan
+        mainAxisAlignment: MainAxisAlignment.end, // Elemen sejajar ke kanan
         children: [
-          // Menggunakan Column untuk meletakkan Text dan Divider
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end, // Teks dan divider ke kanan
-            children: [
-              Text(
-                "Uang Muka : Rp ",
-                style: TextStyle(
-                  fontSize: getResponsiveFontSize(context, factor: 0.03),
-                ),
-              ),
-              Divider(
-                thickness: 2,
-                color: Colors.black,
-                indent: MediaQuery.of(context).size.width * 0.2, // Mengurangi panjang garis
-                endIndent: MediaQuery.of(context).size.width * 0.2, // Mengurangi panjang garis
-              ),
-            ],
+          // Garis di sebelah kiri tanda minus
+          Expanded(
+            child: Divider(
+              thickness: 2,
+              color: Colors.black,
+              indent: MediaQuery.of(context).size.width * 0.7, // Sesuaikan panjang garis
+              endIndent: 5, // Jarak ke tanda minus
+            ),
           ),
-          SizedBox(width: 3), // Jarak antara teks dan tanda kurang
+          // Tanda Minus
           Text(
             "-",
             style: TextStyle(
@@ -187,6 +187,8 @@ class INV_TipeStraight extends StatelessWidget {
           ),
         ],
       ),
+
+      // Pelunasan
       Text(
         "Pelunasan : Rp ",
         style: TextStyle(
@@ -196,6 +198,7 @@ class INV_TipeStraight extends StatelessWidget {
     ],
   ),
 ),
+
 
           ],
         ),
