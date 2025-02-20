@@ -56,48 +56,6 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
     }
   }
 
-  void _onTapDown(TapDownDetails details) {
-    setState(() {
-      _scale = 0.9;
-      _opacity = 0.7;
-    });
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    setState(() {
-      _scale = 1.0;
-      _opacity = 1.0;
-    });
-    _navigateBack();
-  }
-
-  void _onTapCancel() {
-    setState(() {
-      _scale = 1.0;
-      _opacity = 1.0;
-    });
-  }
-
-  void _navigateBack() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 300),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
-        transitionsBuilder: (_, animation, __, child) {
-          const begin = Offset(-1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOut;
-
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          var offsetAnimation = animation.drive(tween);
-
-          return SlideTransition(position: offsetAnimation, child: child);
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -145,23 +103,14 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: () => FocusScope.of(context).unfocus(),
-                          onTapDown: _onTapDown,
-                          onTapUp: _onTapUp,
-                          onTapCancel: _onTapCancel,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
-                            transform: Matrix4.identity()..scale(_scale),
-                            child: Opacity(
-                              opacity: _opacity,
-                              child: Image.asset(
-                                "assets/images/back.png",
-                                height: screenHeight * 0.03,
-                                width: screenHeight * 0.03,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Image.asset(
+                            "assets/images/back.png",
+                            height: screenHeight * 0.03,
+                            width: screenHeight * 0.03,
+                            fit: BoxFit.contain,
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -169,7 +118,9 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                           "Kitchen Set",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
-                            fontSize: MediaQuery.of(context).size.width * 0.04,
+                            fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.045
+                                : MediaQuery.of(context).size.width * 0.04,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -221,7 +172,17 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                     child: Text(
                                       "Tipe Straight",
                                       style: GoogleFonts.manrope(
-                                        fontSize: screenWidth * 0.05,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width <
+                                                    600
+                                                ? MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.05
+                                                : MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.045,
                                         fontWeight: FontWeight.w900,
                                         color: Color(0xFFFF5252),
                                       ),
@@ -246,7 +207,14 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   SizedBox(height: 5),
                                   TextField(
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth * 0.04,
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? MediaQuery.of(context).size.width *
+                                              0.04
+                                          : MediaQuery.of(context).size.width *
+                                              0.035,
                                       fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
@@ -276,7 +244,14 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                   TextField(
                                     maxLines: 3,
                                     style: GoogleFonts.manrope(
-                                      fontSize: screenWidth * 0.04,
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? MediaQuery.of(context).size.width *
+                                              0.04
+                                          : MediaQuery.of(context).size.width *
+                                              0.035,
                                       fontWeight: FontWeight.w400,
                                     ),
                                     decoration: InputDecoration(
@@ -813,7 +788,10 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                   children: [
                     Image.asset(
                       "assets/images/keranjang_putih.png",
-                      height: MediaQuery.of(context).size.height * 0.035,
+                      height: MediaQuery.of(context).size.height *
+                          (MediaQuery.of(context).size.width > 600
+                              ? 0.04
+                              : 0.03),
                       width: MediaQuery.of(context).size.height * 0.035,
                       fit: BoxFit.contain,
                     ),
@@ -823,34 +801,33 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
             ),
             const SizedBox(width: 1),
             Expanded(
-  flex: 1,
-  child: ElevatedButton(
-    onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const INV_TipeStraight(),
-        ),
-      );
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFFFF5252),
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
-    ),
-    child: Text(
-      'Hitung',
-      style: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: MediaQuery.of(context).size.width * 0.052,
-      ),
-    ),
-  ),
-),
-
+              flex: 1,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const INV_TipeStraight(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF5252),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                child: Text(
+                  'Hitung',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: MediaQuery.of(context).size.width * 0.045,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

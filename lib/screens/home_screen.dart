@@ -21,9 +21,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  double _scale = 1.0;
-  double _opacity = 1.0;
-  double _offsetX = 0.0;
   @override
   void initState() {
     super.initState();
@@ -75,8 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Selamat Datang",
                       style: TextStyle(
                         color: Color(0xFFFF5252),
-                        fontSize: MediaQuery.of(context).size.width *
-                            0.045, // Responsive font size
+                        fontSize: MediaQuery.of(context).size.width < 600
+                            ? MediaQuery.of(context).size.width * 0.045 // HP
+                            : MediaQuery.of(context).size.width *
+                                0.04, // Tablet // Responsive font size
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -113,228 +112,157 @@ class _HomeScreenState extends State<HomeScreen> {
             top: screenHeight * 0.098,
             left: screenWidth * 0,
             child: GestureDetector(
-              onTapDown: (details) {
-                setState(() {
-                  _scale = 0.95;
-                  _opacity = 0.7;
-                  _offsetX = 10.0;
-                });
-              },
-              onTapUp: (details) {
-                setState(() {
-                  _scale = 1.0;
-                  _opacity = 1.0;
-                  _offsetX = 0.0;
-                });
-
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (_, __, ___) => const Tipe_Straight(),
-                    transitionsBuilder: (_, animation, __, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOutQuad;
-
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-
-                      return SlideTransition(
-                          position: offsetAnimation, child: child);
-                    },
-                  ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Tipe_Straight()),
                 );
               },
-              onTapCancel: () {
-                setState(() {
-                  _scale = 1.0;
-                  _opacity = 1.0;
-                  _offsetX = 0.0;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut,
-                transform: Matrix4.translationValues(_offsetX, 0, 0)
-                  ..scale(_scale),
-                child: Opacity(
-                  opacity: _opacity,
-                  child: Card(
-                    elevation: 6,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Container(
-                      width: (screenWidth / 2) - 4,
-                      height: screenHeight * 0.205,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+              child: Card(
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Container(
+                  width: (screenWidth / 2) - 4,
+                  height: screenHeight * 0.205,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        ),
+                        child: Image.asset(
+                          "assets/images/kitchen.jpg",
+                          width: double.infinity,
+                          height: screenHeight * 0.150,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Kitchen Set",
+                              style: GoogleFonts.manrope(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black,
+                              ),
                             ),
-                            child: Image.asset(
-                              "assets/images/kitchen.jpg",
-                              width: double.infinity,
-                              height: screenHeight * 0.150,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Kitchen Set",
-                                  style: GoogleFonts.manrope(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.035,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.black,
+                            PopupMenuButton<String>(
+                              padding: EdgeInsets.only(left: screenWidth * 0.1),
+                              onSelected: (value) {
+                                if (value == "Straight") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Tipe_Straight()),
+                                  );
+                                } else if (value == "Letter L") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Tipe_L()),
+                                  );
+                                } else if (value == "Letter U") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Tipe_U()),
+                                  );
+                                } else if (value == "Minibar") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Minibar()),
+                                  );
+                                } else if (value == "Meja Island") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MejaIsland()),
+                                  );
+                                }
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              color: Colors.white,
+                              elevation: 6,
+                              itemBuilder: (BuildContext context) => [
+                                PopupMenuItem(
+                                  value: "Straight",
+                                  child: Text(
+                                    "Straight",
+                                    style:
+                                        TextStyle(fontSize: screenWidth * 0.03),
                                   ),
                                 ),
-                                PopupMenuButton<String>(
-                                  padding:
-                                      EdgeInsets.only(left: screenWidth * 0.1),
-                                  onSelected: (value) {
-                                    if (value == "Straight") {
-                                      Navigator.of(context).push(
-                                        PageRouteBuilder(
-                                          transitionDuration:
-                                              const Duration(milliseconds: 500),
-                                          pageBuilder: (_, __, ___) =>
-                                              const Tipe_Straight(),
-                                          transitionsBuilder:
-                                              (_, animation, __, child) {
-                                            const begin = Offset(1.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.easeInOutQuad;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-                                            var offsetAnimation =
-                                                animation.drive(tween);
-
-                                            return SlideTransition(
-                                                position: offsetAnimation,
-                                                child: child);
-                                          },
-                                        ),
-                                      );
-                                    } else if (value == "Letter L") {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Tipe_L()),
-                                      );
-                                    } else if (value == "Letter U") {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Tipe_U()),
-                                      );
-                                    } else if (value == "Minibar") {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Minibar()),
-                                      );
-                                    } else if (value == "Meja Island") {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MejaIsland()),
-                                      );
-                                    }
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                PopupMenuItem(
+                                  value: "Letter L",
+                                  child: Text(
+                                    "Letter L",
+                                    style:
+                                        TextStyle(fontSize: screenWidth * 0.03),
                                   ),
-                                  color: Colors.white,
-                                  elevation: 6,
-                                  itemBuilder: (BuildContext context) => [
-                                    PopupMenuItem(
-                                      value: "Straight",
-                                      child: Text(
-                                        "Straight",
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.03,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: "Letter L",
-                                      child: Text(
-                                        "Letter L",
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.03,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: "Letter U",
-                                      child: Text(
-                                        "Letter U",
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.03,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: "Minibar",
-                                      child: Text(
-                                        "Minibar",
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.03,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: "Meja Island",
-                                      child: Text(
-                                        "Meja Island",
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.03,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                  child: Image.asset(
-                                    "assets/images/more.png",
-                                    width: screenWidth * 0.06,
-                                    height: screenWidth * 0.06,
-                                    fit: BoxFit.contain,
+                                ),
+                                PopupMenuItem(
+                                  value: "Letter U",
+                                  child: Text(
+                                    "Letter U",
+                                    style:
+                                        TextStyle(fontSize: screenWidth * 0.03),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: "Minibar",
+                                  child: Text(
+                                    "Minibar",
+                                    style:
+                                        TextStyle(fontSize: screenWidth * 0.03),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: "Meja Island",
+                                  child: Text(
+                                    "Meja Island",
+                                    style:
+                                        TextStyle(fontSize: screenWidth * 0.03),
                                   ),
                                 ),
                               ],
+                              child: Image.asset(
+                                "assets/images/more.png",
+                                width: screenWidth * 0.06,
+                                height: screenWidth * 0.06,
+                                fit: BoxFit.contain,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

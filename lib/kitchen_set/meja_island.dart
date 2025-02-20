@@ -22,14 +22,16 @@ class _MejaIslandState extends State<MejaIsland> {
   void _navigateBack() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 500), // Durasi lebih lama
+        transitionDuration:
+            const Duration(milliseconds: 500), // Durasi lebih lama
         pageBuilder: (_, __, ___) => const HomeScreen(),
         transitionsBuilder: (_, animation, __, child) {
           const begin = Offset(-1.0, 0.0); // Geser ke kiri
           const end = Offset.zero;
           const curve = Curves.easeInOutQuad; // Kurva lebih lembut
 
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           var offsetAnimation = animation.drive(tween);
 
           return SlideTransition(position: offsetAnimation, child: child);
@@ -74,7 +76,8 @@ class _MejaIslandState extends State<MejaIsland> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Membuat jarak antara elemen
+                  mainAxisAlignment: MainAxisAlignment
+                      .spaceBetween, // Membuat jarak antara elemen
                   children: [
                     Row(
                       children: [

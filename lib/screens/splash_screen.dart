@@ -5,7 +5,6 @@ import 'package:ganesha_interior/screens/home_screen.dart';
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
@@ -17,12 +16,11 @@ class SplashScreen extends StatelessWidget {
           ),
           (route) => false);
     });
-    
+
     return Scaffold(
       body: Center(
         child: Image.asset('assets/images/logo.png'),
       ),
     );
   }
-
 }

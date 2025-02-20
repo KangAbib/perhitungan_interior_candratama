@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "18709322318",
+    "project_id": "perhitungan-interior",
+    "storage_bucket": "perhitungan-interior.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18709322318:android:8f209eb7e8440978b7811f",
+        "android_client_info": {
+          "package_name": "com.example.ganesha_interior"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg6sH3cXBUG_tLAeXEI9a7rC2KxQmehKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,14 +22,16 @@ class _Tipe_UState extends State<Tipe_U> {
   void _navigateBack() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 500), // Durasi lebih lama
+        transitionDuration:
+            const Duration(milliseconds: 500), // Durasi lebih lama
         pageBuilder: (_, __, ___) => const HomeScreen(),
         transitionsBuilder: (_, animation, __, child) {
           const begin = Offset(-1.0, 0.0); // Geser ke kiri
           const end = Offset.zero;
           const curve = Curves.easeInOutQuad; // Kurva lebih lembut
 
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           var offsetAnimation = animation.drive(tween);
 
           return SlideTransition(position: offsetAnimation, child: child);
@@ -79,7 +81,8 @@ class _Tipe_UState extends State<Tipe_U> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: _navigateBack, // Langsung navigasi saat ditekan
+                          onTap:
+                              _navigateBack, // Langsung navigasi saat ditekan
                           child: Image.asset(
                             "assets/images/back.png",
                             height: screenHeight * 0.03,
