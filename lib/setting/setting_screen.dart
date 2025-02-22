@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -15,8 +14,6 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  double _scale = 1.0;
-  double _opacity = 1.0;
   final TextEditingController _kitchenSetAtasController =
       TextEditingController();
   final TextEditingController _kitchenSetBawahController =

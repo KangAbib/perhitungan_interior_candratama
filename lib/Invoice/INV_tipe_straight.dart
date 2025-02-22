@@ -1,8 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class INV_TipeStraight extends StatelessWidget {
+class INV_TipeStraight extends StatefulWidget {
   const INV_TipeStraight({super.key});
+
+  @override
+  State<INV_TipeStraight> createState() => _INV_TipeStraightState();
+}
+
+class _INV_TipeStraightState extends State<INV_TipeStraight> {
+  String nama = "Memuat...";
+  String alamat = "";
+
+  @override
+  void initState() {
+    super.initState();
+    ambilDataTerakhir();
+  }
+
+  void ambilDataTerakhir() async {
+    try {
+      var snapshot = await FirebaseFirestore.instance
+          .collection("pesanan")
+          .orderBy("tanggal", descending: true)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data();
+        setState(() {
+          nama = data["nama"] ?? "Nama tidak ditemukan";
+          alamat = data["alamat"] ?? "Alamat tidak ditemukan";
+        });
+      } else {
+        setState(() {
+          nama = "Data tidak tersedia";
+          alamat = "";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        nama = "Gagal memuat data";
+        alamat = "";
+      });
+    }
+  }
 
   double getResponsiveFontSize(BuildContext context, {double factor = 0.05}) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -42,32 +85,39 @@ class INV_TipeStraight extends StatelessWidget {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Kepada :",
-                        style: TextStyle(
-                          fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Kepada :",
+                          style: TextStyle(
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.0355),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        "",
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "",
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                    ],
+                        Text(
+                          nama,
+                          style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          alamat,
+                          style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03)),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +161,7 @@ class INV_TipeStraight extends StatelessWidget {
                 ),
                 child: Table(
                   columnWidths: const {
-                    0: FlexColumnWidth(3),
+                    0: FlexColumnWidth(2),
                     1: FlexColumnWidth(2),
                     2: FlexColumnWidth(1),
                     3: FlexColumnWidth(2),
