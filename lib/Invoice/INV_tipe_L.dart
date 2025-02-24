@@ -1,1 +1,322 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+class INV_Tipe_L extends StatefulWidget {
+  const INV_Tipe_L({super.key});
+
+  @override
+  State<INV_Tipe_L> createState() => _INV_TipeL();
+}
+
+class _INV_TipeL extends State<INV_Tipe_L> {
+  String nama = "Memuat...";
+  String alamat = "";
+  String hargaAtas = "";
+  String jumlahAtas = "";
+  String hasilJumlahAtas = "";
+  String hargaBawah = "";
+  String jumlahBawah = "";
+  String hasilJumlahBawah = "";
+  String topTable = "";
+  String backsplash = "";
+  String aksesoris = "";
+  String uangMuka = "";
+  String subTotal = "";
+  String pelunasan = "";
+
+  @override
+  void initState() {
+    super.initState();
+    ambilDataTerakhir();
+  }
+
+  void ambilDataTerakhir() async {
+    try {
+      var snapshot = await FirebaseFirestore.instance
+          .collection("pesanan")
+          .orderBy("tanggal", descending: true)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data();
+        setState(() {
+          nama = data["nama"] ?? "Nama tidak ditemukan";
+          alamat = data["alamat"] ?? "Alamat tidak ditemukan";
+
+          hargaAtas = data["hargaAtas"] ?? "Rp 0";
+          jumlahAtas = data["jumlahAtas"] ?? "0";
+          hasilJumlahAtas = data["hasilJumlahAtas"] ?? "Rp 0";
+
+          hargaBawah = data["hargaBawah"] ?? "Rp 0";
+          jumlahBawah = data["jumlahBawah"] ?? "0";
+          hasilJumlahBawah = data["hasilJumlahBawah"] ?? "Rp 0";
+
+          topTable = data["topTable"] ?? "Rp 0";
+          backsplash = data["backsplash"] ?? "Rp 0";
+          aksesoris = data["aksesoris"] ?? "Rp 0";
+
+          uangMuka = data["uangMuka"] ?? "Rp 0";
+          subTotal = data["subTotal"] ?? "Rp 0";
+          pelunasan = data["pelunasan"] ?? "Rp 0";
+        });
+      } else {
+        setState(() {
+          nama = "Data tidak tersedia";
+          alamat = "";
+          subTotal = "Rp 0";
+          pelunasan = "Rp 0";
+          uangMuka = "Rp 0";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        nama = "Gagal memuat data";
+        alamat = "";
+        subTotal = "Rp 0";
+        pelunasan = "Rp 0";
+        uangMuka = "Rp 0";
+      });
+    }
+  }
+
+  double getResponsiveFontSize(BuildContext context, {double factor = 0.05}) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth * factor;
+  }
+
+  
+
+  @override
+  Widget build(BuildContext context) {
+    String todayDate = DateFormat("EEEE, dd MMM yyyy").format(DateTime.now());
+    String noBayar = DateFormat("dd/MM/yyyy").format(DateTime.now());
+
+    bool isTablet = MediaQuery.of(context).size.width > 600;
+
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Detail Pembayaran",
+                    style: TextStyle(
+                      fontSize: getResponsiveFontSize(context, factor: 0.05),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Image.asset(
+                    "assets/images/logo_inv1.png",
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
+              Divider(thickness: 1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Kepada :",
+                          style: TextStyle(
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.0355),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          nama,
+                          style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          alamat,
+                          style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03)),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Tanggal :",
+                        style: TextStyle(
+                          fontSize:
+                              getResponsiveFontSize(context, factor: 0.0355),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        todayDate,
+                        style: TextStyle(
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03)),
+                      ),
+                      Text(
+                        "No Bayar :",
+                        style: TextStyle(
+                          fontSize:
+                              getResponsiveFontSize(context, factor: 0.0355),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        noBayar,
+                        style: TextStyle(
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                ),
+                child: Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(1.8),
+                    1: FlexColumnWidth(2),
+                    2: FlexColumnWidth(1),
+                    3: FlexColumnWidth(2),
+                  },
+                  border: TableBorder.all(color: Colors.black),
+                  children: [
+                    _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
+                        isHeader: true, context: context),
+                    _buildTableRow([
+                      "Kitchen atas",
+                      hargaAtas,
+                      jumlahAtas,
+                      hasilJumlahAtas
+                    ], context: context),
+                    _buildTableRow([
+                      "Kitchen bawah",
+                      hargaBawah,
+                      jumlahBawah,
+                      hasilJumlahBawah
+                    ], context: context),
+                    _buildTableRow(["Top Table", topTable, "-", topTable],
+                        context: context),
+                    _buildTableRow(["Backsplash", backsplash, "-", backsplash],
+                        context: context),
+                    _buildTableRow(["Aksesoris", aksesoris, "-", aksesoris],
+                        context: context),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Pembayaran : ${isTablet ? "Kitchen Straight" : "Straight"}",
+                    style: TextStyle(
+                      fontSize: getResponsiveFontSize(context, factor: 0.0355),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      "Sub Total : $subTotal",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "Uang Muka : $uangMuka",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            thickness: 2,
+                            color: Colors.black,
+                            indent: MediaQuery.of(context).size.width * 0.7,
+                            endIndent: 5,
+                          ),
+                        ),
+                        Text(
+                          "-",
+                          style: TextStyle(
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.04),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "Pelunasan : $pelunasan",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  TableRow _buildTableRow(List<String> cells,
+    {bool isHeader = false, required BuildContext context}) {
+  return TableRow(
+    children: cells.asMap().entries.map((entry) {
+      int index = entry.key;
+      String text = entry.value;
+
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: index == 2 ? Alignment.center : Alignment.centerLeft, // Center khusus untuk kolom ke-3
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: getResponsiveFontSize(context, factor: 0.0355),
+            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          ),
+          textAlign: index == 2 ? TextAlign.center : TextAlign.left, // Center teks hanya untuk kolom ke-3
+        ),
+      );
+    }).toList(),
+  );
+}
+}

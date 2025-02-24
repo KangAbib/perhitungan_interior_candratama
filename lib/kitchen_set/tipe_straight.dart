@@ -145,72 +145,77 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
   }
 
   void simpanDataKeFirestore() async {
-  if (namaController.text.isEmpty ||
-      alamatController.text.isEmpty ||
-      hargaAtasController.text.isEmpty ||
-      hargaBawahController.text.isEmpty ||
-      jumlahController.text.isEmpty ||  
-      jumlahBawahController.text.isEmpty || 
-      hasilJumlahAtasController.text.isEmpty ||
-      hasilJumlahBawahController.text.isEmpty ||
-      topTableController.text.isEmpty ||
-      backsplashController.text.isEmpty ||
-      aksesorisController.text.isEmpty ||
-      uangMukaController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Harap isi semua kolom sebelum menyimpan."),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
+    if (namaController.text.isEmpty ||
+        alamatController.text.isEmpty ||
+        hargaAtasController.text.isEmpty ||
+        hargaBawahController.text.isEmpty ||
+        jumlahController.text.isEmpty ||
+        jumlahBawahController.text.isEmpty ||
+        hasilJumlahAtasController.text.isEmpty ||
+        hasilJumlahBawahController.text.isEmpty ||
+        topTableController.text.isEmpty ||
+        backsplashController.text.isEmpty ||
+        aksesorisController.text.isEmpty ||
+        uangMukaController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap isi semua kolom sebelum menyimpan."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Fungsi untuk parsing nilai angka dari teks dengan format "Rp 10.000.000"
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
+
+    // Hitung Sub Total
+    double subTotal = parseValue(hasilJumlahAtasController.text) +
+        parseValue(hasilJumlahBawahController.text) +
+        parseValue(topTableController.text) +
+        parseValue(backsplashController.text) +
+        parseValue(aksesorisController.text);
+
+    double uangMuka = parseValue(uangMukaController.text);
+    double pelunasan = subTotal - uangMuka;
+
+    Map<String, dynamic> data = {
+      "nama": namaController.text,
+      "alamat": alamatController.text,
+      "hargaAtas": hargaAtasController.text,
+      "hargaBawah": hargaBawahController.text,
+      "jumlahAtas": jumlahController.text,
+      "jumlahBawah": jumlahBawahController.text,
+      "hasilJumlahAtas": hasilJumlahAtasController.text,
+      "hasilJumlahBawah": hasilJumlahBawahController.text,
+      "topTable": topTableController.text,
+      "backsplash": backsplashController.text,
+      "aksesoris": aksesorisController.text,
+      "uangMuka": uangMukaController.text,
+      "subTotal": "Rp ${_formatter.format(subTotal)}", // Simpan subTotal
+      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "tanggal": Timestamp.now(),
+    };
+
+    try {
+      await FirebaseFirestore.instance.collection("pesanan kitchen straight").add(data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Data berhasil disimpan!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  // Fungsi untuk parsing nilai angka dari teks dengan format "Rp 10.000.000"
-  double parseValue(String text) {
-    return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-  }
-
-  // Hitung Sub Total
-  double subTotal = parseValue(hasilJumlahAtasController.text) +
-                    parseValue(hasilJumlahBawahController.text) +
-                    parseValue(topTableController.text) +
-                    parseValue(backsplashController.text) +
-                    parseValue(aksesorisController.text);
-
-  Map<String, dynamic> data = {
-    "nama": namaController.text,
-    "alamat": alamatController.text,
-    "jumlahAtas": jumlahController.text, 
-    "jumlahBawah": jumlahBawahController.text, 
-    "hasilJumlahAtas": hasilJumlahAtasController.text,
-    "hasilJumlahBawah": hasilJumlahBawahController.text,
-    "topTable": topTableController.text,
-    "backsplash": backsplashController.text,
-    "aksesoris": aksesorisController.text,
-    "uangMuka": uangMukaController.text,
-    "subTotal": "Rp ${_formatter.format(subTotal)}", // Simpan subTotal
-    "tanggal": Timestamp.now(),
-  };
-
-  try {
-    await FirebaseFirestore.instance.collection("pesanan").add(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Data berhasil disimpan!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Gagal menyimpan data: $e"),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
-
 
   @override
   void dispose() {

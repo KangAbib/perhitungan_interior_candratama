@@ -1,5 +1,12 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ganesha_interior/Invoice/INV_tipe_L.dart';
+import 'package:ganesha_interior/kitchen_set/tipe_U.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class Tipe_L extends StatefulWidget {
   const Tipe_L({super.key});
@@ -9,6 +16,269 @@ class Tipe_L extends StatefulWidget {
 }
 
 class _Tipe_LState extends State<Tipe_L> {
+  TextEditingController hargaAtasController =
+      TextEditingController(text: "Rp ");
+  TextEditingController hargaBawahController =
+      TextEditingController(text: "Rp ");
+  TextEditingController hasilJumlahAtasController =
+      TextEditingController(text: "Rp ");
+  TextEditingController hasilJumlahBawahController =
+      TextEditingController(text: "Rp ");
+  TextEditingController backsplashController =
+      TextEditingController(text: "Rp ");
+  TextEditingController aksesorisController =
+      TextEditingController(text: "Rp ");
+  TextEditingController uangMukaController = TextEditingController(text: "Rp ");
+  TextEditingController jumlahAtas1Controller = TextEditingController();
+  TextEditingController jumlahAtas2Controller = TextEditingController();
+  TextEditingController jumlahBawah1Controller = TextEditingController();
+  TextEditingController jumlahBawah2Controller = TextEditingController();
+  TextEditingController _kitchenLetterLAtasController = TextEditingController();
+  TextEditingController _kitchenLetterLBawahController =
+      TextEditingController();
+  TextEditingController namaController = TextEditingController();
+  TextEditingController alamatController = TextEditingController();
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
+
+  StreamSubscription? _hargaKitchenSetAtasSubscription;
+  StreamSubscription? _hargaKitchenSetBawahSubscription;
+
+  void _setupControllerListener(TextEditingController controller) {
+    controller.addListener(() {
+      String text = controller.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+      if (text.isNotEmpty) {
+        int parsedValue = int.tryParse(text) ?? 0;
+        String formattedText = "Rp ${_formatter.format(parsedValue)}";
+
+        if (controller.text != formattedText) {
+          controller.value = TextEditingValue(
+            text: formattedText,
+            selection: TextSelection.collapsed(offset: formattedText.length),
+          );
+        }
+      }
+    });
+  }
+
+  void listenToKitchenLetterL() {
+    _firestore
+        .collection("ukuran_kitchen_set")
+        .doc("Letter L")
+        .snapshots()
+        .listen((DocumentSnapshot doc) {
+      if (doc.exists && doc.data() != null) {
+        double setAtas = (doc["set_atas"] as num).toDouble();
+        double setBawah = (doc["set_bawah"] as num).toDouble();
+
+        setState(() {
+          _kitchenLetterLAtasController.text = setAtas.toString();
+          _kitchenLetterLBawahController.text = setBawah.toString();
+        });
+
+        print(
+            "🔥 Data dari Firestore: set_atas = $setAtas, set_bawah = $setBawah");
+      } else {
+        print("⚠️ Data Letter L tidak ditemukan di Firestore!");
+      }
+    }, onError: (e) {
+      print("❌ Error mengambil data Letter L: $e");
+    });
+  }
+
+  void _updateHasilJumlah({required bool isAtas}) {
+  double parseValue(String text) {
+    String cleanedText = text.replaceAll(RegExp(r'[^0-9]'), ''); // Hanya angka
+    return cleanedText.isNotEmpty ? double.tryParse(cleanedText) ?? 0 : 0;
+  }
+
+  double jumlah1 = parseValue(
+      isAtas ? jumlahAtas1Controller.text : jumlahBawah1Controller.text);
+  double jumlah2 = parseValue(
+      isAtas ? jumlahAtas2Controller.text : jumlahBawah2Controller.text);
+  double setValue = parseValue(isAtas
+      ? _kitchenLetterLAtasController.text
+      : _kitchenLetterLBawahController.text);
+  double harga = parseValue(
+      isAtas ? hargaAtasController.text : hargaBawahController.text);
+
+  // Debugging untuk melihat nilai yang dikonversi
+  print("🔥 jumlah1: $jumlah1, jumlah2: $jumlah2, setValue: $setValue, harga: $harga");
+
+  if (harga == 0) {
+    print("⚠️ Warning: Harga masih Rp 0, pastikan harga sudah diinput dengan benar.");
+  }
+
+  double hasil = (jumlah1 + jumlah2 - setValue).clamp(0, double.infinity) * harga;
+  String hasilFormatted = "Rp ${_formatter.format(hasil)}";
+
+  setState(() {
+    if (isAtas) {
+      hasilJumlahAtasController.text = hasilFormatted;
+    } else {
+      hasilJumlahBawahController.text = hasilFormatted;
+    }
+  });
+
+  updateUangMuka();
+}
+
+
+  void listenToHargaKitchenSet(String docId, TextEditingController controller) {
+    StreamSubscription? subscription = _firestore
+        .collection("harga_kitchen_set")
+        .doc(docId)
+        .snapshots()
+        .listen((DocumentSnapshot doc) {
+      if (doc.exists && doc.data() != null) {
+        var hargaRaw = doc["harga"].toString();
+        print("🔥 Harga dari Firestore ($docId): $hargaRaw");
+
+        int harga =
+            int.tryParse(hargaRaw.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+        print("✅ Harga setelah parsing ($docId): $harga");
+
+        String hargaFormatted = "Rp ${_formatter.format(harga)}";
+
+        if (controller.text != hargaFormatted) {
+          controller.value = TextEditingValue(
+            text: hargaFormatted,
+            selection: TextSelection.collapsed(offset: hargaFormatted.length),
+          );
+        }
+        print("📌 Controller $docId terupdate: ${controller.text}");
+      } else {
+        controller.value = const TextEditingValue(text: "Data Tidak Ada");
+      }
+    }, onError: (e) {
+      controller.value = TextEditingValue(text: "Error: $e");
+    });
+
+    if (docId == "Kitchen Set Atas") {
+      _hargaKitchenSetAtasSubscription = subscription;
+    } else if (docId == "Kitchen Set Bawah") {
+      _hargaKitchenSetBawahSubscription = subscription;
+    }
+  }
+
+  void updateUangMuka() {
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
+
+    double hasilAtas = parseValue(hasilJumlahAtasController.text);
+    double hasilBawah = parseValue(hasilJumlahBawahController.text);
+    double backsplash = parseValue(backsplashController.text);
+    double aksesoris = parseValue(aksesorisController.text);
+
+    double total = hasilAtas + hasilBawah + backsplash + aksesoris;
+    double uangMuka = total * 0.6;
+
+    setState(() {
+      uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
+    });
+  }
+
+  void simpanDataKeFirestore() async {
+    if (namaController.text.isEmpty ||
+        alamatController.text.isEmpty ||
+        hargaAtasController.text.isEmpty ||
+        hargaBawahController.text.isEmpty ||
+        jumlahAtas1Controller.text.isEmpty ||
+        jumlahAtas2Controller.text.isEmpty ||
+        jumlahBawah1Controller.text.isEmpty ||
+        jumlahBawah2Controller.text.isEmpty ||
+        hasilJumlahAtasController.text.isEmpty ||
+        hasilJumlahBawahController.text.isEmpty ||
+        backsplashController.text.isEmpty ||
+        aksesorisController.text.isEmpty ||
+        uangMukaController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap isi semua kolom sebelum menyimpan."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
+
+    double jumlahAtas = parseValue(jumlahAtas1Controller.text) +
+        parseValue(jumlahAtas2Controller.text);
+
+    double jumlahBawah = parseValue(jumlahBawah1Controller.text) +
+        parseValue(jumlahBawah2Controller.text);
+
+    double subTotal = parseValue(hasilJumlahAtasController.text) +
+        parseValue(hasilJumlahBawahController.text) +
+        parseValue(backsplashController.text) +
+        parseValue(aksesorisController.text);
+
+    double uangMuka = parseValue(uangMukaController.text);
+    double pelunasan = subTotal - uangMuka;
+
+    Map<String, dynamic> data = {
+      "nama": namaController.text,
+      "alamat": alamatController.text,
+      "hargaAtas": hargaAtasController.text,
+      "hargaBawah": hargaBawahController.text,
+      "jumlahAtas": jumlahAtas.toString(),
+      "jumlahBawah": jumlahBawah.toString(),
+      "hasilJumlahAtas": hasilJumlahAtasController.text,
+      "hasilJumlahBawah": hasilJumlahBawahController.text,
+      "backsplash": backsplashController.text,
+      "aksesoris": aksesorisController.text,
+      "uangMuka": uangMukaController.text,
+      "subTotal": "Rp ${_formatter.format(subTotal)}",
+      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "tanggal": Timestamp.now(),
+    };
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("pesanan kitchen letter L")
+          .add(data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Data berhasil disimpan!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _hargaKitchenSetAtasSubscription?.cancel();
+    _hargaKitchenSetBawahSubscription?.cancel();
+    hasilJumlahAtasController.removeListener(updateUangMuka);
+    hasilJumlahBawahController.removeListener(updateUangMuka);
+    backsplashController.removeListener(updateUangMuka);
+    aksesorisController.removeListener(updateUangMuka);
+
+    hargaAtasController.dispose();
+    hargaBawahController.dispose();
+    hasilJumlahAtasController.dispose();
+    hasilJumlahBawahController.dispose();
+    backsplashController.dispose();
+    aksesorisController.dispose();
+    uangMukaController.dispose();
+
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -16,8 +286,29 @@ class _Tipe_LState extends State<Tipe_L> {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
     ));
+
+    _setupControllerListener(hargaAtasController);
+    _setupControllerListener(hargaBawahController);
+    _setupControllerListener(backsplashController);
+    _setupControllerListener(aksesorisController);
+    _setupControllerListener(uangMukaController);
+    listenToHargaKitchenSet("Kitchen Set Atas", hargaAtasController);
+    listenToHargaKitchenSet("Kitchen Set Bawah", hargaBawahController);
+
+    listenToKitchenLetterL();
+
+    listenToHargaKitchenSet("Kitchen Set Atas", hargaAtasController);
+    listenToHargaKitchenSet("Kitchen Set Bawah", hargaBawahController);
   }
 
+  void formatInput(TextEditingController controller, String value) {
+    if (!value.startsWith("Rp ")) {
+      controller.value = TextEditingValue(
+        text: "Rp ${value.replaceAll(RegExp(r'[^0-9]'), '')}",
+        selection: TextSelection.collapsed(offset: controller.text.length),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +316,7 @@ class _Tipe_LState extends State<Tipe_L> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Container(
@@ -32,22 +324,27 @@ class _Tipe_LState extends State<Tipe_L> {
             height: screenHeight,
             color: const Color(0xFFD9D9D9),
           ),
-          Container(
-            height: screenHeight * 0.07,
-            width: screenWidth,
-            color: const Color(0xFFFF5252),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: screenHeight * 0.07,
+              width: screenWidth,
+              color: const Color(0xFFFF5252),
+            ),
           ),
           Positioned(
-            top: screenHeight * 0.035,
-            left: screenWidth * 0.02,
-            right: screenWidth * 0.03,
+            top: screenHeight * 0.034,
+            left: screenWidth * 0.01,
+            right: screenWidth * 0.01,
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Container(
-                height: screenHeight * 0.05,
+                height: screenHeight * 0.055,
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
@@ -63,19 +360,21 @@ class _Tipe_LState extends State<Tipe_L> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                              child: Image.asset(
-                                "assets/images/back.png",
-                                height: screenHeight * 0.03,
-                                width: screenHeight * 0.03,
-                                fit: BoxFit.contain,
+                          child: Image.asset(
+                            "assets/images/back.png",
+                            height: screenHeight * 0.03,
+                            width: screenHeight * 0.03,
+                            fit: BoxFit.contain,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                        Text(
                           "Kitchen Set",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
-                            fontSize: 18,
+                            fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.045
+                                : MediaQuery.of(context).size.width * 0.04,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -92,8 +391,838 @@ class _Tipe_LState extends State<Tipe_L> {
               ),
             ),
           ),
+          Positioned.fill(
+            top: screenHeight * 0.097,
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: screenHeight - screenHeight * 0.097,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Image.asset(
+                                "assets/images/Background.jpg",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      "Tipe Letter L",
+                                      style: GoogleFonts.manrope(
+                                        fontSize:
+                                            MediaQuery.of(context).size.width <
+                                                    600
+                                                ? MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.05
+                                                : MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.045,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFFF5252),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Nama Klien",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    controller: namaController,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? MediaQuery.of(context).size.width *
+                                              0.04
+                                          : MediaQuery.of(context).size.width *
+                                              0.035,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: "Masukkan nama",
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Alamat",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    maxLines: 3,
+                                    controller: alamatController,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? MediaQuery.of(context).size.width *
+                                              0.04
+                                          : MediaQuery.of(context).size.width *
+                                              0.035,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: "Masukkan alamat lengkap",
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 3,
+                                            child: Text(
+                                              MediaQuery.of(context)
+                                                          .size
+                                                          .width >
+                                                      600
+                                                  ? "Kitchen Set Atas"
+                                                  : "Atas",
+                                              style: GoogleFonts.lato(
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.032,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              width:
+                                                  10), // Jarak antara "Atas" dan "Harga"
+                                          Text(
+                                            "Harga",
+                                            style: GoogleFonts.lato(
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.032,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              width:
+                                                  60), // ✅ Tambahkan jarak dari kanan
+                                        ],
+                                      ),
+                                      SizedBox(height: 5),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller: jumlahAtas1Controller,
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 22
+                                                          : 12,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                _updateHasilJumlah(
+                                                    isAtas: true);
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "+",
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.06,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller: jumlahAtas2Controller,
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 22
+                                                          : 12,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                _updateHasilJumlah(
+                                                    isAtas: false);
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "-",
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.06,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller:
+                                                  _kitchenLetterLAtasController,
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 22
+                                                          : 12,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                              readOnly: true,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "X",
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.04,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            flex: 2,
+                                            child: TextField(
+                                              controller: hargaAtasController,
+                                              readOnly: true,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 12),
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
+                                              ),
+                                              keyboardType: TextInputType.none,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Hasil Jumlah",
+                                          style: GoogleFonts.lato(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.032,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        TextField(
+                                          controller: hasilJumlahAtasController,
+                                          readOnly: true,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
+                                            filled: true,
+                                            fillColor: Colors.grey[200],
+                                          ),
+                                          keyboardType: TextInputType.none,
+                                          onChanged: (value) =>
+                                              updateUangMuka(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              MediaQuery.of(context)
+                                                          .size
+                                                          .width >
+                                                      600
+                                                  ? "Kitchen Set Bawah"
+                                                  : "Bawah",
+                                              style: GoogleFonts.lato(
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.032,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            "Harga",
+                                            style: GoogleFonts.lato(
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.032,
+                                            ),
+                                          ),
+                                          SizedBox(width: 60),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller:
+                                                  jumlahBawah1Controller,
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 22
+                                                          : 12,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                _updateHasilJumlah(
+                                                    isAtas: true);
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "+",
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.06,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller:
+                                                  jumlahBawah2Controller,
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 22
+                                                          : 12,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                _updateHasilJumlah(
+                                                    isAtas: false);
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "-",
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.06,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller:
+                                                  _kitchenLetterLBawahController,
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 22
+                                                          : 12,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                              readOnly: true,
+                                              onChanged: (value) {
+                                                _updateHasilJumlah(
+                                                    isAtas: false);
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "X",
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.04,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            flex: 2,
+                                            child: TextField(
+                                              controller: hargaBawahController,
+                                              readOnly: true,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 12),
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
+                                              ),
+                                              keyboardType: TextInputType.none,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Hasil Jumlah",
+                                          style: GoogleFonts.lato(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.032,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        TextField(
+                                          controller:
+                                              hasilJumlahBawahController,
+                                          readOnly: true,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
+                                            filled: true,
+                                            fillColor: Colors.grey[200],
+                                          ),
+                                          keyboardType: TextInputType.none,
+                                          onChanged: (value) =>
+                                              updateUangMuka(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Backsplash",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    controller: backsplashController,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 12),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      formatInput(backsplashController, value);
+                                      updateUangMuka();
+                                    },
+                                  ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Aksesoris",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    controller: aksesorisController,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 12),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      formatInput(aksesorisController, value);
+                                      updateUangMuka();
+                                    },
+                                  ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Uang Muka",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    controller: uangMukaController,
+                                    readOnly: true,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 12),
+                                      filled: true,
+                                      fillColor: Colors.grey[200],
+                                    ),
+                                    keyboardType: TextInputType.none,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Tipe_U()),
+                                  );
+                                },
+                                child: Image.asset(
+                                  "assets/images/back_rotasi.png",
+                                  width: 30,
+                                  height: 30,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00BFA5),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/keranjang_putih.png",
+                      height: MediaQuery.of(context).size.height *
+                          (MediaQuery.of(context).size.width > 600
+                              ? 0.04
+                              : 0.03),
+                      width: MediaQuery.of(context).size.height * 0.035,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 1),
+            Expanded(
+              flex: 1,
+              child: ElevatedButton(
+                onPressed: () {
+                  simpanDataKeFirestore();
+
+                  if (namaController.text.isNotEmpty &&
+                      alamatController.text.isNotEmpty &&
+                      hargaAtasController.text.isNotEmpty &&
+                      hargaBawahController.text.isNotEmpty &&
+                      hasilJumlahAtasController.text.isNotEmpty &&
+                      hasilJumlahBawahController.text.isNotEmpty &&
+                      backsplashController.text.isNotEmpty &&
+                      aksesorisController.text.isNotEmpty &&
+                      uangMukaController.text.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const INV_Tipe_L(),
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF5252),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                child: Text(
+                  'Hitung',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: MediaQuery.of(context).size.width * 0.045,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  dynamic get bottomNavigationBar => bottomNavigationBar;
 }

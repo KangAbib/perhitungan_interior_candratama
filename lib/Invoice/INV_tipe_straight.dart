@@ -12,6 +12,18 @@ class INV_TipeStraight extends StatefulWidget {
 class _INV_TipeStraightState extends State<INV_TipeStraight> {
   String nama = "Memuat...";
   String alamat = "";
+  String hargaAtas = "";
+  String jumlahAtas = "";
+  String hasilJumlahAtas = "";
+  String hargaBawah = "";
+  String jumlahBawah = "";
+  String hasilJumlahBawah = "";
+  String topTable = "";
+  String backsplash = "";
+  String aksesoris = "";
+  String uangMuka = "";
+  String subTotal = "";
+  String pelunasan = "";
 
   @override
   void initState() {
@@ -22,7 +34,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
   void ambilDataTerakhir() async {
     try {
       var snapshot = await FirebaseFirestore.instance
-          .collection("pesanan")
+          .collection("pesanan kitchen straight")
           .orderBy("tanggal", descending: true)
           .limit(1)
           .get();
@@ -32,17 +44,39 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
+
+          hargaAtas = data["hargaAtas"] ?? "Rp 0";
+          jumlahAtas = data["jumlahAtas"] ?? "0";
+          hasilJumlahAtas = data["hasilJumlahAtas"] ?? "Rp 0";
+
+          hargaBawah = data["hargaBawah"] ?? "Rp 0";
+          jumlahBawah = data["jumlahBawah"] ?? "0";
+          hasilJumlahBawah = data["hasilJumlahBawah"] ?? "Rp 0";
+
+          topTable = data["topTable"] ?? "Rp 0";
+          backsplash = data["backsplash"] ?? "Rp 0";
+          aksesoris = data["aksesoris"] ?? "Rp 0";
+
+          uangMuka = data["uangMuka"] ?? "Rp 0";
+          subTotal = data["subTotal"] ?? "Rp 0";
+          pelunasan = data["pelunasan"] ?? "Rp 0";
         });
       } else {
         setState(() {
           nama = "Data tidak tersedia";
           alamat = "";
+          subTotal = "Rp 0";
+          pelunasan = "Rp 0";
+          uangMuka = "Rp 0";
         });
       }
     } catch (e) {
       setState(() {
         nama = "Gagal memuat data";
         alamat = "";
+        subTotal = "Rp 0";
+        pelunasan = "Rp 0";
+        uangMuka = "Rp 0";
       });
     }
   }
@@ -51,6 +85,8 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
     double screenWidth = MediaQuery.of(context).size.width;
     return screenWidth * factor;
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +197,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                 ),
                 child: Table(
                   columnWidths: const {
-                    0: FlexColumnWidth(2),
+                    0: FlexColumnWidth(1.8),
                     1: FlexColumnWidth(2),
                     2: FlexColumnWidth(1),
                     3: FlexColumnWidth(2),
@@ -170,14 +206,24 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                   children: [
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
-                    _buildTableRow(["Kitchen atas", "", "", ""],
+                    _buildTableRow([
+                      "Kitchen atas",
+                      hargaAtas,
+                      jumlahAtas,
+                      hasilJumlahAtas
+                    ], context: context),
+                    _buildTableRow([
+                      "Kitchen bawah",
+                      hargaBawah,
+                      jumlahBawah,
+                      hasilJumlahBawah
+                    ], context: context),
+                    _buildTableRow(["Top Table", topTable, "-", topTable],
                         context: context),
-                    _buildTableRow(["Kitchen bawah", "", "", ""],
+                    _buildTableRow(["Backsplash", backsplash, "-", backsplash],
                         context: context),
-                    _buildTableRow(["Top Table", "", "", ""], context: context),
-                    _buildTableRow(["Backsplash", "", "", ""],
+                    _buildTableRow(["Aksesoris", aksesoris, "-", aksesoris],
                         context: context),
-                    _buildTableRow(["Aksesoris", "", "", ""], context: context),
                   ],
                 ),
               ),
@@ -195,7 +241,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
-                      "Sub Total : Rp ",
+                      "Sub Total : $subTotal",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),
@@ -209,7 +255,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "Uang Muka : Rp ",
+                      "Uang Muka : $uangMuka",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),
@@ -236,7 +282,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                       ],
                     ),
                     Text(
-                      "Pelunasan : Rp ",
+                      "Pelunasan : $pelunasan",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),
@@ -252,21 +298,25 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
   }
 
   TableRow _buildTableRow(List<String> cells,
-      {bool isHeader = false, required BuildContext context}) {
-    return TableRow(
-      children: cells.map((cell) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            cell,
-            style: TextStyle(
-              fontSize: getResponsiveFontSize(context, factor: 0.0355),
-              fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-            ),
-            textAlign: isHeader ? TextAlign.center : TextAlign.left,
+    {bool isHeader = false, required BuildContext context}) {
+  return TableRow(
+    children: cells.asMap().entries.map((entry) {
+      int index = entry.key;
+      String text = entry.value;
+
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: index == 2 ? Alignment.center : Alignment.centerLeft, // Center khusus untuk kolom ke-3
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: getResponsiveFontSize(context, factor: 0.0355),
+            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
           ),
-        );
-      }).toList(),
-    );
-  }
+          textAlign: index == 2 ? TextAlign.center : TextAlign.left, // Center teks hanya untuk kolom ke-3
+        ),
+      );
+    }).toList(),
+  );
+}
 }
