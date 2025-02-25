@@ -40,7 +40,7 @@ class _Tipe_LState extends State<Tipe_L> {
   TextEditingController alamatController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
+  final NumberFormat _formatter = NumberFormat("#,##0", "id_ID");
 
   StreamSubscription? _hargaKitchenSetAtasSubscription;
   StreamSubscription? _hargaKitchenSetBawahSubscription;
@@ -88,43 +88,57 @@ class _Tipe_LState extends State<Tipe_L> {
     });
   }
 
-  void _updateHasilJumlah({required bool isAtas}) {
-  double parseValue(String text) {
-    String cleanedText = text.replaceAll(RegExp(r'[^0-9]'), ''); // Hanya angka
-    return cleanedText.isNotEmpty ? double.tryParse(cleanedText) ?? 0 : 0;
+double parseValue(String text) {
+  String cleanedText = text.replaceAll(RegExp(r'[^\d,.]'), '');
+  cleanedText = cleanedText.replaceAll(',', '.');
+
+  if (cleanedText.split('.').length > 2) {
+    int firstDotIndex = cleanedText.indexOf('.');
+    cleanedText = cleanedText.replaceFirst('.', '');
   }
 
-  double jumlah1 = parseValue(
-      isAtas ? jumlahAtas1Controller.text : jumlahBawah1Controller.text);
-  double jumlah2 = parseValue(
-      isAtas ? jumlahAtas2Controller.text : jumlahBawah2Controller.text);
-  double setValue = parseValue(isAtas
-      ? _kitchenLetterLAtasController.text
-      : _kitchenLetterLBawahController.text);
-  double harga = parseValue(
-      isAtas ? hargaAtasController.text : hargaBawahController.text);
-
-  // Debugging untuk melihat nilai yang dikonversi
-  print("🔥 jumlah1: $jumlah1, jumlah2: $jumlah2, setValue: $setValue, harga: $harga");
-
-  if (harga == 0) {
-    print("⚠️ Warning: Harga masih Rp 0, pastikan harga sudah diinput dengan benar.");
-  }
-
-  double hasil = (jumlah1 + jumlah2 - setValue).clamp(0, double.infinity) * harga;
-  String hasilFormatted = "Rp ${_formatter.format(hasil)}";
-
-  setState(() {
-    if (isAtas) {
-      hasilJumlahAtasController.text = hasilFormatted;
-    } else {
-      hasilJumlahBawahController.text = hasilFormatted;
-    }
-  });
-
-  updateUangMuka();
+  double parsedValue = double.tryParse(cleanedText) ?? 0.0001;
+  
+  
+  return parsedValue; 
 }
 
+
+  void _updateHasilJumlah({required bool isAtas}) {
+    double jumlah1 = parseValue(
+        isAtas ? jumlahAtas1Controller.text : jumlahBawah1Controller.text);
+    double jumlah2 = parseValue(
+        isAtas ? jumlahAtas2Controller.text : jumlahBawah2Controller.text);
+    double kitchenSet = parseValue(isAtas
+        ? _kitchenLetterLAtasController.text
+        : _kitchenLetterLBawahController.text);
+    double harga = parseValue(
+        isAtas ? hargaAtasController.text : hargaBawahController.text);
+
+    print(
+        "🔍 jumlah1: $jumlah1, jumlah2: $jumlah2, kitchenSet: $kitchenSet, harga: $harga");
+
+    double hasil = ((jumlah1 + jumlah2 - kitchenSet) * (harga * 1000)).roundToDouble();
+
+
+    if (hasil < 0.0001) {
+      hasil = 0.0001;
+    }
+
+    print("✅ Hasil perhitungan: $hasil");
+
+    String hasilFormatted = "Rp ${_formatter.format(hasil)}";
+
+    setState(() {
+      if (isAtas) {
+        hasilJumlahAtasController.text = hasilFormatted;
+      } else {
+        hasilJumlahBawahController.text = hasilFormatted;
+      }
+    });
+
+    updateUangMuka();
+  }
 
   void listenToHargaKitchenSet(String docId, TextEditingController controller) {
     StreamSubscription? subscription = _firestore
@@ -181,45 +195,47 @@ class _Tipe_LState extends State<Tipe_L> {
     });
   }
 
-  void simpanDataKeFirestore() async {
-    if (namaController.text.isEmpty ||
-        alamatController.text.isEmpty ||
-        hargaAtasController.text.isEmpty ||
-        hargaBawahController.text.isEmpty ||
-        jumlahAtas1Controller.text.isEmpty ||
-        jumlahAtas2Controller.text.isEmpty ||
-        jumlahBawah1Controller.text.isEmpty ||
-        jumlahBawah2Controller.text.isEmpty ||
-        hasilJumlahAtasController.text.isEmpty ||
-        hasilJumlahBawahController.text.isEmpty ||
-        backsplashController.text.isEmpty ||
-        aksesorisController.text.isEmpty ||
-        uangMukaController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Harap isi semua kolom sebelum menyimpan."),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+  void simpanDataKeFirestore(BuildContext context) async {
+  if ([
+    namaController.text,
+    alamatController.text,
+    hargaAtasController.text,
+    hargaBawahController.text,
+    jumlahAtas1Controller.text,
+    jumlahAtas2Controller.text,
+    jumlahBawah1Controller.text,
+    jumlahBawah2Controller.text,
+    hasilJumlahAtasController.text,
+    hasilJumlahBawahController.text,
+    backsplashController.text,
+    aksesorisController.text,
+    uangMukaController.text
+  ].any((element) => element.isEmpty)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Harap isi semua kolom sebelum menyimpan."),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-    double parseValue(String text) {
-      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-    }
+  try {
+    double jumlahAtas = (parseValue(jumlahAtas1Controller.text) +
+        parseValue(jumlahAtas2Controller.text) -
+        parseValue(_kitchenLetterLAtasController.text)).abs();
 
-    double jumlahAtas = parseValue(jumlahAtas1Controller.text) +
-        parseValue(jumlahAtas2Controller.text);
+    double jumlahBawah = (parseValue(jumlahBawah1Controller.text) +
+        parseValue(jumlahBawah2Controller.text) -
+        parseValue(_kitchenLetterLBawahController.text)).abs();
 
-    double jumlahBawah = parseValue(jumlahBawah1Controller.text) +
-        parseValue(jumlahBawah2Controller.text);
+    double subTotal = (parseValue(hasilJumlahAtasController.text) +
+            parseValue(hasilJumlahBawahController.text) +
+            parseValue(backsplashController.text) +
+            parseValue(aksesorisController.text)) *
+        1000;
 
-    double subTotal = parseValue(hasilJumlahAtasController.text) +
-        parseValue(hasilJumlahBawahController.text) +
-        parseValue(backsplashController.text) +
-        parseValue(aksesorisController.text);
-
-    double uangMuka = parseValue(uangMukaController.text);
+    double uangMuka = parseValue(uangMukaController.text) * 1000;
     double pelunasan = subTotal - uangMuka;
 
     Map<String, dynamic> data = {
@@ -233,31 +249,39 @@ class _Tipe_LState extends State<Tipe_L> {
       "hasilJumlahBawah": hasilJumlahBawahController.text,
       "backsplash": backsplashController.text,
       "aksesoris": aksesorisController.text,
-      "uangMuka": uangMukaController.text,
-      "subTotal": "Rp ${_formatter.format(subTotal)}",
-      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "uangMuka": "Rp ${_formatter.format(uangMuka.round())}",
+      "subTotal": "Rp ${_formatter.format(subTotal.round())}",
+      "pelunasan": "Rp ${_formatter.format(pelunasan.round())}",
       "tanggal": Timestamp.now(),
     };
 
-    try {
-      await FirebaseFirestore.instance
-          .collection("pesanan kitchen letter L")
-          .add(data);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Data berhasil disimpan!"),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menyimpan data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    await FirebaseFirestore.instance
+        .collection("pesanan kitchen letter L")
+        .add(data);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Data berhasil disimpan!"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const INV_Tipe_L(),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Gagal menyimpan data: $e"),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
 
   @override
   void dispose() {
@@ -276,6 +300,12 @@ class _Tipe_LState extends State<Tipe_L> {
     aksesorisController.dispose();
     uangMukaController.dispose();
 
+    jumlahBawah1Controller.dispose();
+    jumlahBawah2Controller.dispose();
+    _kitchenLetterLBawahController.dispose();
+    hargaBawahController.dispose();
+    hasilJumlahBawahController.dispose();
+
     super.dispose();
   }
 
@@ -292,13 +322,10 @@ class _Tipe_LState extends State<Tipe_L> {
     _setupControllerListener(backsplashController);
     _setupControllerListener(aksesorisController);
     _setupControllerListener(uangMukaController);
+
     listenToHargaKitchenSet("Kitchen Set Atas", hargaAtasController);
     listenToHargaKitchenSet("Kitchen Set Bawah", hargaBawahController);
-
     listenToKitchenLetterL();
-
-    listenToHargaKitchenSet("Kitchen Set Atas", hargaAtasController);
-    listenToHargaKitchenSet("Kitchen Set Bawah", hargaBawahController);
   }
 
   void formatInput(TextEditingController controller, String value) {
@@ -542,9 +569,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(
-                                              width:
-                                                  10), // Jarak antara "Atas" dan "Harga"
+                                          SizedBox(width: 10),
                                           Text(
                                             "Harga",
                                             style: GoogleFonts.lato(
@@ -555,9 +580,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                                   0.032,
                                             ),
                                           ),
-                                          SizedBox(
-                                              width:
-                                                  60), // ✅ Tambahkan jarak dari kanan
+                                          Spacer(),
                                         ],
                                       ),
                                       SizedBox(height: 5),
@@ -587,10 +610,9 @@ class _Tipe_LState extends State<Tipe_L> {
                                               keyboardType:
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
-                                              onChanged: (value) {
-                                                _updateHasilJumlah(
-                                                    isAtas: true);
-                                              },
+                                              onChanged: (value) =>
+                                                  _updateHasilJumlah(
+                                                      isAtas: true),
                                             ),
                                           ),
                                           SizedBox(width: 5),
@@ -629,10 +651,9 @@ class _Tipe_LState extends State<Tipe_L> {
                                               keyboardType:
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
-                                              onChanged: (value) {
-                                                _updateHasilJumlah(
-                                                    isAtas: false);
-                                              },
+                                              onChanged: (value) =>
+                                                  _updateHasilJumlah(
+                                                      isAtas: true),
                                             ),
                                           ),
                                           SizedBox(width: 5),
@@ -672,7 +693,9 @@ class _Tipe_LState extends State<Tipe_L> {
                                               keyboardType:
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
-                                              readOnly: true,
+                                              onChanged: (value) =>
+                                                  _updateHasilJumlah(
+                                                      isAtas: true),
                                             ),
                                           ),
                                           SizedBox(width: 5),
@@ -716,50 +739,41 @@ class _Tipe_LState extends State<Tipe_L> {
                                           ),
                                         ],
                                       ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        "Hasil Jumlah",
+                                        style: GoogleFonts.lato(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.032,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      TextField(
+                                        controller: hasilJumlahAtasController,
+                                        readOnly: true,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.04,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 12),
+                                          filled: true,
+                                          fillColor: Colors.grey[200],
+                                        ),
+                                        keyboardType: TextInputType.none,
+                                      ),
                                     ],
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Hasil Jumlah",
-                                          style: GoogleFonts.lato(
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.032,
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        TextField(
-                                          controller: hasilJumlahAtasController,
-                                          readOnly: true,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 12),
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
-                                          ),
-                                          keyboardType: TextInputType.none,
-                                          onChanged: (value) =>
-                                              updateUangMuka(),
-                                        ),
-                                      ],
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Column(
@@ -796,7 +810,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                                   0.032,
                                             ),
                                           ),
-                                          SizedBox(width: 60),
+                                          Spacer(),
                                         ],
                                       ),
                                       SizedBox(height: 5),
@@ -827,10 +841,9 @@ class _Tipe_LState extends State<Tipe_L> {
                                               keyboardType:
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
-                                              onChanged: (value) {
-                                                _updateHasilJumlah(
-                                                    isAtas: true);
-                                              },
+                                              onChanged: (value) =>
+                                                  _updateHasilJumlah(
+                                                      isAtas: false),
                                             ),
                                           ),
                                           SizedBox(width: 5),
@@ -870,10 +883,9 @@ class _Tipe_LState extends State<Tipe_L> {
                                               keyboardType:
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
-                                              onChanged: (value) {
-                                                _updateHasilJumlah(
-                                                    isAtas: false);
-                                              },
+                                              onChanged: (value) =>
+                                                  _updateHasilJumlah(
+                                                      isAtas: false),
                                             ),
                                           ),
                                           SizedBox(width: 5),
@@ -914,10 +926,6 @@ class _Tipe_LState extends State<Tipe_L> {
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
                                               readOnly: true,
-                                              onChanged: (value) {
-                                                _updateHasilJumlah(
-                                                    isAtas: false);
-                                              },
                                             ),
                                           ),
                                           SizedBox(width: 5),
@@ -961,51 +969,41 @@ class _Tipe_LState extends State<Tipe_L> {
                                           ),
                                         ],
                                       ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        "Hasil Jumlah",
+                                        style: GoogleFonts.lato(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.032,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      TextField(
+                                        controller: hasilJumlahBawahController,
+                                        readOnly: true,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.04,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 12),
+                                          filled: true,
+                                          fillColor: Colors.grey[200],
+                                        ),
+                                        keyboardType: TextInputType.none,
+                                      ),
                                     ],
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Hasil Jumlah",
-                                          style: GoogleFonts.lato(
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.032,
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        TextField(
-                                          controller:
-                                              hasilJumlahBawahController,
-                                          readOnly: true,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 12),
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
-                                          ),
-                                          keyboardType: TextInputType.none,
-                                          onChanged: (value) =>
-                                              updateUangMuka(),
-                                        ),
-                                      ],
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Padding(
@@ -1182,24 +1180,7 @@ class _Tipe_LState extends State<Tipe_L> {
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {
-                  simpanDataKeFirestore();
-
-                  if (namaController.text.isNotEmpty &&
-                      alamatController.text.isNotEmpty &&
-                      hargaAtasController.text.isNotEmpty &&
-                      hargaBawahController.text.isNotEmpty &&
-                      hasilJumlahAtasController.text.isNotEmpty &&
-                      hasilJumlahBawahController.text.isNotEmpty &&
-                      backsplashController.text.isNotEmpty &&
-                      aksesorisController.text.isNotEmpty &&
-                      uangMukaController.text.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const INV_Tipe_L(),
-                      ),
-                    );
-                  }
+                  simpanDataKeFirestore(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5252),

@@ -18,7 +18,6 @@ class _INV_TipeL extends State<INV_Tipe_L> {
   String hargaBawah = "";
   String jumlahBawah = "";
   String hasilJumlahBawah = "";
-  String topTable = "";
   String backsplash = "";
   String aksesoris = "";
   String uangMuka = "";
@@ -34,7 +33,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
   void ambilDataTerakhir() async {
     try {
       var snapshot = await FirebaseFirestore.instance
-          .collection("pesanan")
+          .collection("pesanan kitchen letter L")
           .orderBy("tanggal", descending: true)
           .limit(1)
           .get();
@@ -53,7 +52,6 @@ class _INV_TipeL extends State<INV_Tipe_L> {
           jumlahBawah = data["jumlahBawah"] ?? "0";
           hasilJumlahBawah = data["hasilJumlahBawah"] ?? "Rp 0";
 
-          topTable = data["topTable"] ?? "Rp 0";
           backsplash = data["backsplash"] ?? "Rp 0";
           aksesoris = data["aksesoris"] ?? "Rp 0";
 
@@ -218,8 +216,6 @@ class _INV_TipeL extends State<INV_Tipe_L> {
                       jumlahBawah,
                       hasilJumlahBawah
                     ], context: context),
-                    _buildTableRow(["Top Table", topTable, "-", topTable],
-                        context: context),
                     _buildTableRow(["Backsplash", backsplash, "-", backsplash],
                         context: context),
                     _buildTableRow(["Aksesoris", aksesoris, "-", aksesoris],
@@ -232,7 +228,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "Kitchen Straight" : "Straight"}",
+                    "Pembayaran : ${isTablet ? "Kitchen Letter L" : "Letter L"}",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,
