@@ -783,6 +783,7 @@ double parseValue(String text) {
                                       Row(
                                         children: [
                                           Expanded(
+                                            flex: 3,
                                             child: Text(
                                               MediaQuery.of(context)
                                                           .size
