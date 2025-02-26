@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/Invoice/INV_tipe_U.dart';
+import 'package:ganesha_interior/kitchen_set/minibar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -119,8 +120,8 @@ class _Tipe_UState extends State<Tipe_U> {
     print(
         "🔍 jumlah1: $jumlah1, jumlah2: $jumlah2, jumlah3: $jumlah3, kitchenSet: $kitchenSet, harga: $harga");
 
-    double hasil =
-        ((jumlah1 + jumlah2 + jumlah3 - kitchenSet) * (harga * 1000)).roundToDouble();
+    double hasil = ((jumlah1 + jumlah2 + jumlah3 - kitchenSet) * (harga * 1000))
+        .roundToDouble();
 
     if (hasil < 0.0001) {
       hasil = 0.0001;
@@ -250,8 +251,8 @@ class _Tipe_UState extends State<Tipe_U> {
         "alamat": alamatController.text,
         "hargaAtas": hargaAtasController.text,
         "hargaBawah": hargaBawahController.text,
-        "jumlahAtas": jumlahAtas.toString(),
-        "jumlahBawah": jumlahBawah.toString(),
+        "jumlahAtas": jumlahAtas.toStringAsFixed(2),
+        "jumlahBawah": jumlahBawah.toStringAsFixed(2),
         "hasilJumlahAtas": hasilJumlahAtasController.text,
         "hasilJumlahBawah": hasilJumlahBawahController.text,
         "backsplash": backsplashController.text,
@@ -263,7 +264,7 @@ class _Tipe_UState extends State<Tipe_U> {
       };
 
       await FirebaseFirestore.instance
-          .collection("pesanan kitchen letter U")
+          .collection("pesanan kitchen U")
           .add(data);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -306,12 +307,13 @@ class _Tipe_UState extends State<Tipe_U> {
     aksesorisController.dispose();
     uangMukaController.dispose();
 
+    jumlahAtas1Controller.dispose();
+    jumlahAtas2Controller.dispose();
+    jumlahAtas3Controller.dispose();
     jumlahBawah1Controller.dispose();
     jumlahBawah2Controller.dispose();
     jumlahBawah3Controller.dispose();
     _kitchenLetterLBawahController.dispose();
-    hargaBawahController.dispose();
-    hasilJumlahBawahController.dispose();
 
     super.dispose();
   }
@@ -578,8 +580,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                           ),
                                           SizedBox(width: 10),
                                           Expanded(
-                                            flex:
-                                                3, // Bisa ditingkatkan untuk lebih jauh ke kanan
+                                            flex: 3,
                                             child: Text(
                                               "Harga",
                                               textAlign: TextAlign.right,
@@ -607,10 +608,9 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .size
                                                             .width >
                                                         600
-                                                    ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    ? 25
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -619,15 +619,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -659,9 +652,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -670,15 +662,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -710,9 +695,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -721,15 +705,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -763,9 +740,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -774,15 +750,10 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -808,13 +779,12 @@ class _Tipe_UState extends State<Tipe_U> {
                                             flex: 2,
                                             child: TextField(
                                               controller: hargaAtasController,
-                                              
                                               readOnly: true,
                                               style: GoogleFonts.manrope(
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.03,
+                                                    0.035,
                                                 fontWeight: FontWeight.w400,
                                               ),
                                               decoration: InputDecoration(
@@ -824,8 +794,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 12),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                                 filled: true,
                                                 fillColor: Colors.grey[200],
                                               ),
@@ -896,14 +866,18 @@ class _Tipe_UState extends State<Tipe_U> {
                                             ),
                                           ),
                                           SizedBox(width: 10),
-                                          Text(
-                                            "Harga",
-                                            style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.032,
+                                          Expanded(
+                                            flex: 3,
+                                            child: Text(
+                                              "Harga",
+                                              textAlign: TextAlign.right,
+                                              style: GoogleFonts.lato(
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.032,
+                                              ),
                                             ),
                                           ),
                                           Spacer(),
@@ -923,9 +897,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -934,15 +907,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -975,9 +941,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -986,15 +951,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -1027,9 +985,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -1038,15 +995,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -1079,9 +1029,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                             .width >
                                                         600
                                                     ? 20
-                                                    : 10, // Ubah ukuran font di sini
-                                                fontWeight: FontWeight
-                                                    .bold, // (Opsional) Atur ketebalan font
+                                                    : 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(
@@ -1090,15 +1039,10 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                                        vertical: 4,
+                                                        horizontal: 6),
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -1127,7 +1071,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.03,
+                                                    0.035,
                                                 fontWeight: FontWeight.w400,
                                               ),
                                               decoration: InputDecoration(
@@ -1137,8 +1081,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                                 ),
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 12),
+                                                        vertical: 4,
+                                                        horizontal: 6),
                                                 filled: true,
                                                 fillColor: Colors.grey[200],
                                               ),
@@ -1301,7 +1245,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Tipe_U()),
+                                        builder: (context) => Minibar()),
                                   );
                                 },
                                 child: Image.asset(

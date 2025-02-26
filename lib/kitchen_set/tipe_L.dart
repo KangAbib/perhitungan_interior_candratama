@@ -88,21 +88,19 @@ class _Tipe_LState extends State<Tipe_L> {
     });
   }
 
-double parseValue(String text) {
-  String cleanedText = text.replaceAll(RegExp(r'[^\d,.]'), '');
-  cleanedText = cleanedText.replaceAll(',', '.');
+  double parseValue(String text) {
+    String cleanedText = text.replaceAll(RegExp(r'[^\d,.]'), '');
+    cleanedText = cleanedText.replaceAll(',', '.');
 
-  if (cleanedText.split('.').length > 2) {
-    int firstDotIndex = cleanedText.indexOf('.');
-    cleanedText = cleanedText.replaceFirst('.', '');
+    if (cleanedText.split('.').length > 2) {
+      int firstDotIndex = cleanedText.indexOf('.');
+      cleanedText = cleanedText.replaceFirst('.', '');
+    }
+
+    double parsedValue = double.tryParse(cleanedText) ?? 0.0001;
+
+    return parsedValue;
   }
-
-  double parsedValue = double.tryParse(cleanedText) ?? 0.0001;
-  
-  
-  return parsedValue; 
-}
-
 
   void _updateHasilJumlah({required bool isAtas}) {
     double jumlah1 = parseValue(
@@ -118,8 +116,9 @@ double parseValue(String text) {
     print(
         "🔍 jumlah1: $jumlah1, jumlah2: $jumlah2, kitchenSet: $kitchenSet, harga: $harga");
 
-    double hasil = ((jumlah1 + jumlah2 - kitchenSet) * (harga * 1000)).roundToDouble();
-
+    double hasil = (jumlah1 + jumlah2 - kitchenSet) * (harga * 1000);
+    if (hasil < 0) hasil = 0;
+    hasil = double.parse(hasil.toStringAsFixed(2));
 
     if (hasil < 0.0001) {
       hasil = 0.0001;
@@ -196,92 +195,93 @@ double parseValue(String text) {
   }
 
   void simpanDataKeFirestore(BuildContext context) async {
-  if ([
-    namaController.text,
-    alamatController.text,
-    hargaAtasController.text,
-    hargaBawahController.text,
-    jumlahAtas1Controller.text,
-    jumlahAtas2Controller.text,
-    jumlahBawah1Controller.text,
-    jumlahBawah2Controller.text,
-    hasilJumlahAtasController.text,
-    hasilJumlahBawahController.text,
-    backsplashController.text,
-    aksesorisController.text,
-    uangMukaController.text
-  ].any((element) => element.isEmpty)) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Harap isi semua kolom sebelum menyimpan."),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
+    if ([
+      namaController.text,
+      alamatController.text,
+      hargaAtasController.text,
+      hargaBawahController.text,
+      jumlahAtas1Controller.text,
+      jumlahAtas2Controller.text,
+      jumlahBawah1Controller.text,
+      jumlahBawah2Controller.text,
+      hasilJumlahAtasController.text,
+      hasilJumlahBawahController.text,
+      backsplashController.text,
+      aksesorisController.text,
+      uangMukaController.text
+    ].any((element) => element.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap isi semua kolom sebelum menyimpan."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      double jumlahAtas = (parseValue(jumlahAtas1Controller.text) +
+              parseValue(jumlahAtas2Controller.text) -
+              parseValue(_kitchenLetterLAtasController.text))
+          .abs();
+
+      double jumlahBawah = (parseValue(jumlahBawah1Controller.text) +
+              parseValue(jumlahBawah2Controller.text) -
+              parseValue(_kitchenLetterLBawahController.text))
+          .abs();
+
+      double subTotal = (parseValue(hasilJumlahAtasController.text) +
+              parseValue(hasilJumlahBawahController.text) +
+              parseValue(backsplashController.text) +
+              parseValue(aksesorisController.text)) *
+          1000;
+
+      double uangMuka = parseValue(uangMukaController.text) * 1000;
+      double pelunasan = subTotal - uangMuka;
+
+      Map<String, dynamic> data = {
+        "nama": namaController.text,
+        "alamat": alamatController.text,
+        "hargaAtas": hargaAtasController.text,
+        "hargaBawah": hargaBawahController.text,
+        "jumlahAtas": jumlahAtas.toStringAsFixed(2), 
+        "jumlahBawah": jumlahBawah.toStringAsFixed(2),
+        "hasilJumlahAtas": hasilJumlahAtasController.text,
+        "hasilJumlahBawah": hasilJumlahBawahController.text,
+        "backsplash": backsplashController.text,
+        "aksesoris": aksesorisController.text,
+        "uangMuka": "Rp ${_formatter.format(uangMuka.round())}",
+        "subTotal": "Rp ${_formatter.format(subTotal.round())}",
+        "pelunasan": "Rp ${_formatter.format(pelunasan.round())}",
+        "tanggal": Timestamp.now(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection("pesanan kitchen L")
+          .add(data);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Data berhasil disimpan!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_Tipe_L(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  try {
-    double jumlahAtas = (parseValue(jumlahAtas1Controller.text) +
-        parseValue(jumlahAtas2Controller.text) -
-        parseValue(_kitchenLetterLAtasController.text)).abs();
-
-    double jumlahBawah = (parseValue(jumlahBawah1Controller.text) +
-        parseValue(jumlahBawah2Controller.text) -
-        parseValue(_kitchenLetterLBawahController.text)).abs();
-
-    double subTotal = (parseValue(hasilJumlahAtasController.text) +
-            parseValue(hasilJumlahBawahController.text) +
-            parseValue(backsplashController.text) +
-            parseValue(aksesorisController.text)) *
-        1000;
-
-    double uangMuka = parseValue(uangMukaController.text) * 1000;
-    double pelunasan = subTotal - uangMuka;
-
-    Map<String, dynamic> data = {
-      "nama": namaController.text,
-      "alamat": alamatController.text,
-      "hargaAtas": hargaAtasController.text,
-      "hargaBawah": hargaBawahController.text,
-      "jumlahAtas": jumlahAtas.toString(),
-      "jumlahBawah": jumlahBawah.toString(),
-      "hasilJumlahAtas": hasilJumlahAtasController.text,
-      "hasilJumlahBawah": hasilJumlahBawahController.text,
-      "backsplash": backsplashController.text,
-      "aksesoris": aksesorisController.text,
-      "uangMuka": "Rp ${_formatter.format(uangMuka.round())}",
-      "subTotal": "Rp ${_formatter.format(subTotal.round())}",
-      "pelunasan": "Rp ${_formatter.format(pelunasan.round())}",
-      "tanggal": Timestamp.now(),
-    };
-
-    await FirebaseFirestore.instance
-        .collection("pesanan kitchen letter L")
-        .add(data);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Data berhasil disimpan!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const INV_Tipe_L(),
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Gagal menyimpan data: $e"),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
-
 
   @override
   void dispose() {
@@ -303,8 +303,6 @@ double parseValue(String text) {
     jumlahBawah1Controller.dispose();
     jumlahBawah2Controller.dispose();
     _kitchenLetterLBawahController.dispose();
-    hargaBawahController.dispose();
-    hasilJumlahBawahController.dispose();
 
     super.dispose();
   }
@@ -583,7 +581,7 @@ double parseValue(String text) {
                                           Spacer(),
                                         ],
                                       ),
-                                      SizedBox(height: 5),
+                                      SizedBox(height: 7),
                                       Row(
                                         children: [
                                           Expanded(
@@ -595,17 +593,15 @@ double parseValue(String text) {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -636,17 +632,15 @@ double parseValue(String text) {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -656,7 +650,7 @@ double parseValue(String text) {
                                                       isAtas: true),
                                             ),
                                           ),
-                                          SizedBox(width: 5),
+                                          SizedBox(width: 7),
                                           Text(
                                             "-",
                                             style: TextStyle(
@@ -678,21 +672,20 @@ double parseValue(String text) {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
                                               textAlign: TextAlign.center,
+                                              readOnly: true,
                                               onChanged: (value) =>
                                                   _updateHasilJumlah(
                                                       isAtas: true),
@@ -827,17 +820,15 @@ double parseValue(String text) {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -869,17 +860,15 @@ double parseValue(String text) {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -911,17 +900,15 @@ double parseValue(String text) {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                  vertical:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 22
-                                                          : 12,
-                                                  horizontal: 12,
-                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,

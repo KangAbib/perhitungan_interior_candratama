@@ -166,12 +166,10 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
       return;
     }
 
-    // Fungsi untuk parsing nilai angka dari teks dengan format "Rp 10.000.000"
     double parseValue(String text) {
       return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
     }
 
-    // Hitung Sub Total
     double subTotal = parseValue(hasilJumlahAtasController.text) +
         parseValue(hasilJumlahBawahController.text) +
         parseValue(topTableController.text) +
@@ -194,13 +192,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
       "backsplash": backsplashController.text,
       "aksesoris": aksesorisController.text,
       "uangMuka": uangMukaController.text,
-      "subTotal": "Rp ${_formatter.format(subTotal)}", // Simpan subTotal
+      "subTotal": "Rp ${_formatter.format(subTotal)}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "tanggal": Timestamp.now(),
     };
 
     try {
-      await FirebaseFirestore.instance.collection("pesanan kitchen straight").add(data);
+      await FirebaseFirestore.instance
+          .collection("pesanan kitchen straight")
+          .add(data);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Data berhasil disimpan!"),
@@ -518,16 +518,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                        vertical: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width >
-                                                                600
-                                                            ? 22
-                                                            : 12,
-                                                        horizontal: 12),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -691,16 +690,15 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                        vertical: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width >
-                                                                600
-                                                            ? 22
-                                                            : 12,
-                                                        horizontal: 12),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 25
+                                                    : 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               keyboardType:
                                                   TextInputType.number,

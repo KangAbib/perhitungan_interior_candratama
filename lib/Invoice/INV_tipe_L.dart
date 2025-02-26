@@ -33,7 +33,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
   void ambilDataTerakhir() async {
     try {
       var snapshot = await FirebaseFirestore.instance
-          .collection("pesanan kitchen letter L")
+          .collection("pesanan kitchen L")
           .orderBy("tanggal", descending: true)
           .limit(1)
           .get();

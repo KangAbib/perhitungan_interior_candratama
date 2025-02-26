@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ganesha_interior/screens/home_screen.dart';
+
 
 class Minibar extends StatefulWidget {
   const Minibar({super.key});
@@ -10,8 +10,6 @@ class Minibar extends StatefulWidget {
 }
 
 class _MinibarState extends State<Minibar> {
-  double _scale = 1.0;
-  double _opacity = 1.0;
 
   @override
   void initState() {
@@ -20,47 +18,6 @@ class _MinibarState extends State<Minibar> {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
     ));
-  }
-
-  void _onTapDown(TapDownDetails details) {
-    setState(() {
-      _scale = 0.9;
-      _opacity = 0.7;
-    });
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    setState(() {
-      _scale = 1.0;
-      _opacity = 1.0;
-    });
-  }
-
-  void _onTapCancel() {
-    setState(() {
-      _scale = 1.0;
-      _opacity = 1.0;
-    });
-  }
-
-  void _navigateBack() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
-        transitionsBuilder: (_, animation, __, child) {
-          const begin = Offset(-1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOutQuad;
-
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          var offsetAnimation = animation.drive(tween);
-
-          return SlideTransition(position: offsetAnimation, child: child);
-        },
-      ),
-    );
   }
 
   @override
@@ -104,23 +61,14 @@ class _MinibarState extends State<Minibar> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTapDown: _onTapDown,
-                          onTapUp: _onTapUp,
-                          onTapCancel: _onTapCancel,
-                          onTap: _navigateBack,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
-                            transform: Matrix4.identity()..scale(_scale),
-                            child: Opacity(
-                              opacity: _opacity,
-                              child: Image.asset(
-                                "assets/images/back.png",
-                                height: screenHeight * 0.03,
-                                width: screenHeight * 0.03,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Image.asset(
+                            "assets/images/back.png",
+                            height: screenHeight * 0.03,
+                            width: screenHeight * 0.03,
+                            fit: BoxFit.contain,
                           ),
                         ),
                         const SizedBox(width: 10),

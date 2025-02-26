@@ -154,19 +154,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child:Padding(
+                        padding: EdgeInsets.only(
+                              left: (MediaQuery.of(context).size.width / 2) *
+                                  0.1),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               "Kitchen Set",
-                              style: GoogleFonts.manrope(
-                                fontSize:
-                                    MediaQuery.of(context).size.width * 0.035,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.black,
-                              ),
+                              textAlign: TextAlign.center,
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black,
+                            ),
                             ),
                             PopupMenuButton<String>(
                               padding: EdgeInsets.only(left: screenWidth * 0.1),
@@ -262,6 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
+                      ),),
                     ],
                   ),
                 ),
@@ -307,18 +315,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: (MediaQuery.of(context).size.width / 2) *
+                                  0.1),
                           child: Text(
                             "Partisi",
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.manrope(
                               fontSize:
-                                  MediaQuery.of(context).size.width * 0.03,
-                              fontWeight: FontWeight.w900,
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w800,
                               color: Colors.black,
                             ),
                           ),
                         ),
+                      ),
+                    ),
                       ],
                     ),
                   )),
@@ -361,18 +378,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                       Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: (MediaQuery.of(context).size.width / 2) *
+                                  0.1),
                           child: Text(
                             "Backdrop TV",
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.manrope(
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w800,
                               color: Colors.black,
                             ),
                           ),
                         ),
+                      ),
+                    ),
                       ],
                     ),
                   )),
@@ -416,18 +442,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: (MediaQuery.of(context).size.width / 2) *
+                                  0.1),
                           child: Text(
                             "Lemari",
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.manrope(
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w800,
                               color: Colors.black,
                             ),
                           ),
                         ),
+                      ),
+                    ),
                       ],
                     ),
                   )),
@@ -470,17 +505,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Backdrop",
-                          style: GoogleFonts.manrope(
-                            fontSize: MediaQuery.of(context).size.width * 0.035,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black,
+                      Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: (MediaQuery.of(context).size.width / 2) *
+                                  0.1),
+                          child: Text(
+                            "Backdrop",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.manrope(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
+                    ),
                     ],
                   ),
                 ),
@@ -525,18 +570,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: (MediaQuery.of(context).size.width / 2) *
+                                  0.1),
                           child: Text(
                             "Meja Rias",
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.manrope(
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w800,
                               color: Colors.black,
                             ),
                           ),
                         ),
+                      ),
+                    ),
                       ],
                     )),
               ),
