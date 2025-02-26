@@ -33,8 +33,8 @@ class _Tipe_LState extends State<Tipe_L> {
   TextEditingController jumlahAtas2Controller = TextEditingController();
   TextEditingController jumlahBawah1Controller = TextEditingController();
   TextEditingController jumlahBawah2Controller = TextEditingController();
-  TextEditingController _kitchenLetterLAtasController = TextEditingController();
-  TextEditingController _kitchenLetterLBawahController =
+  final TextEditingController _kitchenLetterLAtasController = TextEditingController();
+  final TextEditingController _kitchenLetterLBawahController =
       TextEditingController();
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
@@ -244,7 +244,7 @@ class _Tipe_LState extends State<Tipe_L> {
         "alamat": alamatController.text,
         "hargaAtas": hargaAtasController.text,
         "hargaBawah": hargaBawahController.text,
-        "jumlahAtas": jumlahAtas.toStringAsFixed(2), 
+        "jumlahAtas": jumlahAtas.toStringAsFixed(2),
         "jumlahBawah": jumlahBawah.toStringAsFixed(2),
         "hasilJumlahAtas": hasilJumlahAtasController.text,
         "hasilJumlahBawah": hasilJumlahBawahController.text,

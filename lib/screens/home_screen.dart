@@ -155,121 +155,127 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child:Padding(
-                        padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Kitchen Set",
-                              textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
-                            ),
-                            ),
-                            PopupMenuButton<String>(
-                              padding: EdgeInsets.only(left: screenWidth * 0.1),
-                              onSelected: (value) {
-                                if (value == "Straight") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Tipe_Straight()),
-                                  );
-                                } else if (value == "Letter L") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const Tipe_L()),
-                                  );
-                                } else if (value == "Letter U") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const Tipe_U()),
-                                  );
-                                } else if (value == "Minibar") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const Minibar()),
-                                  );
-                                } else if (value == "Meja Island") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const MejaIsland()),
-                                  );
-                                }
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              color: Colors.white,
-                              elevation: 6,
-                              itemBuilder: (BuildContext context) => [
-                                PopupMenuItem(
-                                  value: "Straight",
-                                  child: Text(
-                                    "Straight",
-                                    style:
-                                        TextStyle(fontSize: screenWidth * 0.03),
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: (MediaQuery.of(context).size.width / 2) *
+                                    0.1),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Kitchen Set",
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.manrope(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.035,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.black,
                                   ),
                                 ),
-                                PopupMenuItem(
-                                  value: "Letter L",
-                                  child: Text(
-                                    "Letter L",
-                                    style:
-                                        TextStyle(fontSize: screenWidth * 0.03),
+                                PopupMenuButton<String>(
+                                  padding:
+                                      EdgeInsets.only(left: screenWidth * 0.1),
+                                  onSelected: (value) {
+                                    if (value == "Straight") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tipe_Straight()),
+                                      );
+                                    } else if (value == "Letter L") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tipe_L()),
+                                      );
+                                    } else if (value == "Letter U") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tipe_U()),
+                                      );
+                                    } else if (value == "Minibar") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Minibar()),
+                                      );
+                                    } else if (value == "Meja Island") {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MejaIsland()),
+                                      );
+                                    }
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                ),
-                                PopupMenuItem(
-                                  value: "Letter U",
-                                  child: Text(
-                                    "Letter U",
-                                    style:
-                                        TextStyle(fontSize: screenWidth * 0.03),
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: "Minibar",
-                                  child: Text(
-                                    "Minibar",
-                                    style:
-                                        TextStyle(fontSize: screenWidth * 0.03),
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: "Meja Island",
-                                  child: Text(
-                                    "Meja Island",
-                                    style:
-                                        TextStyle(fontSize: screenWidth * 0.03),
+                                  color: Colors.white,
+                                  elevation: 6,
+                                  itemBuilder: (BuildContext context) => [
+                                    PopupMenuItem(
+                                      value: "Straight",
+                                      child: Text(
+                                        "Straight",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.03),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Letter L",
+                                      child: Text(
+                                        "Letter L",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.03),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Letter U",
+                                      child: Text(
+                                        "Letter U",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.03),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Minibar",
+                                      child: Text(
+                                        "Minibar",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.03),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "Meja Island",
+                                      child: Text(
+                                        "Meja Island",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.03),
+                                      ),
+                                    ),
+                                  ],
+                                  child: Image.asset(
+                                    "assets/images/more.png",
+                                    width: screenWidth * 0.06,
+                                    height: screenWidth * 0.06,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ],
-                              child: Image.asset(
-                                "assets/images/more.png",
-                                width: screenWidth * 0.06,
-                                height: screenWidth * 0.06,
-                                fit: BoxFit.contain,
-                              ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                      ),),
                     ],
                   ),
                 ),
@@ -316,26 +322,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                          child: Text(
-                            "Partisi",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) *
+                                          0.1),
+                              child: Text(
+                                "Partisi",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.manrope(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
                       ],
                     ),
                   )),
@@ -378,27 +385,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                       Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                          child: Text(
-                            "Backdrop TV",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                        Expanded(
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) *
+                                          0.1),
+                              child: Text(
+                                "Backdrop TV",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.manrope(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
                       ],
                     ),
                   )),
@@ -443,26 +451,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                          child: Text(
-                            "Lemari",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) *
+                                          0.1),
+                              child: Text(
+                                "Lemari",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.manrope(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
                       ],
                     ),
                   )),
@@ -506,26 +515,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                          child: Text(
-                            "Backdrop",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: (MediaQuery.of(context).size.width / 2) *
+                                    0.1),
+                            child: Text(
+                              "Backdrop",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.manrope(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
                     ],
                   ),
                 ),
@@ -571,26 +580,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                          child: Text(
-                            "Meja Rias",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) *
+                                          0.1),
+                              child: Text(
+                                "Meja Rias",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.manrope(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.035,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
                       ],
                     )),
               ),

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -84,8 +83,6 @@ class _INV_TipeU extends State<INV_Tipe_U> {
     double screenWidth = MediaQuery.of(context).size.width;
     return screenWidth * factor;
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -295,25 +292,29 @@ class _INV_TipeU extends State<INV_Tipe_U> {
   }
 
   TableRow _buildTableRow(List<String> cells,
-    {bool isHeader = false, required BuildContext context}) {
-  return TableRow(
-    children: cells.asMap().entries.map((entry) {
-      int index = entry.key;
-      String text = entry.value;
+      {bool isHeader = false, required BuildContext context}) {
+    return TableRow(
+      children: cells.asMap().entries.map((entry) {
+        int index = entry.key;
+        String text = entry.value;
 
-      return Container(
-        padding: const EdgeInsets.all(8.0),
-        alignment: index == 2 ? Alignment.center : Alignment.centerLeft, // Center khusus untuk kolom ke-3
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: getResponsiveFontSize(context, factor: 0.0355),
-            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+        return Container(
+          padding: const EdgeInsets.all(8.0),
+          alignment: index == 2
+              ? Alignment.center
+              : Alignment.centerLeft, // Center khusus untuk kolom ke-3
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: getResponsiveFontSize(context, factor: 0.0355),
+              fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+            ),
+            textAlign: index == 2
+                ? TextAlign.center
+                : TextAlign.left, // Center teks hanya untuk kolom ke-3
           ),
-          textAlign: index == 2 ? TextAlign.center : TextAlign.left, // Center teks hanya untuk kolom ke-3
-        ),
-      );
-    }).toList(),
-  );
-}
+        );
+      }).toList(),
+    );
+  }
 }

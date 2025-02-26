@@ -35,8 +35,8 @@ class _Tipe_UState extends State<Tipe_U> {
   TextEditingController jumlahBawah1Controller = TextEditingController();
   TextEditingController jumlahBawah2Controller = TextEditingController();
   TextEditingController jumlahBawah3Controller = TextEditingController();
-  TextEditingController _kitchenLetterLAtasController = TextEditingController();
-  TextEditingController _kitchenLetterLBawahController =
+  final TextEditingController _kitchenLetterLAtasController = TextEditingController();
+  final TextEditingController _kitchenLetterLBawahController =
       TextEditingController();
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
