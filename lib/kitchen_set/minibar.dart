@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ganesha_interior/Invoice/INV_minibar.dart';
+import 'package:ganesha_interior/kitchen_set/meja_island.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -35,55 +37,39 @@ class _MinibarState extends State<Minibar> {
   }
 
   void _setupControllerListener(TextEditingController controller) {
-  controller.addListener(() {
-    String text = controller.text.replaceAll(RegExp(r'[^0-9.,]'), '');
-    if (text.isNotEmpty) {
-      
-      double parsedValue = double.tryParse(text.replaceAll(",", ".")) ?? 0;
-      String formattedText = controller == minibarController
-          ? "Rp ${_formatter.format(parsedValue)}"
-          : text; 
-      if (controller.text != formattedText) {
-        controller.value = TextEditingValue(
-          text: formattedText,
-          selection: TextSelection.collapsed(offset: formattedText.length),
-        );
-      }
-    } else {
-      controller.text = controller == minibarController ? "Rp " : "";
-    }
-    _hitungMinibar();
-  });
-}
+    controller.addListener(() {
+      _hitungMinibar();
+    });
+  }
 
   void _hitungMinibar() {
-  double parseValue(String text) {
-  String cleanedText = text.replaceAll(RegExp(r'[^0-9,]'), ''); 
-  cleanedText = cleanedText.replaceAll(RegExp(r',+'), ','); 
-  if (cleanedText.contains(',')) {
-    
-    cleanedText = cleanedText.replaceAll('.', '');
-  } else {
-    
-    cleanedText = cleanedText.replaceAll(',', '');
+    double parseUkuran(String text) {
+      String cleanedText =
+          text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double parseHarga(String text) {
+      String cleanedText =
+          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double ukuranMinibar = parseUkuran(ukuranminibarController.text);
+    double hargaMinibar = parseHarga(minibarController.text);
+
+    double totalHarga = ukuranMinibar * hargaMinibar;
+    double uangMuka = totalHarga * 0.6;
+
+    print("Ukuran: $ukuranMinibar, Harga: $hargaMinibar, Total: $totalHarga");
+
+    setState(() {
+      jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
+      uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
+    });
   }
-  return double.tryParse(cleanedText.replaceAll(',', '.')) ?? 0;
-}
-
-  double ukuranMinibar = parseValue(ukuranminibarController.text);
-  double hargaMinibar = parseValue(minibarController.text);
-
-  double totalHarga = ukuranMinibar * hargaMinibar;
-  double uangMuka = totalHarga * 0.6;
-
-  print("ukuran: $ukuranMinibar, harga: $hargaMinibar, total: $totalHarga");
-
-  setState(() {
-    jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
-    uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
-  });
-}
-
 
   void simpanDataKeFirestore() async {
     if (namaController.text.isEmpty ||
@@ -99,6 +85,22 @@ class _MinibarState extends State<Minibar> {
       return;
     }
 
+    // Debugging untuk melihat data sebelum dikirim ke Firestore
+    print("Nama: ${namaController.text}");
+    print("Alamat: ${alamatController.text}");
+    print("Ukuran Minibar: ${ukuranminibarController.text}");
+    print("Harga Minibar: ${minibarController.text}");
+
+    double parseValue(String text) {
+      String cleanedText =
+          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double subTotal = parseValue(jumlahController.text);
+    double uangMuka = parseValue(uangMukaController.text);
+    double pelunasan = subTotal - uangMuka;
+
     Map<String, dynamic> data = {
       "nama": namaController.text,
       "alamat": alamatController.text,
@@ -106,15 +108,23 @@ class _MinibarState extends State<Minibar> {
       "hargaMinibar": minibarController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
+      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "tanggal": Timestamp.now(),
     };
 
     try {
-      await _firestore.collection("pesanan minibar").add(data);
+      await FirebaseFirestore.instance.collection("pesanan minibar").add(data);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Data berhasil disimpan!"),
           backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_Minibar(),
         ),
       );
     } catch (e) {
@@ -396,10 +406,27 @@ class _MinibarState extends State<Minibar> {
                                                     horizontal: 12),
                                             hintText: "Masukkan ukuran",
                                           ),
-                                          keyboardType: TextInputType.number,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
                                           textAlign: TextAlign.center,
+                                          onChanged: (value) {
+                                            _hitungMinibar();
+                                          },
                                         ),
                                       ),
+                                      SizedBox(width: 10),
+
+                                      // Teks "×" di tengah
+                                      Text(
+                                        "×",
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.07,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+
+                                      // Tambahkan jarak kecil
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: TextField(
@@ -417,8 +444,35 @@ class _MinibarState extends State<Minibar> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
+                                            hintText: "Masukkan harga",
                                           ),
                                           keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            String cleanedText =
+                                                value.replaceAll(
+                                                    RegExp(r'[^0-9]'), '');
+
+                                            if (cleanedText.isNotEmpty) {
+                                              double parsedValue =
+                                                  double.tryParse(
+                                                          cleanedText) ??
+                                                      0;
+                                              String formattedValue = _formatter
+                                                  .format(parsedValue);
+
+                                              minibarController.value =
+                                                  TextEditingValue(
+                                                text: "Rp $formattedValue",
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                        offset:
+                                                            "Rp $formattedValue"
+                                                                .length),
+                                              );
+                                            } else {
+                                              minibarController.text = "Rp ";
+                                            }
+                                          },
                                         ),
                                       ),
                                     ],
@@ -504,7 +558,7 @@ class _MinibarState extends State<Minibar> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Minibar()),
+                                        builder: (context) => MejaIsland()),
                                   );
                                 },
                                 child: Image.asset(

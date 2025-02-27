@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class INV_Tipe_U extends StatefulWidget {
@@ -27,7 +28,9 @@ class _INV_TipeU extends State<INV_Tipe_U> {
   @override
   void initState() {
     super.initState();
-    ambilDataTerakhir();
+    initializeDateFormatting().then((_) {
+      ambilDataTerakhir();
+    });
   }
 
   void ambilDataTerakhir() async {
@@ -86,7 +89,8 @@ class _INV_TipeU extends State<INV_Tipe_U> {
 
   @override
   Widget build(BuildContext context) {
-    String todayDate = DateFormat("EEEE, dd MMM yyyy").format(DateTime.now());
+   String todayDate =
+        DateFormat("EEEE, dd MMM yyyy", "id_ID").format(DateTime.now());
     String noBayar = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
     bool isTablet = MediaQuery.of(context).size.width > 600;

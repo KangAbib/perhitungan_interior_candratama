@@ -1,27 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ganesha_interior/Invoice/INV_backdrop.dart';
-import 'package:ganesha_interior/table/meja_screen.dart';
+import 'package:ganesha_interior/Invoice/INV_custom.dart';
+import 'package:ganesha_interior/backdrop_tv/backdrop_tv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class Backdrop extends StatefulWidget {
-  const Backdrop({super.key});
+class InteriorCustomScreen extends StatefulWidget {
+  const InteriorCustomScreen({super.key});
 
   @override
-  State<Backdrop> createState() => _BackdropState();
+  State<InteriorCustomScreen> createState() => _InteriorCustomScreenState();
 }
 
-class _BackdropState extends State<Backdrop> {
-  TextEditingController BackdropController = TextEditingController(text: "Rp ");
+class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
+  TextEditingController InteriorCustomController = TextEditingController(text: "Rp ");
   TextEditingController uangMukaController = TextEditingController(text: "Rp ");
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController panjangBackdropController = TextEditingController();
-  TextEditingController tinggiBackdropController = TextEditingController();
-
+  TextEditingController ukuranInteriorCustomController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -34,18 +32,17 @@ class _BackdropState extends State<Backdrop> {
       statusBarIconBrightness: Brightness.dark,
     ));
 
-    _setupControllerListener(BackdropController);
-    _setupControllerListener(panjangBackdropController);
-    _setupControllerListener(tinggiBackdropController);
+    _setupControllerListener(InteriorCustomController);
+    _setupControllerListener(ukuranInteriorCustomController);
   }
 
   void _setupControllerListener(TextEditingController controller) {
     controller.addListener(() {
-      _hitungBackdrop();
+      _hitungInteriorCustom();
     });
   }
 
-  void _hitungBackdrop() {
+  void _hitungInteriorCustom() {
     double parseUkuran(String text) {
       String cleanedText =
           text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
@@ -60,14 +57,13 @@ class _BackdropState extends State<Backdrop> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double panjangBackdrop = parseUkuran(panjangBackdropController.text);
-    double tinggiBackdrop = parseUkuran(tinggiBackdropController.text);
-    double hargaBackdrop = parseHarga(BackdropController.text);
+    double ukuranInteriorCustom = parseUkuran(ukuranInteriorCustomController.text);
+    double hargaInteriorCustom = parseHarga(InteriorCustomController.text);
 
-    double totalHarga = panjangBackdrop * tinggiBackdrop * hargaBackdrop;
+    double totalHarga = ukuranInteriorCustom * hargaInteriorCustom;
     double uangMuka = totalHarga * 0.6;
 
-    print("panjang: $panjangBackdrop, tinggi: $tinggiBackdrop, Harga: $hargaBackdrop, Total: $totalHarga");
+    print("Ukuran: $ukuranInteriorCustom, Harga: $hargaInteriorCustom, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -78,9 +74,8 @@ class _BackdropState extends State<Backdrop> {
   void simpanDataKeFirestore() async {
     if (namaController.text.isEmpty ||
         alamatController.text.isEmpty ||
-        panjangBackdropController.text.isEmpty ||
-        tinggiBackdropController.text.isEmpty ||
-        BackdropController.text.isEmpty) {
+        ukuranInteriorCustomController.text.isEmpty ||
+        InteriorCustomController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Harap isi semua kolom sebelum menyimpan."),
@@ -90,11 +85,11 @@ class _BackdropState extends State<Backdrop> {
       return;
     }
 
+    // Debugging untuk melihat data sebelum dikirim ke Firestore
     print("Nama: ${namaController.text}");
     print("Alamat: ${alamatController.text}");
-    print("panjang Backdrop: ${panjangBackdropController.text}");
-    print("tinggi Backdrop: ${tinggiBackdropController.text}");
-    print("Harga Backdrop: ${BackdropController.text}");
+    print("Ukuran InteriorCustom: ${ukuranInteriorCustomController.text}");
+    print("Harga InteriorCustom: ${InteriorCustomController.text}");
 
     double parseValue(String text) {
       String cleanedText =
@@ -102,10 +97,6 @@ class _BackdropState extends State<Backdrop> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double panjangBackdrop = parseValue(panjangBackdropController.text);
-    double tinggiBackdrop = parseValue(tinggiBackdropController.text);
-    double hargaBackdrop = parseValue(BackdropController.text);
-    double jumlahKali = panjangBackdrop * tinggiBackdrop;
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
     double pelunasan = subTotal - uangMuka;
@@ -113,10 +104,8 @@ class _BackdropState extends State<Backdrop> {
     Map<String, dynamic> data = {
       "nama": namaController.text,
       "alamat": alamatController.text,
-      "panjangBackdrop": panjangBackdropController.text,
-      "tinggiBackdrop": tinggiBackdropController.text,
-      "jumlahKali": jumlahKali.toString(),
-      "hargaBackdrop": BackdropController.text,
+      "ukuranInteriorCustom": ukuranInteriorCustomController.text,
+      "hargaInteriorCustom": InteriorCustomController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
@@ -124,7 +113,7 @@ class _BackdropState extends State<Backdrop> {
     };
 
     try {
-      await FirebaseFirestore.instance.collection("pesanan Backdrop").add(data);
+      await FirebaseFirestore.instance.collection("pesanan InteriorCustom").add(data);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Data berhasil disimpan!"),
@@ -135,7 +124,7 @@ class _BackdropState extends State<Backdrop> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const INV_Backdrop(),
+          builder: (context) => const INV_InteriorCustom(),
         ),
       );
     } catch (e) {
@@ -150,13 +139,12 @@ class _BackdropState extends State<Backdrop> {
 
   @override
   void dispose() {
-    BackdropController.dispose();
+    InteriorCustomController.dispose();
     uangMukaController.dispose();
     jumlahController.dispose();
     namaController.dispose();
     alamatController.dispose();
-    panjangBackdropController.dispose();
-    tinggiBackdropController.dispose();
+    ukuranInteriorCustomController.dispose();
     super.dispose();
   }
 
@@ -266,7 +254,7 @@ class _BackdropState extends State<Backdrop> {
                                 children: [
                                   Center(
                                     child: Text(
-                                      "Backdrop",
+                                      "InteriorCustom",
                                       style: GoogleFonts.manrope(
                                         fontSize:
                                             MediaQuery.of(context).size.width <
@@ -363,11 +351,11 @@ class _BackdropState extends State<Backdrop> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        flex: 2, // Panjang di kiri
+                                        flex: 2,
                                         child: Padding(
                                           padding: EdgeInsets.only(left: 5),
                                           child: Text(
-                                            "Panjang",
+                                            "Ukuran",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.w900,
                                               fontSize: MediaQuery.of(context)
@@ -379,13 +367,11 @@ class _BackdropState extends State<Backdrop> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 1, // Tinggi di tengah
+                                        flex: 10,
                                         child: Padding(
-                                          padding: EdgeInsets.only(
-                                              left:
-                                                  6),
+                                          padding: EdgeInsets.only(left: 20),
                                           child: Text(
-                                            "Tinggi",
+                                            "Harga",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.w900,
                                               fontSize: MediaQuery.of(context)
@@ -397,35 +383,14 @@ class _BackdropState extends State<Backdrop> {
                                           ),
                                         ),
                                       ),
-                                      Expanded(
-                                        flex:
-                                            4, // Harga di kanan dengan padding
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                              right:
-                                                  80), // Tambahkan jarak dari kanan
-                                          child: Text(
-                                            "Harga",
-                                            style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.035,
-                                            ),
-                                            textAlign: TextAlign.right,
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                   SizedBox(height: 5),
                                   Row(
                                     children: [
                                       Expanded(
-                                        flex: 1,
                                         child: TextField(
-                                          controller: panjangBackdropController,
+                                          controller: ukuranInteriorCustomController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -439,17 +404,20 @@ class _BackdropState extends State<Backdrop> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
+                                            hintText: "Masukkan ukuran",
                                           ),
                                           keyboardType:
                                               TextInputType.numberWithOptions(
                                                   decimal: true),
                                           textAlign: TextAlign.center,
                                           onChanged: (value) {
-                                            _hitungBackdrop();
+                                            _hitungInteriorCustom();
                                           },
                                         ),
                                       ),
                                       SizedBox(width: 10),
+
+                                      // Teks "×" di tengah
                                       Text(
                                         "×",
                                         style: GoogleFonts.manrope(
@@ -457,47 +425,12 @@ class _BackdropState extends State<Backdrop> {
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
+
+                                      // Tambahkan jarak kecil
                                       SizedBox(width: 10),
                                       Expanded(
-                                        flex: 1,
                                         child: TextField(
-                                          controller: tinggiBackdropController,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 12),
-                                          ),
-                                          keyboardType:
-                                              TextInputType.numberWithOptions(
-                                                  decimal: true),
-                                          textAlign: TextAlign.center,
-                                          onChanged: (value) {
-                                            _hitungBackdrop();
-                                          },
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "×",
-                                        style: GoogleFonts.manrope(
-                                          fontSize: screenWidth * 0.075,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        flex: 2,
-                                        child: TextField(
-                                          controller: BackdropController,
+                                          controller: InteriorCustomController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -527,7 +460,7 @@ class _BackdropState extends State<Backdrop> {
                                               String formattedValue = _formatter
                                                   .format(parsedValue);
 
-                                              BackdropController.value =
+                                              InteriorCustomController.value =
                                                   TextEditingValue(
                                                 text: "Rp $formattedValue",
                                                 selection:
@@ -537,7 +470,7 @@ class _BackdropState extends State<Backdrop> {
                                                                 .length),
                                               );
                                             } else {
-                                              BackdropController.text = "Rp ";
+                                              InteriorCustomController.text = "Rp ";
                                             }
                                           },
                                         ),
@@ -625,7 +558,7 @@ class _BackdropState extends State<Backdrop> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => MejaScreen()),
+                                        builder: (context) => BackdropTV()),
                                   );
                                 },
                                 child: Image.asset(
