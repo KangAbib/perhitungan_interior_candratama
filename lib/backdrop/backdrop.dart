@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/Invoice/INV_backdrop.dart';
+import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:ganesha_interior/table/meja_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +22,6 @@ class _BackdropState extends State<Backdrop> {
   TextEditingController alamatController = TextEditingController();
   TextEditingController panjangBackdropController = TextEditingController();
   TextEditingController tinggiBackdropController = TextEditingController();
-
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -67,7 +67,8 @@ class _BackdropState extends State<Backdrop> {
     double totalHarga = panjangBackdrop * tinggiBackdrop * hargaBackdrop;
     double uangMuka = totalHarga * 0.6;
 
-    print("panjang: $panjangBackdrop, tinggi: $tinggiBackdrop, Harga: $hargaBackdrop, Total: $totalHarga");
+    print(
+        "panjang: $panjangBackdrop, tinggi: $tinggiBackdrop, Harga: $hargaBackdrop, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -75,85 +76,159 @@ class _BackdropState extends State<Backdrop> {
     });
   }
 
+  double hitungSubTotal() {
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
+
+    return parseValue(jumlahController.text);
+  }
+
+  void tambahKeKeranjang(String namaInterior, double harga) async {
+    try {
+      var keranjangRef = FirebaseFirestore.instance
+          .collection("keranjang")
+          .doc("listKeranjang");
+
+      var docSnapshot = await keranjangRef.get();
+      Map<String, dynamic>? data = docSnapshot.data() ?? {};
+
+      int nomorBarang = 1;
+      for (var key in data.keys) {
+        if (key.startsWith("barang")) {
+          int nomor = int.parse(key.replaceAll("barang", ""));
+          if (nomor >= nomorBarang) {
+            nomorBarang = nomor + 1;
+          }
+        }
+      }
+
+      String existingBarangKey = "";
+      for (var key in data.keys) {
+        if (data[key]["nama"] == namaInterior) {
+          existingBarangKey = key;
+          break;
+        }
+      }
+
+      if (existingBarangKey.isNotEmpty) {
+        await keranjangRef.update({
+          "$existingBarangKey.harga": harga,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Harga $namaInterior berhasil diperbarui "),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      } else {
+        String barangKey = "barang$nomorBarang";
+
+        await keranjangRef.set({
+          barangKey: {"nama": namaInterior, "harga": harga}
+        }, SetOptions(merge: true));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "$namaInterior ditambahkan ke keranjang sebagai Barang $nomorBarang!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menambahkan ke keranjang."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void simpanDataKeFirestore() async {
-  if (namaController.text.isEmpty ||
-      alamatController.text.isEmpty ||
-      panjangBackdropController.text.isEmpty ||
-      tinggiBackdropController.text.isEmpty ||
-      BackdropController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Harap isi semua kolom sebelum menyimpan."),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
+    if (namaController.text.isEmpty ||
+        alamatController.text.isEmpty ||
+        panjangBackdropController.text.isEmpty ||
+        tinggiBackdropController.text.isEmpty ||
+        BackdropController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap isi semua kolom sebelum menyimpan."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    print("Nama: ${namaController.text}");
+    print("Alamat: ${alamatController.text}");
+    print("Panjang Backdrop: ${panjangBackdropController.text}");
+    print("Tinggi Backdrop: ${tinggiBackdropController.text}");
+    print("Harga Backdrop: ${BackdropController.text}");
+
+    double parseValue(String text) {
+      String cleanedText =
+          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double parseUkuran(String text) {
+      String cleanedText =
+          text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double panjangBackdrop = parseUkuran(panjangBackdropController.text);
+    double tinggiBackdrop = parseUkuran(tinggiBackdropController.text);
+    double hargaBackdrop = parseValue(BackdropController.text);
+
+    double subTotal = parseValue(jumlahController.text);
+    double uangMuka = parseValue(uangMukaController.text);
+    double pelunasan = subTotal - uangMuka;
+
+    // ✅ Perbaiki jumlahKali agar akurat
+    double jumlahKali = panjangBackdrop * tinggiBackdrop;
+
+    Map<String, dynamic> data = {
+      "nama": namaController.text,
+      "alamat": alamatController.text,
+      "panjangBackdrop": panjangBackdropController.text,
+      "tinggiBackdrop": tinggiBackdropController.text,
+      "hargaBackdrop": BackdropController.text,
+      "jumlahAtas": jumlahController.text,
+      "uangMuka": uangMukaController.text,
+      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "jumlahKali":
+          jumlahKali.toStringAsFixed(2), // 🔥 Simpan dengan format yang benar
+      "tanggal": Timestamp.now(),
+    };
+
+    try {
+      await FirebaseFirestore.instance.collection("pesanan Backdrop").add(data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Data berhasil disimpan!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_Backdrop(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  print("Nama: ${namaController.text}");
-  print("Alamat: ${alamatController.text}");
-  print("Panjang Backdrop: ${panjangBackdropController.text}");
-  print("Tinggi Backdrop: ${tinggiBackdropController.text}");
-  print("Harga Backdrop: ${BackdropController.text}");
-
-  double parseValue(String text) {
-    String cleanedText = text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
-    return double.tryParse(cleanedText) ?? 0.0;
-  }
-
-  double parseUkuran(String text) {
-    String cleanedText = text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.'); 
-    return double.tryParse(cleanedText) ?? 0.0;
-  }
-
-  double panjangBackdrop = parseUkuran(panjangBackdropController.text);
-  double tinggiBackdrop = parseUkuran(tinggiBackdropController.text);
-  double hargaBackdrop = parseValue(BackdropController.text);
-
-  double subTotal = parseValue(jumlahController.text);
-  double uangMuka = parseValue(uangMukaController.text);
-  double pelunasan = subTotal - uangMuka;
-
-  // ✅ Perbaiki jumlahKali agar akurat
-  double jumlahKali = panjangBackdrop * tinggiBackdrop;
-
-  Map<String, dynamic> data = {
-    "nama": namaController.text,
-    "alamat": alamatController.text,
-    "panjangBackdrop": panjangBackdropController.text,
-    "tinggiBackdrop": tinggiBackdropController.text,
-    "hargaBackdrop": BackdropController.text,
-    "jumlahAtas": jumlahController.text,
-    "uangMuka": uangMukaController.text,
-    "pelunasan": "Rp ${_formatter.format(pelunasan)}",
-    "jumlahKali": jumlahKali.toStringAsFixed(2), // 🔥 Simpan dengan format yang benar
-    "tanggal": Timestamp.now(),
-  };
-
-  try {
-    await FirebaseFirestore.instance.collection("pesanan Backdrop").add(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Data berhasil disimpan!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const INV_Backdrop(),
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Gagal menyimpan data: $e"),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
 
   @override
   void dispose() {
@@ -209,7 +284,11 @@ class _BackdropState extends State<Backdrop> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                            );
                           },
                           child: Image.asset(
                             "assets/images/back.png",
@@ -220,7 +299,7 @@ class _BackdropState extends State<Backdrop> {
                         ),
                         const SizedBox(width: 10),
                         const Text(
-                          "Kitchen Set",
+                          "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
                             fontSize: 18,
@@ -229,11 +308,58 @@ class _BackdropState extends State<Backdrop> {
                         ),
                       ],
                     ),
-                    Image.asset(
-                      "assets/images/keranjang_merah.png",
-                      height: screenHeight * 0.035,
-                      width: screenHeight * 0.035,
-                      fit: BoxFit.contain,
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection("keranjang")
+                          .doc("listKeranjang")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        int jumlahItem = 0;
+
+                        if (snapshot.hasData && snapshot.data!.exists) {
+                          var data =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          jumlahItem = data.keys
+                              .where((key) => key.startsWith("barang"))
+                              .length;
+                        }
+
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Image.asset(
+                              "assets/images/keranjang_merah.png",
+                              height: screenHeight * 0.035,
+                              width: screenHeight * 0.035,
+                              fit: BoxFit.contain,
+                            ),
+                            if (jumlahItem > 0) // Tampilkan hanya jika ada item
+                              Positioned(
+                                top: -4,
+                                right: -4,
+                                child: Container(
+                                  width: screenHeight * 0.022,
+                                  height: screenHeight * 0.022,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF5252),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 1),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    jumlahItem.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: screenHeight * 0.015,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -388,9 +514,7 @@ class _BackdropState extends State<Backdrop> {
                                       Expanded(
                                         flex: 1, // Tinggi di tengah
                                         child: Padding(
-                                          padding: EdgeInsets.only(
-                                              left:
-                                                  6),
+                                          padding: EdgeInsets.only(left: 6),
                                           child: Text(
                                             "Tinggi",
                                             style: GoogleFonts.lato(
@@ -660,7 +784,9 @@ class _BackdropState extends State<Backdrop> {
             Expanded(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  tambahKeKeranjang("Backdrop", hitungSubTotal());
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00BFA5),
                   padding: const EdgeInsets.symmetric(vertical: 16),

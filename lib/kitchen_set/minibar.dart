@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/Invoice/INV_minibar.dart';
 import 'package:ganesha_interior/kitchen_set/meja_island.dart';
+import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -69,6 +70,77 @@ class _MinibarState extends State<Minibar> {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
       uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
     });
+  }
+
+  double hitungSubTotal() {
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
+
+    return parseValue(jumlahController.text);
+  }
+
+  void tambahKeKeranjang(String namaInterior, double harga) async {
+    try {
+      var keranjangRef = FirebaseFirestore.instance
+          .collection("keranjang")
+          .doc("listKeranjang");
+
+      var docSnapshot = await keranjangRef.get();
+      Map<String, dynamic>? data = docSnapshot.data() ?? {};
+
+      int nomorBarang = 1;
+      for (var key in data.keys) {
+        if (key.startsWith("barang")) {
+          int nomor = int.parse(key.replaceAll("barang", ""));
+          if (nomor >= nomorBarang) {
+            nomorBarang = nomor + 1;
+          }
+        }
+      }
+
+      String existingBarangKey = "";
+      for (var key in data.keys) {
+        if (data[key]["nama"] == namaInterior) {
+          existingBarangKey = key;
+          break;
+        }
+      }
+
+      if (existingBarangKey.isNotEmpty) {
+        await keranjangRef.update({
+          "$existingBarangKey.harga": harga,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Harga $namaInterior berhasil diperbarui "),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      } else {
+        String barangKey = "barang$nomorBarang";
+
+        await keranjangRef.set({
+          barangKey: {"nama": namaInterior, "harga": harga}
+        }, SetOptions(merge: true));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "$namaInterior ditambahkan ke keranjang sebagai Barang $nomorBarang!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menambahkan ke keranjang."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void simpanDataKeFirestore() async {
@@ -190,7 +262,11 @@ class _MinibarState extends State<Minibar> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                            );
                           },
                           child: Image.asset(
                             "assets/images/back.png",
@@ -210,11 +286,29 @@ class _MinibarState extends State<Minibar> {
                         ),
                       ],
                     ),
-                    Image.asset(
-                      "assets/images/keranjang_merah.png",
-                      height: screenHeight * 0.035,
-                      width: screenHeight * 0.035,
-                      fit: BoxFit.contain,
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Image.asset(
+                          "assets/images/keranjang_merah.png",
+                          height: screenHeight * 0.035,
+                          width: screenHeight * 0.035,
+                          fit: BoxFit.contain,
+                        ),
+                        Positioned(
+                          top: -4,
+                          right: -4,
+                          child: Container(
+                            width: screenHeight * 0.022,
+                            height: screenHeight * 0.022,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF5252),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -586,7 +680,8 @@ class _MinibarState extends State<Minibar> {
             Expanded(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {tambahKeKeranjang("Minibar", hitungSubTotal());
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00BFA5),
                   padding: const EdgeInsets.symmetric(vertical: 16),

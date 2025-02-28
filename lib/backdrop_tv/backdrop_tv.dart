@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/Invoice/INV_backdrop_tv.dart';
 import 'package:ganesha_interior/lemari/lemari.dart';
+import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -14,7 +15,8 @@ class BackdropTV extends StatefulWidget {
 }
 
 class _BackdropState extends State<BackdropTV> {
-  TextEditingController BackdropTVController = TextEditingController(text: "Rp ");
+  TextEditingController BackdropTVController =
+      TextEditingController(text: "Rp ");
   TextEditingController uangMukaController = TextEditingController(text: "Rp ");
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
@@ -22,8 +24,7 @@ class _BackdropState extends State<BackdropTV> {
   TextEditingController ukuranBackdropTVController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NumberFormat _formatter =
-      NumberFormat("#,###", "id_ID"); 
+  final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
 
   @override
   void initState() {
@@ -44,103 +45,173 @@ class _BackdropState extends State<BackdropTV> {
   }
 
   void _hitungBackdropTV() {
-  double parseUkuran(String text) {
-    String cleanedText = text
-        .replaceAll(RegExp(r'[^0-9,.]'), '') 
-        .replaceAll(',', '.'); 
+    double parseUkuran(String text) {
+      String cleanedText =
+          text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
 
-    return double.tryParse(cleanedText) ?? 0.0;
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double parseHarga(String text) {
+      String cleanedText =
+          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double ukuranBackdropTV = parseUkuran(ukuranBackdropTVController.text);
+    double hargaBackdropTV = parseHarga(BackdropTVController.text);
+
+    double totalHarga = ukuranBackdropTV * hargaBackdropTV;
+    double uangMuka = totalHarga * 0.6;
+
+    print(
+        "Ukuran: $ukuranBackdropTV, Harga: $hargaBackdropTV, Total: $totalHarga");
+
+    setState(() {
+      jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
+      uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
+    });
   }
 
-  double parseHarga(String text) {
-    String cleanedText = text
-        .replaceAll("Rp ", "")
-        .replaceAll(RegExp(r'[^0-9]'), ''); 
+  double hitungSubTotal() {
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
 
-    return double.tryParse(cleanedText) ?? 0.0;
+    return parseValue(jumlahController.text);
   }
 
-  double ukuranBackdropTV = parseUkuran(ukuranBackdropTVController.text);
-  double hargaBackdropTV = parseHarga(BackdropTVController.text);
+  void tambahKeKeranjang(String namaInterior, double harga) async {
+    try {
+      var keranjangRef = FirebaseFirestore.instance
+          .collection("keranjang")
+          .doc("listKeranjang");
 
-  double totalHarga = ukuranBackdropTV * hargaBackdropTV;
-  double uangMuka = totalHarga * 0.6;
+      var docSnapshot = await keranjangRef.get();
+      Map<String, dynamic>? data = docSnapshot.data() ?? {};
 
-  print("Ukuran: $ukuranBackdropTV, Harga: $hargaBackdropTV, Total: $totalHarga");
+      int nomorBarang = 1;
+      for (var key in data.keys) {
+        if (key.startsWith("barang")) {
+          int nomor = int.parse(key.replaceAll("barang", ""));
+          if (nomor >= nomorBarang) {
+            nomorBarang = nomor + 1;
+          }
+        }
+      }
 
-  setState(() {
-    jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
-    uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
-  });
-}
+      String existingBarangKey = "";
+      for (var key in data.keys) {
+        if (data[key]["nama"] == namaInterior) {
+          existingBarangKey = key;
+          break;
+        }
+      }
 
+      if (existingBarangKey.isNotEmpty) {
+        await keranjangRef.update({
+          "$existingBarangKey.harga": harga,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Harga $namaInterior berhasil diperbarui "),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      } else {
+        String barangKey = "barang$nomorBarang";
+
+        await keranjangRef.set({
+          barangKey: {"nama": namaInterior, "harga": harga}
+        }, SetOptions(merge: true));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "$namaInterior ditambahkan ke keranjang sebagai Barang $nomorBarang!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menambahkan ke keranjang."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   void simpanDataKeFirestore() async {
-  if (namaController.text.isEmpty ||
-      alamatController.text.isEmpty ||
-      ukuranBackdropTVController.text.isEmpty ||
-      BackdropTVController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Harap isi semua kolom sebelum menyimpan."),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
+    if (namaController.text.isEmpty ||
+        alamatController.text.isEmpty ||
+        ukuranBackdropTVController.text.isEmpty ||
+        BackdropTVController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap isi semua kolom sebelum menyimpan."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Debugging untuk melihat data sebelum dikirim ke Firestore
+    print("Nama: ${namaController.text}");
+    print("Alamat: ${alamatController.text}");
+    print("Ukuran BackdropTV: ${ukuranBackdropTVController.text}");
+    print("Harga BackdropTV: ${BackdropTVController.text}");
+
+    double parseValue(String text) {
+      String cleanedText =
+          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double subTotal = parseValue(jumlahController.text);
+    double uangMuka = parseValue(uangMukaController.text);
+    double pelunasan = subTotal - uangMuka;
+
+    Map<String, dynamic> data = {
+      "nama": namaController.text,
+      "alamat": alamatController.text,
+      "ukuranBackdropTV": ukuranBackdropTVController.text,
+      "hargaBackdropTV": BackdropTVController.text,
+      "jumlahAtas": jumlahController.text,
+      "uangMuka": uangMukaController.text,
+      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "tanggal": Timestamp.now(),
+    };
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("pesanan BackdropTV")
+          .add(data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Data berhasil disimpan!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_BackdropTV(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  // Debugging untuk melihat data sebelum dikirim ke Firestore
-  print("Nama: ${namaController.text}");
-  print("Alamat: ${alamatController.text}");
-  print("Ukuran BackdropTV: ${ukuranBackdropTVController.text}");
-  print("Harga BackdropTV: ${BackdropTVController.text}");
-
-  double parseValue(String text) {
-    String cleanedText = text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
-    return double.tryParse(cleanedText) ?? 0.0;
-  }
-
-  double subTotal = parseValue(jumlahController.text);
-  double uangMuka = parseValue(uangMukaController.text);
-  double pelunasan = subTotal - uangMuka;
-
-  Map<String, dynamic> data = {
-    "nama": namaController.text,
-    "alamat": alamatController.text,
-    "ukuranBackdropTV": ukuranBackdropTVController.text,
-    "hargaBackdropTV": BackdropTVController.text,
-    "jumlahAtas": jumlahController.text,
-    "uangMuka": uangMukaController.text,
-    "pelunasan": "Rp ${_formatter.format(pelunasan)}",
-    "tanggal": Timestamp.now(),
-  };
-
-  try {
-    await FirebaseFirestore.instance.collection("pesanan BackdropTV").add(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Data berhasil disimpan!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const INV_BackdropTV(),
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Gagal menyimpan data: $e"),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
-
-
 
   @override
   void dispose() {
@@ -195,7 +266,11 @@ class _BackdropState extends State<BackdropTV> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                            );
                           },
                           child: Image.asset(
                             "assets/images/back.png",
@@ -206,7 +281,7 @@ class _BackdropState extends State<BackdropTV> {
                         ),
                         const SizedBox(width: 10),
                         const Text(
-                          "Kitchen Set",
+                          "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
                             fontSize: 18,
@@ -215,11 +290,58 @@ class _BackdropState extends State<BackdropTV> {
                         ),
                       ],
                     ),
-                    Image.asset(
-                      "assets/images/keranjang_merah.png",
-                      height: screenHeight * 0.035,
-                      width: screenHeight * 0.035,
-                      fit: BoxFit.contain,
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection("keranjang")
+                          .doc("listKeranjang")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        int jumlahItem = 0;
+
+                        if (snapshot.hasData && snapshot.data!.exists) {
+                          var data =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          jumlahItem = data.keys
+                              .where((key) => key.startsWith("barang"))
+                              .length;
+                        }
+
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Image.asset(
+                              "assets/images/keranjang_merah.png",
+                              height: screenHeight * 0.035,
+                              width: screenHeight * 0.035,
+                              fit: BoxFit.contain,
+                            ),
+                            if (jumlahItem > 0) // Tampilkan hanya jika ada item
+                              Positioned(
+                                top: -4,
+                                right: -4,
+                                child: Container(
+                                  width: screenHeight * 0.022,
+                                  height: screenHeight * 0.022,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF5252),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 1),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    jumlahItem.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: screenHeight * 0.015,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -395,7 +517,8 @@ class _BackdropState extends State<BackdropTV> {
                                     children: [
                                       Expanded(
                                         child: TextField(
-                                          controller: ukuranBackdropTVController,
+                                          controller:
+                                              ukuranBackdropTVController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -579,7 +702,9 @@ class _BackdropState extends State<BackdropTV> {
             Expanded(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  tambahKeKeranjang("Backdrop TV", hitungSubTotal());
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00BFA5),
                   padding: const EdgeInsets.symmetric(vertical: 16),

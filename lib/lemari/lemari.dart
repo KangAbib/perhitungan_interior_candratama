@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/Invoice/INV_lemari.dart';
 import 'package:ganesha_interior/backdrop/backdrop.dart';
+import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -69,6 +70,77 @@ class _LemariScreenState extends State<LemariScreen> {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
       uangMukaController.text = "Rp ${_formatter.format(uangMuka)}";
     });
+  }
+
+  double hitungSubTotal() {
+    double parseValue(String text) {
+      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    }
+
+    return parseValue(jumlahController.text);
+  }
+
+  void tambahKeKeranjang(String namaInterior, double harga) async {
+    try {
+      var keranjangRef = FirebaseFirestore.instance
+          .collection("keranjang")
+          .doc("listKeranjang");
+
+      var docSnapshot = await keranjangRef.get();
+      Map<String, dynamic>? data = docSnapshot.data() ?? {};
+
+      int nomorBarang = 1;
+      for (var key in data.keys) {
+        if (key.startsWith("barang")) {
+          int nomor = int.parse(key.replaceAll("barang", ""));
+          if (nomor >= nomorBarang) {
+            nomorBarang = nomor + 1;
+          }
+        }
+      }
+
+      String existingBarangKey = "";
+      for (var key in data.keys) {
+        if (data[key]["nama"] == namaInterior) {
+          existingBarangKey = key;
+          break;
+        }
+      }
+
+      if (existingBarangKey.isNotEmpty) {
+        await keranjangRef.update({
+          "$existingBarangKey.harga": harga,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Harga $namaInterior berhasil diperbarui "),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      } else {
+        String barangKey = "barang$nomorBarang";
+
+        await keranjangRef.set({
+          barangKey: {"nama": namaInterior, "harga": harga}
+        }, SetOptions(merge: true));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "$namaInterior ditambahkan ke keranjang sebagai Barang $nomorBarang!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menambahkan ke keranjang."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void simpanDataKeFirestore() async {
@@ -190,7 +262,11 @@ class _LemariScreenState extends State<LemariScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                            );
                           },
                           child: Image.asset(
                             "assets/images/back.png",
@@ -201,7 +277,7 @@ class _LemariScreenState extends State<LemariScreen> {
                         ),
                         const SizedBox(width: 10),
                         const Text(
-                          "Kitchen Set",
+                          "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
                             fontSize: 18,
@@ -210,11 +286,58 @@ class _LemariScreenState extends State<LemariScreen> {
                         ),
                       ],
                     ),
-                    Image.asset(
-                      "assets/images/keranjang_merah.png",
-                      height: screenHeight * 0.035,
-                      width: screenHeight * 0.035,
-                      fit: BoxFit.contain,
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection("keranjang")
+                          .doc("listKeranjang")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        int jumlahItem = 0;
+
+                        if (snapshot.hasData && snapshot.data!.exists) {
+                          var data =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          jumlahItem = data.keys
+                              .where((key) => key.startsWith("barang"))
+                              .length;
+                        }
+
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Image.asset(
+                              "assets/images/keranjang_merah.png",
+                              height: screenHeight * 0.035,
+                              width: screenHeight * 0.035,
+                              fit: BoxFit.contain,
+                            ),
+                            if (jumlahItem > 0) // Tampilkan hanya jika ada item
+                              Positioned(
+                                top: -4,
+                                right: -4,
+                                child: Container(
+                                  width: screenHeight * 0.022,
+                                  height: screenHeight * 0.022,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF5252),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 1),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    jumlahItem.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: screenHeight * 0.015,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -586,7 +709,9 @@ class _LemariScreenState extends State<LemariScreen> {
             Expanded(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  tambahKeKeranjang("Lemari", hitungSubTotal());
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00BFA5),
                   padding: const EdgeInsets.symmetric(vertical: 16),

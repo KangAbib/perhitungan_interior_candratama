@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/backdrop/backdrop.dart';
@@ -80,29 +81,58 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Image.asset(
-                          "assets/images/keranjang_merah.png",
-                          height: screenHeight * 0.035,
-                          width: screenHeight * 0.035,
-                          fit: BoxFit.contain,
-                        ),
-                        Positioned(
-                          top: -4,
-                          right: -4,
-                          child: Container(
-                            width: screenHeight * 0.022,
-                            height: screenHeight * 0.022,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFF5252),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1),
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection("keranjang")
+                          .doc("listKeranjang")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        int jumlahItem = 0;
+
+                        if (snapshot.hasData && snapshot.data!.exists) {
+                          var data =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          jumlahItem = data.keys
+                              .where((key) => key.startsWith("barang"))
+                              .length;
+                        }
+
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Image.asset(
+                              "assets/images/keranjang_merah.png",
+                              height: screenHeight * 0.035,
+                              width: screenHeight * 0.035,
+                              fit: BoxFit.contain,
                             ),
-                          ),
-                        ),
-                      ],
+                            if (jumlahItem > 0) // Tampilkan hanya jika ada item
+                              Positioned(
+                                top: -4,
+                                right: -4,
+                                child: Container(
+                                  width: screenHeight * 0.022,
+                                  height: screenHeight * 0.022,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF5252),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 1),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    jumlahItem.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: screenHeight * 0.015,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -614,7 +644,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const InteriorCustomScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const InteriorCustomScreen()),
                 );
               },
               child: Card(

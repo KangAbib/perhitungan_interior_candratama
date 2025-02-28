@@ -41,9 +41,9 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
-          hargaMejaIsland = data["hargaMejaIsland"] ?? "Rp 0";
+          hargaMejaIsland = data["hargaMejaisland"] ?? "Rp 0";
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
-          ukuranMejaIsland = data["ukuranMejaIsland"] ?? "0";
+          ukuranMejaIsland = data["ukuranMejaisland"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           subTotal =
               "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
