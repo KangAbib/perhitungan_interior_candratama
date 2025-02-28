@@ -76,77 +76,84 @@ class _BackdropState extends State<Backdrop> {
   }
 
   void simpanDataKeFirestore() async {
-    if (namaController.text.isEmpty ||
-        alamatController.text.isEmpty ||
-        panjangBackdropController.text.isEmpty ||
-        tinggiBackdropController.text.isEmpty ||
-        BackdropController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Harap isi semua kolom sebelum menyimpan."),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    print("Nama: ${namaController.text}");
-    print("Alamat: ${alamatController.text}");
-    print("panjang Backdrop: ${panjangBackdropController.text}");
-    print("tinggi Backdrop: ${tinggiBackdropController.text}");
-    print("Harga Backdrop: ${BackdropController.text}");
-
-    double parseValue(String text) {
-      String cleanedText =
-          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
-      return double.tryParse(cleanedText) ?? 0.0;
-    }
-
-    double panjangBackdrop = parseValue(panjangBackdropController.text);
-    double tinggiBackdrop = parseValue(tinggiBackdropController.text);
-    double hargaBackdrop = parseValue(BackdropController.text);
-    double jumlahKali = panjangBackdrop * tinggiBackdrop;
-    double subTotal = parseValue(jumlahController.text);
-    double uangMuka = parseValue(uangMukaController.text);
-    double pelunasan = subTotal - uangMuka;
-
-    Map<String, dynamic> data = {
-      "nama": namaController.text,
-      "alamat": alamatController.text,
-      "panjangBackdrop": panjangBackdropController.text,
-      "tinggiBackdrop": tinggiBackdropController.text,
-      "jumlahKali": jumlahKali.toString(),
-      "hargaBackdrop": BackdropController.text,
-      "jumlahAtas": jumlahController.text,
-      "uangMuka": uangMukaController.text,
-      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
-      "tanggal": Timestamp.now(),
-    };
-
-    try {
-      await FirebaseFirestore.instance.collection("pesanan Backdrop").add(data);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Data berhasil disimpan!"),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const INV_Backdrop(),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menyimpan data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  if (namaController.text.isEmpty ||
+      alamatController.text.isEmpty ||
+      panjangBackdropController.text.isEmpty ||
+      tinggiBackdropController.text.isEmpty ||
+      BackdropController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Harap isi semua kolom sebelum menyimpan."),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
   }
+
+  print("Nama: ${namaController.text}");
+  print("Alamat: ${alamatController.text}");
+  print("Panjang Backdrop: ${panjangBackdropController.text}");
+  print("Tinggi Backdrop: ${tinggiBackdropController.text}");
+  print("Harga Backdrop: ${BackdropController.text}");
+
+  double parseValue(String text) {
+    String cleanedText = text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+    return double.tryParse(cleanedText) ?? 0.0;
+  }
+
+  double parseUkuran(String text) {
+    String cleanedText = text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.'); 
+    return double.tryParse(cleanedText) ?? 0.0;
+  }
+
+  double panjangBackdrop = parseUkuran(panjangBackdropController.text);
+  double tinggiBackdrop = parseUkuran(tinggiBackdropController.text);
+  double hargaBackdrop = parseValue(BackdropController.text);
+
+  double subTotal = parseValue(jumlahController.text);
+  double uangMuka = parseValue(uangMukaController.text);
+  double pelunasan = subTotal - uangMuka;
+
+  // ✅ Perbaiki jumlahKali agar akurat
+  double jumlahKali = panjangBackdrop * tinggiBackdrop;
+
+  Map<String, dynamic> data = {
+    "nama": namaController.text,
+    "alamat": alamatController.text,
+    "panjangBackdrop": panjangBackdropController.text,
+    "tinggiBackdrop": tinggiBackdropController.text,
+    "hargaBackdrop": BackdropController.text,
+    "jumlahAtas": jumlahController.text,
+    "uangMuka": uangMukaController.text,
+    "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+    "jumlahKali": jumlahKali.toStringAsFixed(2), // 🔥 Simpan dengan format yang benar
+    "tanggal": Timestamp.now(),
+  };
+
+  try {
+    await FirebaseFirestore.instance.collection("pesanan Backdrop").add(data);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Data berhasil disimpan!"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const INV_Backdrop(),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Gagal menyimpan data: $e"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   @override
   void dispose() {

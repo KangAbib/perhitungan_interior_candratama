@@ -13,6 +13,7 @@ class INV_InteriorCustom extends StatefulWidget {
 class _INV_Partsi extends State<INV_InteriorCustom> {
   String nama = "Memuat...";
   String alamat = "";
+  String namainterior = "";
   String hargaInteriorCustom = "";
   String jumlahAtas = "";
   String ukuranInteriorCustom = "";
@@ -28,7 +29,7 @@ class _INV_Partsi extends State<INV_InteriorCustom> {
   void ambilDataTerakhir() async {
     try {
       var snapshot = await FirebaseFirestore.instance
-          .collection("pesanan InteriorCustom")
+          .collection("pesanan Custom")
           .orderBy("tanggal", descending: true)
           .limit(1)
           .get();
@@ -41,6 +42,7 @@ class _INV_Partsi extends State<INV_InteriorCustom> {
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
+          namainterior = data["NamaInterior"] ?? "Nama Interior tidak ditemukan";
           hargaInteriorCustom = data["hargaInteriorCustom"] ?? "Rp 0";
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
           ukuranInteriorCustom = data["ukuranInteriorCustom"] ?? "0";
@@ -61,6 +63,7 @@ class _INV_Partsi extends State<INV_InteriorCustom> {
         setState(() {
           nama = "Data tidak tersedia";
           alamat = "";
+          namainterior = "";
           hargaInteriorCustom = "Rp 0";
           jumlahAtas = "Rp 0";
           ukuranInteriorCustom = "0";
@@ -73,6 +76,7 @@ class _INV_Partsi extends State<INV_InteriorCustom> {
       setState(() {
         nama = "Gagal memuat data";
         alamat = "";
+        namainterior = "";
         hargaInteriorCustom = "Rp 0";
         jumlahAtas = "Rp 0";
         ukuranInteriorCustom = "0";
@@ -216,7 +220,7 @@ class _INV_Partsi extends State<INV_InteriorCustom> {
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
                     _buildTableRow([
-                      "InteriorCustom set",
+                      namainterior,
                       hargaInteriorCustom,
                       ukuranInteriorCustom,
                       jumlahAtas
@@ -232,7 +236,7 @@ class _INV_Partsi extends State<INV_InteriorCustom> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "InteriorCustom set" : "InteriorCustom set"}",
+                    "Pembayaran : $namainterior",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,

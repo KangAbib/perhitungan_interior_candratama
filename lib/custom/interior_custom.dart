@@ -14,12 +14,15 @@ class InteriorCustomScreen extends StatefulWidget {
 }
 
 class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
-  TextEditingController InteriorCustomController = TextEditingController(text: "Rp ");
+  TextEditingController InteriorCustomController =
+      TextEditingController(text: "Rp ");
   TextEditingController uangMukaController = TextEditingController(text: "Rp ");
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
+  TextEditingController namacustomController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController ukuranInteriorCustomController = TextEditingController();
+  TextEditingController ukuranInteriorCustomController =
+      TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -57,13 +60,15 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double ukuranInteriorCustom = parseUkuran(ukuranInteriorCustomController.text);
+    double ukuranInteriorCustom =
+        parseUkuran(ukuranInteriorCustomController.text);
     double hargaInteriorCustom = parseHarga(InteriorCustomController.text);
 
     double totalHarga = ukuranInteriorCustom * hargaInteriorCustom;
     double uangMuka = totalHarga * 0.6;
 
-    print("Ukuran: $ukuranInteriorCustom, Harga: $hargaInteriorCustom, Total: $totalHarga");
+    print(
+        "Ukuran: $ukuranInteriorCustom, Harga: $hargaInteriorCustom, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -106,6 +111,7 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
       "alamat": alamatController.text,
       "ukuranInteriorCustom": ukuranInteriorCustomController.text,
       "hargaInteriorCustom": InteriorCustomController.text,
+      "NamaInterior": namacustomController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
@@ -113,7 +119,9 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
     };
 
     try {
-      await FirebaseFirestore.instance.collection("pesanan InteriorCustom").add(data);
+      await FirebaseFirestore.instance
+          .collection("pesanan Custom")
+          .add(data);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Data berhasil disimpan!"),
@@ -143,6 +151,7 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
     uangMukaController.dispose();
     jumlahController.dispose();
     namaController.dispose();
+    namacustomController.dispose();
     alamatController.dispose();
     ukuranInteriorCustomController.dispose();
     super.dispose();
@@ -390,7 +399,8 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
                                     children: [
                                       Expanded(
                                         child: TextField(
-                                          controller: ukuranInteriorCustomController,
+                                          controller:
+                                              ukuranInteriorCustomController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -470,12 +480,45 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
                                                                 .length),
                                               );
                                             } else {
-                                              InteriorCustomController.text = "Rp ";
+                                              InteriorCustomController.text =
+                                                  "Rp ";
                                             }
                                           },
                                         ),
                                       ),
                                     ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Nama Interior",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    controller: namacustomController,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 12),
+                                    ),
+                                    keyboardType: TextInputType.text,
                                   ),
                                   SizedBox(height: 10),
                                   Padding(

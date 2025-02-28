@@ -44,7 +44,7 @@ class _INV_Partsi extends State<INV_Backdrop> {
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaBackdrop = data["hargaBackdrop"] ?? "Rp 0";
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
-          ukuranBackdrop = data["ukuranBackdrop"] ?? "0";
+          ukuranBackdrop = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           subTotal =
               "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";

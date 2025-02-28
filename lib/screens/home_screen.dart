@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/backdrop/backdrop.dart';
 import 'package:ganesha_interior/backdrop_tv/backdrop_tv.dart';
+import 'package:ganesha_interior/custom/interior_custom.dart';
 import 'package:ganesha_interior/kitchen_set/meja_island.dart';
 import 'package:ganesha_interior/kitchen_set/minibar.dart';
 import 'package:ganesha_interior/kitchen_set/tipe_L.dart';
@@ -609,53 +610,61 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             top: screenHeight * 0.764,
             left: screenWidth * 0,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: (MediaQuery.of(context).size.width / 2) - 4,
-                height: screenHeight * 0.223,
-                decoration: BoxDecoration(
-                  color: Colors.white,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InteriorCustomScreen()),
+                );
+              },
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 8,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.asset(
-                          "assets/images/custom.webp",
-                          fit: BoxFit.contain,
+                child: Container(
+                  width: (MediaQuery.of(context).size.width / 2) - 4,
+                  height: screenHeight * 0.223,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 8,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image.asset(
+                            "assets/images/custom.webp",
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: (MediaQuery.of(context).size.width / 2) *
-                                  0.1),
-                          child: Text(
-                            "Custom",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.manrope(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.black,
+                      Expanded(
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: (MediaQuery.of(context).size.width / 2) *
+                                    0.1),
+                            child: Text(
+                              "Custom",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.manrope(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
