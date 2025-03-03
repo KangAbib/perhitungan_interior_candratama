@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganesha_interior/Invoice/INV_backdrop.dart';
+import 'package:ganesha_interior/keranjang/list_keranjang.dart';
 import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:ganesha_interior/table/meja_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -111,9 +112,12 @@ class _BackdropState extends State<Backdrop> {
         }
       }
 
+      int timestamp = DateTime.now().millisecondsSinceEpoch;
+
       if (existingBarangKey.isNotEmpty) {
         await keranjangRef.update({
           "$existingBarangKey.harga": harga,
+          "$existingBarangKey.timestamp": timestamp,
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -125,13 +129,13 @@ class _BackdropState extends State<Backdrop> {
         String barangKey = "barang$nomorBarang";
 
         await keranjangRef.set({
-          barangKey: {"nama": namaInterior, "harga": harga}
+          barangKey: {"nama": namaInterior, "harga": harga, "timestamp": timestamp}
         }, SetOptions(merge: true));
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                "$namaInterior ditambahkan ke keranjang sebagai Barang $nomorBarang!"),
+                "$namaInterior ditambahkan ke keranjang"),
             backgroundColor: Colors.green,
           ),
         );
@@ -324,40 +328,54 @@ class _BackdropState extends State<Backdrop> {
                               .length;
                         }
 
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Image.asset(
-                              "assets/images/keranjang_merah.png",
-                              height: screenHeight * 0.035,
-                              width: screenHeight * 0.035,
-                              fit: BoxFit.contain,
-                            ),
-                            if (jumlahItem > 0) // Tampilkan hanya jika ada item
-                              Positioned(
-                                top: -4,
-                                right: -4,
-                                child: Container(
-                                  width: screenHeight * 0.022,
-                                  height: screenHeight * 0.022,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF5252),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color: Colors.white, width: 1),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    jumlahItem.toString(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: screenHeight * 0.015,
-                                      fontWeight: FontWeight.bold,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const KeranjangScreen()),
+                            );
+                          },
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // Ikon Keranjang
+                              Image.asset(
+                                "assets/images/keranjang_merah.png",
+                                height: screenHeight * 0.035,
+                                width: screenHeight * 0.035,
+                                fit: BoxFit.contain,
+                              ),
+
+                              // Badge Jumlah Item (Ditampilkan jika jumlahItem > 0)
+                              if (jumlahItem > 0)
+                                Positioned(
+                                  top: -6, // Ubah agar lebih rapi
+                                  right: -6,
+                                  child: Container(
+                                    width: screenHeight *
+                                        0.024, // Ukuran lebih proporsional
+                                    height: screenHeight * 0.024,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFF5252),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          color: Colors.white, width: 1),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      jumlahItem.toString(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: screenHeight * 0.015,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         );
                       },
                     ),

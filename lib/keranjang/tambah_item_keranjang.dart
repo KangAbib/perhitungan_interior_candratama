@@ -1,28 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ganesha_interior/Invoice/INV_backdrop_tv.dart';
+import 'package:ganesha_interior/keranjang/daftar_bayar_keranjang.dart';
 import 'package:ganesha_interior/keranjang/list_keranjang.dart';
-import 'package:ganesha_interior/lemari/lemari.dart';
 import 'package:ganesha_interior/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class BackdropTV extends StatefulWidget {
-  const BackdropTV({super.key});
+class Tambah_ItemScreen extends StatefulWidget {
+  const Tambah_ItemScreen({super.key});
 
   @override
-  State<BackdropTV> createState() => _BackdropState();
+  State<Tambah_ItemScreen> createState() => _Tambah_ItemScreenState();
 }
 
-class _BackdropState extends State<BackdropTV> {
-  TextEditingController BackdropTVController =
+class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
+  TextEditingController InteriorCustomController =
       TextEditingController(text: "Rp ");
   TextEditingController uangMukaController = TextEditingController(text: "Rp ");
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
+  TextEditingController namacustomController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController ukuranBackdropTVController = TextEditingController();
+  TextEditingController ukuranInteriorCustomController =
+      TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -35,17 +36,17 @@ class _BackdropState extends State<BackdropTV> {
       statusBarIconBrightness: Brightness.dark,
     ));
 
-    _setupControllerListener(BackdropTVController);
-    _setupControllerListener(ukuranBackdropTVController);
+    _setupControllerListener(InteriorCustomController);
+    _setupControllerListener(ukuranInteriorCustomController);
   }
 
   void _setupControllerListener(TextEditingController controller) {
     controller.addListener(() {
-      _hitungBackdropTV();
+      _hitungInteriorCustom();
     });
   }
 
-  void _hitungBackdropTV() {
+  void _hitungInteriorCustom() {
     double parseUkuran(String text) {
       String cleanedText =
           text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
@@ -60,14 +61,15 @@ class _BackdropState extends State<BackdropTV> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double ukuranBackdropTV = parseUkuran(ukuranBackdropTVController.text);
-    double hargaBackdropTV = parseHarga(BackdropTVController.text);
+    double ukuranInteriorCustom =
+        parseUkuran(ukuranInteriorCustomController.text);
+    double hargaInteriorCustom = parseHarga(InteriorCustomController.text);
 
-    double totalHarga = ukuranBackdropTV * hargaBackdropTV;
+    double totalHarga = ukuranInteriorCustom * hargaInteriorCustom;
     double uangMuka = totalHarga * 0.6;
 
     print(
-        "Ukuran: $ukuranBackdropTV, Harga: $hargaBackdropTV, Total: $totalHarga");
+        "Ukuran: $ukuranInteriorCustom, Harga: $hargaInteriorCustom, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -83,7 +85,8 @@ class _BackdropState extends State<BackdropTV> {
     return parseValue(jumlahController.text);
   }
 
-  void tambahKeKeranjang(String namaInterior, double harga) async {
+  void tambahKeKeranjang(
+      String namaInterior, double harga, BuildContext context) async {
     try {
       var keranjangRef = FirebaseFirestore.instance
           .collection("keranjang")
@@ -119,7 +122,7 @@ class _BackdropState extends State<BackdropTV> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Harga $namaInterior berhasil diperbarui "),
+            content: Text("Harga $namaInterior berhasil diperbarui"),
             backgroundColor: Colors.blue,
           ),
         );
@@ -127,17 +130,28 @@ class _BackdropState extends State<BackdropTV> {
         String barangKey = "barang$nomorBarang";
 
         await keranjangRef.set({
-          barangKey: {"nama": namaInterior, "harga": harga, "timestamp": timestamp}
+          barangKey: {
+            "nama": namaInterior,
+            "harga": harga,
+            "timestamp": timestamp
+          }
         }, SetOptions(merge: true));
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                "$namaInterior ditambahkan ke keranjang"),
+            content: Text("$namaInterior ditambahkan ke keranjang"),
             backgroundColor: Colors.green,
           ),
         );
       }
+
+      // Navigasi ke Daftar_KeranjangScreen setelah sukses
+      Future.delayed(const Duration(milliseconds: 500), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Daftar_KeranjangScreen()),
+        );
+      });
     } catch (e) {
       print("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -149,82 +163,15 @@ class _BackdropState extends State<BackdropTV> {
     }
   }
 
-  void simpanDataKeFirestore() async {
-    if (namaController.text.isEmpty ||
-        alamatController.text.isEmpty ||
-        ukuranBackdropTVController.text.isEmpty ||
-        BackdropTVController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Harap isi semua kolom sebelum menyimpan."),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Debugging untuk melihat data sebelum dikirim ke Firestore
-    print("Nama: ${namaController.text}");
-    print("Alamat: ${alamatController.text}");
-    print("Ukuran BackdropTV: ${ukuranBackdropTVController.text}");
-    print("Harga BackdropTV: ${BackdropTVController.text}");
-
-    double parseValue(String text) {
-      String cleanedText =
-          text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
-      return double.tryParse(cleanedText) ?? 0.0;
-    }
-
-    double subTotal = parseValue(jumlahController.text);
-    double uangMuka = parseValue(uangMukaController.text);
-    double pelunasan = subTotal - uangMuka;
-
-    Map<String, dynamic> data = {
-      "nama": namaController.text,
-      "alamat": alamatController.text,
-      "ukuranBackdropTV": ukuranBackdropTVController.text,
-      "hargaBackdropTV": BackdropTVController.text,
-      "jumlahAtas": jumlahController.text,
-      "uangMuka": uangMukaController.text,
-      "pelunasan": "Rp ${_formatter.format(pelunasan)}",
-      "tanggal": Timestamp.now(),
-    };
-
-    try {
-      await FirebaseFirestore.instance
-          .collection("pesanan BackdropTV")
-          .add(data);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Data berhasil disimpan!"),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const INV_BackdropTV(),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menyimpan data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
   @override
   void dispose() {
-    BackdropTVController.dispose();
+    InteriorCustomController.dispose();
     uangMukaController.dispose();
     jumlahController.dispose();
     namaController.dispose();
+    namacustomController.dispose();
     alamatController.dispose();
-    ukuranBackdropTVController.dispose();
+    ukuranInteriorCustomController.dispose();
     super.dispose();
   }
 
@@ -285,7 +232,7 @@ class _BackdropState extends State<BackdropTV> {
                         ),
                         const SizedBox(width: 10),
                         const Text(
-                          "Estimasi Harga",
+                          "Tambah Interior",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
                             fontSize: 18,
@@ -399,7 +346,7 @@ class _BackdropState extends State<BackdropTV> {
                                 children: [
                                   Center(
                                     child: Text(
-                                      "Backdrop TV",
+                                      "Interior Custom",
                                       style: GoogleFonts.manrope(
                                         fontSize:
                                             MediaQuery.of(context).size.width <
@@ -493,6 +440,38 @@ class _BackdropState extends State<BackdropTV> {
                                     ),
                                   ),
                                   SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Nama Interior",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  TextField(
+                                    controller: namacustomController,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 12),
+                                    ),
+                                    keyboardType: TextInputType.text,
+                                  ),
+                                  SizedBox(height: 10),
                                   Row(
                                     children: [
                                       Expanded(
@@ -536,7 +515,7 @@ class _BackdropState extends State<BackdropTV> {
                                       Expanded(
                                         child: TextField(
                                           controller:
-                                              ukuranBackdropTVController,
+                                              ukuranInteriorCustomController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -550,20 +529,29 @@ class _BackdropState extends State<BackdropTV> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
+                                            hintText: "Masukkan ukuran",
                                           ),
                                           keyboardType:
                                               TextInputType.numberWithOptions(
                                                   decimal: true),
                                           textAlign: TextAlign.center,
                                           onChanged: (value) {
-                                            _hitungBackdropTV();
+                                            _hitungInteriorCustom();
                                           },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "×",
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.075,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: TextField(
-                                          controller: BackdropTVController,
+                                          controller: InteriorCustomController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -593,7 +581,7 @@ class _BackdropState extends State<BackdropTV> {
                                               String formattedValue = _formatter
                                                   .format(parsedValue);
 
-                                              BackdropTVController.value =
+                                              InteriorCustomController.value =
                                                   TextEditingValue(
                                                 text: "Rp $formattedValue",
                                                 selection:
@@ -603,13 +591,15 @@ class _BackdropState extends State<BackdropTV> {
                                                                 .length),
                                               );
                                             } else {
-                                              BackdropTVController.text = "Rp ";
+                                              InteriorCustomController.text =
+                                                  "Rp ";
                                             }
                                           },
                                         ),
                                       ),
                                     ],
                                   ),
+
                                   SizedBox(height: 10),
                                   Padding(
                                     padding: EdgeInsets.only(
@@ -646,59 +636,41 @@ class _BackdropState extends State<BackdropTV> {
                                     keyboardType: TextInputType.none,
                                   ),
                                   SizedBox(height: 10),
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        left:
-                                            MediaQuery.of(context).size.width *
-                                                0.005),
-                                    child: Text(
-                                      "Uang Muka",
-                                      style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                                0.035,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  TextField(
-                                    controller: uangMukaController,
-                                    readOnly: true,
-                                    style: GoogleFonts.manrope(
-                                      fontSize: screenWidth * 0.04,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 12),
-                                      filled: true,
-                                      fillColor: Colors.grey[200],
-                                    ),
-                                    keyboardType: TextInputType.none,
-                                  ),
+                                  // Padding(
+                                  //   padding: EdgeInsets.only(
+                                  //       left:
+                                  //           MediaQuery.of(context).size.width *
+                                  //               0.005),
+                                  //   child: Text(
+                                  //     "Uang Muka",
+                                  //     style: GoogleFonts.lato(
+                                  //       fontWeight: FontWeight.w900,
+                                  //       fontSize:
+                                  //           MediaQuery.of(context).size.width *
+                                  //               0.035,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // SizedBox(height: 5),
+                                  // TextField(
+                                  //   controller: uangMukaController,
+                                  //   readOnly: true,
+                                  //   style: GoogleFonts.manrope(
+                                  //     fontSize: screenWidth * 0.04,
+                                  //     fontWeight: FontWeight.w400,
+                                  //   ),
+                                  //   decoration: InputDecoration(
+                                  //     border: OutlineInputBorder(
+                                  //       borderRadius: BorderRadius.circular(10),
+                                  //     ),
+                                  //     contentPadding: EdgeInsets.symmetric(
+                                  //         vertical: 10, horizontal: 12),
+                                  //     filled: true,
+                                  //     fillColor: Colors.grey[200],
+                                  //   ),
+                                  //   keyboardType: TextInputType.none,
+                                  // ),
                                 ],
-                              ),
-                            ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LemariScreen()),
-                                  );
-                                },
-                                child: Image.asset(
-                                  "assets/images/back_rotasi.png",
-                                  width: 30,
-                                  height: 30,
-                                ),
                               ),
                             ),
                           ],
@@ -720,7 +692,18 @@ class _BackdropState extends State<BackdropTV> {
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {
-                  tambahKeKeranjang("Backdrop TV", hitungSubTotal());
+                  String namaInterior = namacustomController.text.trim();
+                  if (namaInterior.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            "Harap isi nama interior sebelum menambahkan ke keranjang"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                  tambahKeKeranjang(namaInterior, hitungSubTotal(), context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00BFA5),
@@ -750,7 +733,18 @@ class _BackdropState extends State<BackdropTV> {
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {
-                  simpanDataKeFirestore();
+                  String namaInterior = namacustomController.text.trim();
+
+                  if (namaInterior.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Harap isi nama interior."),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                  tambahKeKeranjang(namaInterior, hitungSubTotal(), context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5252),
@@ -760,7 +754,7 @@ class _BackdropState extends State<BackdropTV> {
                   ),
                 ),
                 child: Text(
-                  'Hitung',
+                  'Tambah',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

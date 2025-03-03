@@ -7,10 +7,10 @@ class INV_InteriorCustom extends StatefulWidget {
   const INV_InteriorCustom({super.key});
 
   @override
-  State<INV_InteriorCustom> createState() => _INV_Partsi();
+  State<INV_InteriorCustom> createState() => _INV_Custom();
 }
 
-class _INV_Partsi extends State<INV_InteriorCustom> {
+class _INV_Custom extends State<INV_InteriorCustom> {
   String nama = "Memuat...";
   String alamat = "";
   String namainterior = "";
