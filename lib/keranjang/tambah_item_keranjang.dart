@@ -225,8 +225,8 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                           },
                           child: Image.asset(
                             "assets/images/back.png",
-                            height: screenHeight * 0.03,
-                            width: screenHeight * 0.03,
+                            height: screenHeight * 0.035,
+                            width: screenHeight * 0.035,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -373,7 +373,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                                     child: Text(
                                       "Nama Klien",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -410,7 +410,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                                     child: Text(
                                       "Alamat",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -448,7 +448,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                                     child: Text(
                                       "Nama Interior",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -481,7 +481,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                                           child: Text(
                                             "Ukuran",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -497,7 +497,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                                           child: Text(
                                             "Harga",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -609,7 +609,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                                     child: Text(
                                       "Hasil Jumlah",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,

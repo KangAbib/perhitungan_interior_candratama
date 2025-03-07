@@ -16,6 +16,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
   double subTotal = 0;
   double diskon = 0;
   double uangMuka = 0;
+  double pelunasan = 0;
   List<Map<String, dynamic>> listKeranjang = [];
   final formatCurrency = NumberFormat("#,###", "id_ID");
 
@@ -24,7 +25,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
       var snapshot = await FirebaseFirestore.instance
           .collection("pesanan_keranjang")
           .orderBy("timestamp", descending: true)
-          .limit(1) // Ambil pesanan terbaru
+          .limit(1)
           .get();
 
       if (snapshot.docs.isNotEmpty) {
@@ -33,9 +34,10 @@ class _INV_Keranjang extends State<INV_Keranjang> {
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "";
-          subTotal = (data["totalHarga"] ?? 0).toDouble();
+          subTotal = (data["total_harga"] ?? 0).toDouble();
           diskon = (data["diskon"] ?? 0).toDouble();
-          uangMuka = (data["uangMuka"] ?? 0).toDouble();
+          uangMuka = (data["uang_muka"] ?? 0).toDouble();
+          pelunasan = (data["sisa_pembayaran"] ?? 0).toDouble();
           listKeranjang = List<Map<String, dynamic>>.from(data["items"] ?? []);
         });
       }
@@ -56,13 +58,16 @@ class _INV_Keranjang extends State<INV_Keranjang> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting("id_ID", null).then((_) {
+      setState(() {});
+    });
     ambilDataKeranjang();
   }
 
   @override
   Widget build(BuildContext context) {
     String todayDate =
-    DateFormat("EEEE, dd MMM yyyy", "id_ID").format(DateTime.now());
+        DateFormat("EEEE, dd MMM yyyy", "id_ID").format(DateTime.now());
     String noBayar = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
     bool isTablet = MediaQuery.of(context).size.width > 600;
@@ -162,27 +167,35 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Table(
-                    columnWidths: const {
-                      0: FlexColumnWidth(3), // Nama
-                      1: FlexColumnWidth(2), // Harga
-                      2: FlexColumnWidth(2), // Total
-                    },
-                    border: TableBorder.all(color: Colors.black),
+                  child: Column(
                     children: [
-                      _buildTableRow(["Nama", "Harga", "Total"],
-                          isHeader: true, context: context),
-                      ...listKeranjang.map((item) {
-                        return _buildTableRow([
-                          item["nama"],
-                          item["harga"],
-                          item["total"],
-                        ], context: context);
-                      }).toList(),
+                      Table(
+                        columnWidths: const {
+                          0: FlexColumnWidth(2),
+                          1: FlexColumnWidth(2),
+                          2: FlexColumnWidth(2),
+                        },
+                        border: TableBorder.all(color: Colors.black),
+                        children: [
+                          _buildTableRow(["Kategori", "Harga", "Total"],
+                              isHeader: true, context: context),
+                          ...List<TableRow>.from((listKeranjang
+                                  .where((item) => item["timestamp"] != null)
+                                  .toList()
+                                ..sort((a, b) =>
+                                    b["timestamp"].compareTo(a["timestamp"])))
+                              .map((item) => _buildTableRow([
+                                    item["nama"]?.toString() ?? "-",
+                                    formatRupiah(
+                                        (item["harga"] ?? 0).toDouble()),
+                                    formatRupiah(
+                                        (item["harga"] ?? 0).toDouble()),
+                                  ], context: context))),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -201,7 +214,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
-                      "Sub Total : $subTotal",
+                      "Sub Total : ${formatRupiah(subTotal)}",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),
@@ -215,7 +228,13 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "Uang Muka : $uangMuka",
+                      "Diskon : ${formatRupiah(diskon)}",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                    Text(
+                       "Uang Muka : ${formatRupiah(uangMuka)}",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),
@@ -242,7 +261,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                       ],
                     ),
                     Text(
-                      "Pelunasan : ",
+                      "Pelunasan : ${formatRupiah(pelunasan)}",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),

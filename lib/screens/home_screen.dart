@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    bool isTablet = screenWidth > 600; // Deteksi tablet
 
     return Scaffold(
       body: Stack(
@@ -54,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             top: screenHeight * 0.035,
             left: screenWidth * 0.02,
-            right: screenWidth * 0.03,
+            right: screenWidth * 0.02,
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -76,9 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         color: Color(0xFFFF5252),
                         fontSize: MediaQuery.of(context).size.width < 600
-                            ? MediaQuery.of(context).size.width * 0.045 // HP
-                            : MediaQuery.of(context).size.width *
-                                0.04, // Tablet // Responsive font size
+                            ? MediaQuery.of(context).size.width * 0.045
+                            : MediaQuery.of(context).size.width * 0.035,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -110,22 +110,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Stack(
                             clipBehavior: Clip.none,
                             children: [
-                              // Ikon Keranjang
                               Image.asset(
                                 "assets/images/keranjang_merah.png",
                                 height: screenHeight * 0.035,
                                 width: screenHeight * 0.035,
                                 fit: BoxFit.contain,
                               ),
-
-                              // Badge Jumlah Item (Ditampilkan jika jumlahItem > 0)
                               if (jumlahItem > 0)
                                 Positioned(
-                                  top: -6, // Ubah agar lebih rapi
+                                  top: -6,
                                   right: -6,
                                   child: Container(
-                                    width: screenHeight *
-                                        0.024, // Ukuran lebih proporsional
+                                    width: screenHeight * 0.024,
                                     height: screenHeight * 0.024,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFFF5252),
@@ -156,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.098,
-            left: screenWidth * 0,
+            left: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -171,19 +167,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Container(
-                  width: (screenWidth / 2) - 4,
+                  width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                   height: screenHeight * 0.205,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             top: screenHeight * 0.098,
             left: (MediaQuery.of(context).size.width / 2) + 1,
-            right: screenWidth * 0,
+            right: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -396,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.311,
-            left: screenWidth * 0,
+            left: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -410,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Container(
-                    width: (MediaQuery.of(context).size.width / 2) - 4,
+                    width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                     height: screenHeight * 0.22,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -460,7 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.311,
-            right: screenWidth * 0,
+            right: isTablet ? screenWidth * 0.01 : 0,
             left: (MediaQuery.of(context).size.width / 2) + 1,
             child: GestureDetector(
               onTap: () {
@@ -525,7 +514,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.538,
-            left: screenWidth * 0,
+            left: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -539,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Container(
-                  width: (MediaQuery.of(context).size.width / 2) - 4,
+                  width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                   height: screenHeight * 0.22,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -589,7 +578,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.538,
-            right: screenWidth * 0,
+            right: isTablet ? screenWidth * 0.01 : 0,
             left: (MediaQuery.of(context).size.width / 2) + 1,
             child: GestureDetector(
               onTap: () {
@@ -654,7 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.764,
-            left: screenWidth * 0,
+             left: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -669,7 +658,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Container(
-                  width: (MediaQuery.of(context).size.width / 2) - 4,
+                  width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                   height: screenHeight * 0.223,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -718,7 +707,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             top: screenHeight * 0.764,
             left: (MediaQuery.of(context).size.width / 2) + 4,
-            right: screenWidth * 0,
+            right: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(

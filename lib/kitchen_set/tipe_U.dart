@@ -485,8 +485,8 @@ class _Tipe_UState extends State<Tipe_U> {
                           },
                           child: Image.asset(
                             "assets/images/back.png",
-                            height: screenHeight * 0.03,
-                            width: screenHeight * 0.03,
+                            height: screenHeight * 0.035,
+                            width: screenHeight * 0.035,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -631,7 +631,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                     child: Text(
                                       "Nama Klien",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -668,7 +668,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                     child: Text(
                                       "Alamat",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -714,7 +714,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                                   ? "Kitchen Set Atas"
                                                   : "Atas",
                                               style: GoogleFonts.lato(
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.normal,
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -729,7 +729,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                               "Harga",
                                               textAlign: TextAlign.right,
                                               style: GoogleFonts.lato(
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.normal,
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -952,7 +952,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                       Text(
                                         "Hasil Jumlah",
                                         style: GoogleFonts.lato(
-                                          fontWeight: FontWeight.w900,
+                                          fontWeight: FontWeight.normal,
                                           fontSize: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -1001,7 +1001,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                                   ? "Kitchen Set Bawah"
                                                   : "Bawah",
                                               style: GoogleFonts.lato(
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.normal,
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -1016,7 +1016,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                               "Harga",
                                               textAlign: TextAlign.right,
                                               style: GoogleFonts.lato(
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.normal,
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -1239,7 +1239,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                       Text(
                                         "Hasil Jumlah",
                                         style: GoogleFonts.lato(
-                                          fontWeight: FontWeight.w900,
+                                          fontWeight: FontWeight.normal,
                                           fontSize: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -1280,7 +1280,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                     child: Text(
                                       "Backsplash",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -1316,7 +1316,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                     child: Text(
                                       "Aksesoris",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -1352,7 +1352,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                     child: Text(
                                       "Uang Muka",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -1382,8 +1382,8 @@ class _Tipe_UState extends State<Tipe_U> {
                               ),
                             ),
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: screenHeight * 0.025,
+                              right: screenHeight * 0.025,
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -1394,8 +1394,8 @@ class _Tipe_UState extends State<Tipe_U> {
                                 },
                                 child: Image.asset(
                                   "assets/images/back_rotasi.png",
-                                  width: 30,
-                                  height: 30,
+                                  height: screenHeight * 0.035,
+                                  width: screenHeight * 0.035,
                                 ),
                               ),
                             ),

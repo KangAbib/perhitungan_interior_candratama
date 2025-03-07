@@ -37,6 +37,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
+  final ScrollController _scrollController = ScrollController();
 
   StreamSubscription? _hargaKitchenSetSubscription;
   StreamSubscription? _hargaKitchenSetAtasSubscription;
@@ -74,17 +75,46 @@ class _SettingScreenState extends State<SettingScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$jenis berhasil disimpan")),
-      );
+    SnackBar(
+      content: Text(
+        "$jenis berhasil disimpan",
+        style: TextStyle(
+          fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 20, // Perbesar teks jika di tablet
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  );
 
       _kitchenSetAtasController.clear();
       _kitchenSetBawahController.clear();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal menyimpan: $e")),
+        SnackBar(content: Text("Gagal menyimpan: $e",style: TextStyle(
+          fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 20, // Perbesar teks jika di tablet
+          fontWeight: FontWeight.bold,
+        ),),),
       );
     }
   }
+  void _showSnackBar(String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(
+          fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 20, // Ukuran teks sesuai layar
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      behavior: SnackBarBehavior.floating, // Membuat SnackBar lebih menonjol
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+  );
+}
+
 
   void listenToHargaKitchenSet(String docId, TextEditingController controller) {
     StreamSubscription? subscription = _firestore
@@ -120,45 +150,39 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
-  Future<void> _saveUkuranKitchenSet(
-      String jenis, String atas, String bawah) async {
-    if (atas.isEmpty || bawah.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Harap isi ukuran sebelum menyimpan")),
-      );
-      return;
-    }
-
-    String atasFormatted = atas.replaceAll(',', '.');
-    String bawahFormatted = bawah.replaceAll(',', '.');
-
-    double rawAtas = double.tryParse(atasFormatted) ?? 0.0;
-    double rawBawah = double.tryParse(bawahFormatted) ?? 0.0;
-
-    try {
-      await FirebaseFirestore.instance
-          .collection("ukuran_kitchen_set")
-          .doc(jenis)
-          .set({
-        "jenis": jenis,
-        "set_atas": rawAtas,
-        "set_bawah": rawBawah,
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$jenis berhasil disimpan")),
-      );
-
-      _kitchenSetLController.clear();
-      _kitchenSetUController.clear();
-      _kitchenSetULController.clear();
-      _kitchenSetUUController.clear();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal menyimpan: $e")),
-      );
-    }
+  void _saveUkuranKitchenSet(String jenis, String atas, String bawah) async {
+  if (atas.isEmpty || bawah.isEmpty) {
+    _showSnackBar("Harap isi ukuran sebelum menyimpan");
+    return;
   }
+
+  String atasFormatted = atas.replaceAll(',', '.');
+  String bawahFormatted = bawah.replaceAll(',', '.');
+
+  double rawAtas = double.tryParse(atasFormatted) ?? 0.0;
+  double rawBawah = double.tryParse(bawahFormatted) ?? 0.0;
+
+  try {
+    await FirebaseFirestore.instance
+        .collection("ukuran_kitchen_set")
+        .doc(jenis)
+        .set({
+      "jenis": jenis,
+      "set_atas": rawAtas,
+      "set_bawah": rawBawah,
+    });
+
+    _showSnackBar("$jenis berhasil disimpan");
+
+    _kitchenSetLController.clear();
+    _kitchenSetUController.clear();
+    _kitchenSetULController.clear();
+    _kitchenSetUUController.clear();
+  } catch (e) {
+    _showSnackBar("Gagal menyimpan: $e");
+  }
+}
+
 
   void listenToUkuranKitchenSet(
       String docId,
@@ -199,6 +223,12 @@ class _SettingScreenState extends State<SettingScreen> {
     } else if (docId == "Letter U") {
       _ukuranKitchenSetUSubscription = subscription;
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -261,7 +291,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context); // Kembali ke HomeScreen
+                        Navigator.pop(context);
                       },
                       child: Image.asset(
                         "assets/images/back.png",
@@ -310,7 +340,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             "Daftar Harga",
                             style: GoogleFonts.manrope(
                               color: Color(0xFFFF5252),
-                              fontSize: screenWidth * 0.05,
+                              fontSize: screenWidth * 0.04,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -319,7 +349,9 @@ class _SettingScreenState extends State<SettingScreen> {
                         Text(
                           "Kitchen set atas",
                           style: GoogleFonts.manrope(
-                            fontSize: screenWidth * 0.04,
+                            fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.04
+                                : MediaQuery.of(context).size.width * 0.03,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -329,6 +361,14 @@ class _SettingScreenState extends State<SettingScreen> {
                             Expanded(
                               child: TextFormField(
                                 controller: _kitchenSetAtasController,
+                                style: GoogleFonts.manrope(
+                                  fontSize: MediaQuery.of(context).size.width <
+                                          600
+                                      ? MediaQuery.of(context).size.width * 0.04
+                                      : MediaQuery.of(context).size.width *
+                                          0.035,
+                                  fontWeight: FontWeight.w400,
+                                ),
                                 keyboardType: TextInputType.number,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly
@@ -357,9 +397,18 @@ class _SettingScreenState extends State<SettingScreen> {
                                     _kitchenSetAtasController.text);
                                 _kitchenSetAtasController.clear();
                               },
-                              child: const Text(
+                              child: Text(
                                 "Simpan",
-                                style: TextStyle(color: Colors.white),
+                                style: GoogleFonts.manrope(
+                                  color: Colors.white,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 600
+                                          ? MediaQuery.of(context).size.width *
+                                              0.045
+                                          : MediaQuery.of(context).size.width *
+                                              0.03,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ),
                           ],
@@ -368,7 +417,9 @@ class _SettingScreenState extends State<SettingScreen> {
                         Text(
                           "Kitchen set bawah",
                           style: GoogleFonts.manrope(
-                            fontSize: screenWidth * 0.04,
+                            fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.04
+                                : MediaQuery.of(context).size.width * 0.03,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -378,6 +429,14 @@ class _SettingScreenState extends State<SettingScreen> {
                             Expanded(
                               child: TextFormField(
                                 controller: _kitchenSetBawahController,
+                                style: GoogleFonts.manrope(
+                                  fontSize: MediaQuery.of(context).size.width <
+                                          600
+                                      ? MediaQuery.of(context).size.width * 0.04
+                                      : MediaQuery.of(context).size.width *
+                                          0.035,
+                                  fontWeight: FontWeight.w400,
+                                ),
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
@@ -402,9 +461,18 @@ class _SettingScreenState extends State<SettingScreen> {
                                 _saveData("Kitchen Set Bawah",
                                     _kitchenSetBawahController.text);
                               },
-                              child: const Text(
+                              child: Text(
                                 "Simpan",
-                                style: TextStyle(color: Colors.white),
+                                style: GoogleFonts.manrope(
+                                  color: Colors.white,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 600
+                                          ? MediaQuery.of(context).size.width *
+                                              0.045
+                                          : MediaQuery.of(context).size.width *
+                                              0.03,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ),
                           ],
@@ -439,10 +507,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               "Daftar Ukuran Kitchen",
                               style: GoogleFonts.manrope(
                                 color: Color(0xFFFF5252),
-                                fontSize: MediaQuery.of(context).size.width <
-                                        600
-                                    ? MediaQuery.of(context).size.width * 0.05
-                                    : MediaQuery.of(context).size.width * 0.045,
+                                fontSize: screenWidth * 0.04,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -453,7 +518,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             style: GoogleFonts.manrope(
                               fontSize: MediaQuery.of(context).size.width < 600
                                   ? MediaQuery.of(context).size.width * 0.04
-                                  : MediaQuery.of(context).size.width * 0.035,
+                                  : MediaQuery.of(context).size.width * 0.03,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -466,8 +531,29 @@ class _SettingScreenState extends State<SettingScreen> {
                                     : 2,
                                 child: TextFormField(
                                   controller: _kitchenSetLController,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width <
+                                            600
+                                        ? MediaQuery.of(context).size.width *
+                                            0.04
+                                        : MediaQuery.of(context).size.width *
+                                            0.035,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                   decoration: InputDecoration(
                                     labelText: "Set Atas",
+                                    labelStyle: GoogleFonts.manrope(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? 14
+                                          : 20, // Label lebih besar di tablet
+                                      fontWeight: FontWeight
+                                          .bold, // Tambahkan bold agar lebih jelas
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -488,8 +574,29 @@ class _SettingScreenState extends State<SettingScreen> {
                                     : 2,
                                 child: TextFormField(
                                   controller: _kitchenSetUController,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width <
+                                            600
+                                        ? MediaQuery.of(context).size.width *
+                                            0.04
+                                        : MediaQuery.of(context).size.width *
+                                            0.035,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                   decoration: InputDecoration(
                                     labelText: "Set Bawah",
+                                    labelStyle: GoogleFonts.manrope(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? 14
+                                          : 20, // Label lebih besar di tablet
+                                      fontWeight: FontWeight
+                                          .bold, // Tambahkan bold agar lebih jelas
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -532,12 +639,17 @@ class _SettingScreenState extends State<SettingScreen> {
                                 },
                                 child: Text(
                                   "Simpan",
-                                  style: TextStyle(
+                                  style: GoogleFonts.manrope(
                                     color: Colors.white,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width < 600
-                                            ? 14
-                                            : 18,
+                                    fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width <
+                                            600
+                                        ? MediaQuery.of(context).size.width *
+                                            0.045
+                                        : MediaQuery.of(context).size.width *
+                                            0.03,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ),
@@ -549,7 +661,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             style: GoogleFonts.manrope(
                               fontSize: MediaQuery.of(context).size.width < 600
                                   ? MediaQuery.of(context).size.width * 0.04
-                                  : MediaQuery.of(context).size.width * 0.035,
+                                  : MediaQuery.of(context).size.width * 0.03,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -559,8 +671,29 @@ class _SettingScreenState extends State<SettingScreen> {
                               Expanded(
                                 child: TextFormField(
                                   controller: _kitchenSetULController,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width <
+                                            600
+                                        ? MediaQuery.of(context).size.width *
+                                            0.04
+                                        : MediaQuery.of(context).size.width *
+                                            0.035,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                   decoration: InputDecoration(
                                     labelText: "Set Atas",
+                                    labelStyle: GoogleFonts.manrope(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? 14
+                                          : 20, // Label lebih besar di tablet
+                                      fontWeight: FontWeight
+                                          .bold, // Tambahkan bold agar lebih jelas
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -577,8 +710,29 @@ class _SettingScreenState extends State<SettingScreen> {
                               Expanded(
                                 child: TextFormField(
                                   controller: _kitchenSetUUController,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width <
+                                            600
+                                        ? MediaQuery.of(context).size.width *
+                                            0.04
+                                        : MediaQuery.of(context).size.width *
+                                            0.035,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                   decoration: InputDecoration(
                                     labelText: "Set Bawah",
+                                    labelStyle: GoogleFonts.manrope(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width <
+                                              600
+                                          ? 14
+                                          : 20, // Label lebih besar di tablet
+                                      fontWeight: FontWeight
+                                          .bold, // Tambahkan bold agar lebih jelas
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -618,12 +772,17 @@ class _SettingScreenState extends State<SettingScreen> {
                                 },
                                 child: Text(
                                   "Simpan",
-                                  style: TextStyle(
+                                  style: GoogleFonts.manrope(
                                     color: Colors.white,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width < 600
-                                            ? 14
-                                            : 18,
+                                    fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width <
+                                            600
+                                        ? MediaQuery.of(context).size.width *
+                                            0.045
+                                        : MediaQuery.of(context).size.width *
+                                            0.03,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ),
@@ -634,404 +793,437 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ),
                 ),
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "List Data",
-                            style: GoogleFonts.manrope(
-                              color: Color(0xFFFF5252),
-                              fontSize: screenWidth * 0.045,
-                              fontWeight: FontWeight.bold,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              "List Data",
+                              style: GoogleFonts.manrope(
+                                color: Color(0xFFFF5252),
+                                fontSize: screenWidth * 0.045,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.width < 600
-                              ? MediaQuery.of(context).size.height * 0.17
-                              : MediaQuery.of(context).size.height * 0.3,
-                          child: Scrollbar(
-                            child: ListView(
-                              shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "1. Kitchen Set Atas",
-                                        style: GoogleFonts.manrope(
-                                          fontSize: MediaQuery.of(context)
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height < 750
+                                ? MediaQuery.of(context).size.height *
+                                    0.1 // HP kecil (misal iPhone SE)
+                                : MediaQuery.of(context).size.width > 1200
+                                    ? MediaQuery.of(context).size.height *
+                                        0.22 // iPad Pro (layar besar)
+                                    : MediaQuery.of(context).size.width > 900
+                                        ? MediaQuery.of(context).size.height *
+                                            0.2 // Tablet umum (misal iPad Air)
+                                        : MediaQuery.of(context).size.width >
+                                                750
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.18 // iPad Mini
+                                            : null, // HP besar (misal iPhone XR), tidak mengambil space
+
+                            child: Scrollbar(
+                              controller: _scrollController,
+                              child: ListView(
+                                controller: _scrollController,
+                                shrinkWrap: true,
+                                physics: BouncingScrollPhysics(),
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex:
+                                            2, // Memastikan teks dan kotak output seimbang
+                                        child: Text(
+                                          "1. Kitchen Set Atas",
+                                          style: GoogleFonts.manrope(
+                                            fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width <
+                                                    600
+                                                ? 14
+                                                : 25,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Container(
+                                          height: MediaQuery.of(context)
                                                       .size
                                                       .width <
                                                   600
-                                              ? 14
-                                              : 30,
+                                              ? 40
+                                              : 55,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF6666),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: ValueListenableBuilder<
+                                              TextEditingValue>(
+                                            valueListenable:
+                                                _kitchenSetAtasOutputController,
+                                            builder: (context, value, child) {
+                                              String formattedText =
+                                                  "Memuat...";
+
+                                              if (value.text.isNotEmpty) {
+                                                int? parsedValue = int.tryParse(
+                                                  value.text
+                                                      .replaceAll('.', '')
+                                                      .replaceAll(',', ''),
+                                                );
+
+                                                if (parsedValue != null) {
+                                                  formattedText = NumberFormat
+                                                          .decimalPattern('id')
+                                                      .format(parsedValue);
+                                                }
+                                              }
+
+                                              return Center(
+                                                child: Text(
+                                                  formattedText,
+                                                  style: GoogleFonts.manrope(
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .width <
+                                                                600
+                                                            ? 14
+                                                            : 24,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width <
-                                              600
-                                          ? 150
-                                          : 400,
-                                      height:
-                                          MediaQuery.of(context).size.width <
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          "2. Kitchen Set Bawah",
+                                          style: GoogleFonts.manrope(
+                                            fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width <
+                                                    600
+                                                ? 14
+                                                : 25,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Container(
+                                          height: MediaQuery.of(context)
+                                                      .size
+                                                      .width <
                                                   600
                                               ? 40
-                                              : 65,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF6666),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: ValueListenableBuilder<
-                                          TextEditingValue>(
-                                        valueListenable:
-                                            _kitchenSetAtasOutputController,
-                                        builder: (context, value, child) {
-                                          String formattedText = "Memuat...";
+                                              : 55,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF6666),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: ValueListenableBuilder<
+                                              TextEditingValue>(
+                                            valueListenable:
+                                                _kitchenSetBawahOutputController,
+                                            builder: (context, value, child) {
+                                              String formattedText =
+                                                  "Memuat...";
 
-                                          if (value.text.isNotEmpty) {
-                                            int? parsedValue = int.tryParse(
-                                              value.text
-                                                  .replaceAll('.', '')
-                                                  .replaceAll(',', ''),
-                                            );
+                                              if (value.text.isNotEmpty &&
+                                                  value.text != "Memuat...") {
+                                                int? parsedValue = int.tryParse(
+                                                  value.text
+                                                      .replaceAll('.', '')
+                                                      .replaceAll(',', ''),
+                                                );
 
-                                            if (parsedValue != null) {
-                                              formattedText =
-                                                  NumberFormat.decimalPattern(
-                                                          'id')
+                                                if (parsedValue != null) {
+                                                  formattedText = NumberFormat
+                                                          .decimalPattern('id')
                                                       .format(parsedValue);
-                                            }
-                                          }
+                                                } else {
+                                                  formattedText = value.text;
+                                                }
+                                              }
 
-                                          return Center(
-                                            child: Text(
-                                              formattedText,
+                                              return Center(
+                                                child: Text(
+                                                  formattedText,
+                                                  style: GoogleFonts.manrope(
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .width <
+                                                                600
+                                                            ? 14
+                                                            : 24,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex:
+                                            2, // Memberikan ruang untuk teks agar proporsional
+                                        child: Text(
+                                          "3. Kitchen Letter L",
+                                          style: GoogleFonts.manrope(
+                                            fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width <
+                                                    600
+                                                ? 14
+                                                : 25,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                          width:
+                                              10), // Memberikan sedikit jarak agar rapi
+                                      Expanded(
+                                        flex:
+                                            1, // Proporsi tetap di semua layar
+                                        child: Container(
+                                          height: MediaQuery.of(context)
+                                                      .size
+                                                      .width <
+                                                  600
+                                              ? 50
+                                              : 55,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF6666),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Center(
+                                            child: TextField(
+                                              controller:
+                                                  _kitchenLetterLAtasController,
+                                              textAlign: TextAlign.center,
                                               style: GoogleFonts.manrope(
                                                 fontSize: MediaQuery.of(context)
                                                             .size
                                                             .width <
                                                         600
-                                                    ? 14
-                                                    : 24,
+                                                    ? 12
+                                                    : 22, // Perbesar font di tablet
+                                                fontWeight: FontWeight
+                                                    .bold, // Tambahkan bold agar lebih jelas
                                                 color: Colors.white,
-                                                fontWeight: FontWeight.bold,
                                               ),
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.zero,
+                                              ),
+                                              readOnly: true,
                                             ),
-                                          );
-                                        },
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "2. Kitchen Set Bawah",
-                                        style: GoogleFonts.manrope(
-                                          fontSize: MediaQuery.of(context)
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          height: MediaQuery.of(context)
                                                       .size
                                                       .width <
                                                   600
-                                              ? 14
-                                              : 30,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width <
-                                              600
-                                          ? 150
-                                          : 400,
-                                      height:
-                                          MediaQuery.of(context).size.width <
-                                                  600
-                                              ? 40
-                                              : 65,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF6666),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: ValueListenableBuilder<
-                                          TextEditingValue>(
-                                        valueListenable:
-                                            _kitchenSetBawahOutputController,
-                                        builder: (context, value, child) {
-                                          String formattedText = "Memuat...";
-
-                                          if (value.text.isNotEmpty &&
-                                              value.text != "Memuat...") {
-                                            int? parsedValue = int.tryParse(
-                                              value.text
-                                                  .replaceAll('.', '')
-                                                  .replaceAll(',', ''),
-                                            );
-
-                                            if (parsedValue != null) {
-                                              formattedText =
-                                                  NumberFormat.decimalPattern(
-                                                          'id')
-                                                      .format(parsedValue);
-                                            } else {
-                                              formattedText = value.text;
-                                            }
-                                          }
-
-                                          return Center(
-                                            child: Text(
-                                              formattedText,
+                                              ? 50
+                                              : 55,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF6666),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Center(
+                                            child: TextField(
+                                              controller:
+                                                  _kitchenLetterLBawahController,
+                                              textAlign: TextAlign.center,
                                               style: GoogleFonts.manrope(
                                                 fontSize: MediaQuery.of(context)
                                                             .size
                                                             .width <
                                                         600
-                                                    ? 14
-                                                    : 24,
-                                                color: Colors.white,
+                                                    ? 12
+                                                    : 22, // Sama seperti atas
                                                 fontWeight: FontWeight.bold,
+                                                color: Colors.white,
                                               ),
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.zero,
+                                              ),
+                                              readOnly: true,
                                             ),
-                                          );
-                                        },
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        "3. Kitchen Letter L",
-                                        style: GoogleFonts.manrope(
-                                          fontSize: MediaQuery.of(context)
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          "4. Kitchen Letter U",
+                                          style: GoogleFonts.manrope(
+                                            fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width <
+                                                    600
+                                                ? 14
+                                                : 25,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          height: MediaQuery.of(context)
                                                       .size
                                                       .width <
                                                   600
-                                              ? 14
-                                              : 30,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width <
-                                                    600
-                                                ? 20
-                                                : 40),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width <
-                                              600
-                                          ? 50
-                                          : 100,
-                                      height:
-                                          MediaQuery.of(context).size.width <
-                                                  600
                                               ? 50
-                                              : 65,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF6666),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: TextField(
-                                          controller:
-                                              _kitchenLetterLAtasController,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width <
-                                                    600
-                                                ? 12
-                                                : 18,
-                                            color: Colors.white,
+                                              : 55,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF6666),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.zero,
+                                          child: Center(
+                                            child: TextField(
+                                              controller:
+                                                  _kitchenLetterUAtasController,
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width <
+                                                        600
+                                                    ? 12
+                                                    : 22, // Font lebih besar untuk tablet
+                                                fontWeight: FontWeight
+                                                    .bold, // Tambahkan bold untuk kejelasan
+                                                color: Colors.white,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.zero,
+                                              ),
+                                              readOnly: true,
+                                            ),
                                           ),
-                                          readOnly: true,
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width <
-                                                    600
-                                                ? 10
-                                                : 20),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width <
-                                              600
-                                          ? 50
-                                          : 100,
-                                      height:
-                                          MediaQuery.of(context).size.width <
-                                                  600
-                                              ? 50
-                                              : 65,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF6666),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: TextField(
-                                          controller:
-                                              _kitchenLetterLBawahController,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width <
-                                                    600
-                                                ? 12
-                                                : 18,
-                                            color: Colors.white,
-                                          ),
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.zero,
-                                          ),
-                                          readOnly: true,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        "4. Kitchen Letter U",
-                                        style: GoogleFonts.manrope(
-                                          fontSize: MediaQuery.of(context)
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          height: MediaQuery.of(context)
                                                       .size
                                                       .width <
                                                   600
-                                              ? 14
-                                              : 30,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width <
-                                                    600
-                                                ? 20
-                                                : 40),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width <
-                                              600
-                                          ? 50
-                                          : 100,
-                                      height:
-                                          MediaQuery.of(context).size.width <
-                                                  600
                                               ? 50
-                                              : 65,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF6666),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: TextField(
-                                          controller:
-                                              _kitchenLetterUAtasController,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width <
-                                                    600
-                                                ? 12
-                                                : 18,
-                                            color: Colors.white,
+                                              : 55,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF6666),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.zero,
+                                          child: Center(
+                                            child: TextField(
+                                              controller:
+                                                  _kitchenLetterUBawahController,
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: MediaQuery.of(context)
+                                                            .size
+                                                            .width <
+                                                        600
+                                                    ? 12
+                                                    : 22, // Ukuran font lebih besar di tablet
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.zero,
+                                              ),
+                                              readOnly: true,
+                                            ),
                                           ),
-                                          readOnly: true,
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width <
-                                                    600
-                                                ? 10
-                                                : 20),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width <
-                                              600
-                                          ? 50
-                                          : 100,
-                                      height:
-                                          MediaQuery.of(context).size.width <
-                                                  600
-                                              ? 50
-                                              : 65,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF6666),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: TextField(
-                                          controller:
-                                              _kitchenLetterUBawahController,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width <
-                                                    600
-                                                ? 12
-                                                : 18,
-                                            color: Colors.white,
-                                          ),
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.zero,
-                                          ),
-                                          readOnly: true,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

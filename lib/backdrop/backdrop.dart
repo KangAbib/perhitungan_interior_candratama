@@ -302,11 +302,13 @@ class _BackdropState extends State<Backdrop> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                         Text(
                           "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
-                            fontSize: 18,
+                            fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.045
+                                : MediaQuery.of(context).size.width * 0.04,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -444,7 +446,7 @@ class _BackdropState extends State<Backdrop> {
                                     child: Text(
                                       "Nama Klien",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -481,7 +483,7 @@ class _BackdropState extends State<Backdrop> {
                                     child: Text(
                                       "Alamat",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -520,7 +522,7 @@ class _BackdropState extends State<Backdrop> {
                                           child: Text(
                                             "Panjang",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -536,7 +538,7 @@ class _BackdropState extends State<Backdrop> {
                                           child: Text(
                                             "Tinggi",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -556,7 +558,7 @@ class _BackdropState extends State<Backdrop> {
                                           child: Text(
                                             "Harga",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -702,7 +704,7 @@ class _BackdropState extends State<Backdrop> {
                                     child: Text(
                                       "Hasil Jumlah",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -737,7 +739,7 @@ class _BackdropState extends State<Backdrop> {
                                     child: Text(
                                       "Uang Muka",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -767,8 +769,8 @@ class _BackdropState extends State<Backdrop> {
                               ),
                             ),
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: screenHeight * 0.025,
+                              right: screenHeight * 0.025,
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -779,8 +781,8 @@ class _BackdropState extends State<Backdrop> {
                                 },
                                 child: Image.asset(
                                   "assets/images/back_rotasi.png",
-                                  width: 30,
-                                  height: 30,
+                                  height: screenHeight * 0.035,
+                                  width: screenHeight * 0.035,
                                 ),
                               ),
                             ),

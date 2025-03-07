@@ -145,17 +145,19 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                       },
                       child: Image.asset(
                         "assets/images/back.png",
-                        height: screenHeight * 0.03,
-                        width: screenHeight * 0.03,
+                        height: screenHeight * 0.035,
+                        width: screenHeight * 0.035,
                         fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Text(
+                     Text(
                       "Estimasi Harga",
                       style: TextStyle(
                         color: Color(0xFFFF5252),
-                        fontSize: 18,
+                        fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.045
+                                : MediaQuery.of(context).size.width * 0.04,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -239,7 +241,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         child: Text(
                                           "Nama Klien",
                                           style: GoogleFonts.lato(
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.normal,
                                             fontSize: MediaQuery.of(context)
                                                     .size
                                                     .width *
@@ -282,7 +284,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         child: Text(
                                           "Alamat",
                                           style: GoogleFonts.lato(
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.normal,
                                             fontSize: MediaQuery.of(context)
                                                     .size
                                                     .width *
@@ -326,7 +328,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         child: Text(
                                           "List Interior",
                                           style: GoogleFonts.lato(
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.normal,
                                             fontSize: MediaQuery.of(context)
                                                     .size
                                                     .width *
@@ -393,18 +395,18 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                       ),
                                                     ),
                                                     SizedBox(width: 8),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      String itemKey =
-                                                          items[index]["key"];
-                                                      hapusItemKeranjang(
-                                                          itemKey);
-                                                    },
-                                                    child: Icon(
-                                                      Icons.close,
-                                                      color: Colors.red,
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        String itemKey =
+                                                            items[index]["key"];
+                                                        hapusItemKeranjang(
+                                                            itemKey);
+                                                      },
+                                                      child: Icon(
+                                                        Icons.close,
+                                                        color: Colors.red,
+                                                      ),
                                                     ),
-                                                  ),
                                                   ],
                                                 ),
                                               ),
@@ -626,7 +628,10 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
         }
       });
 
-      // Ambil nilai diskon dari inputan
+      // Ambil nilai uang muka & diskon dari inputan
+      double uangMukaInput = double.tryParse(
+              uangMukaController.text.replaceAll(RegExp(r'[^0-9]'), '')) ??
+          0;
       double diskonInput = double.tryParse(
               diskonController.text.replaceAll(RegExp(r'[^0-9]'), '')) ??
           0;
@@ -634,6 +639,10 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
       // Hitung total harga setelah diskon
       double totalHargaSetelahDiskon = totalHargaItem - diskonInput;
       if (totalHargaSetelahDiskon < 0) totalHargaSetelahDiskon = 0;
+
+      // Hitung sisa pembayaran setelah dikurangi uang muka
+      double sisaPembayaran = totalHargaSetelahDiskon - uangMukaInput;
+      if (sisaPembayaran < 0) sisaPembayaran = 0;
 
       // Simpan pesanan ke koleksi 'pesanan_keranjang'
       await FirebaseFirestore.instance.collection("pesanan_keranjang").add({
@@ -643,14 +652,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
         "total_harga": totalHargaItem,
         "diskon": diskonInput,
         "total_setelah_diskon": totalHargaSetelahDiskon,
+        "uang_muka": uangMukaInput,
+        "sisa_pembayaran": sisaPembayaran,
         "timestamp": FieldValue.serverTimestamp(),
       });
 
       // Hapus isi keranjang setelah pembayaran sukses
-      await FirebaseFirestore.instance
-          .collection("keranjang")
-          .doc("listKeranjang")
-          .set({});
+      await FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang").set({});
 
       // Navigasi ke halaman INV_Keranjang
       Navigator.pushReplacement(

@@ -242,12 +242,9 @@ class _Tipe_LState extends State<Tipe_L> {
           "$existingBarangKey.harga": harga,
           "$existingBarangKey.timestamp": timestamp,
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Harga $namaInterior berhasil diperbarui "),
-            backgroundColor: Colors.blue,
-          ),
-        );
+        
+        _showSnackBar("Harga $namaInterior berhasil diperbarui", Colors.blue);
+        
       } else {
         String barangKey = "barang$nomorBarang";
 
@@ -259,22 +256,30 @@ class _Tipe_LState extends State<Tipe_L> {
           }
         }, SetOptions(merge: true));
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("$namaInterior ditambahkan ke keranjang"),
-            backgroundColor: Colors.green,
-          ),
-        );
+         _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
       }
     } catch (e) {
       print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menambahkan ke keranjang."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
     }
+  }
+
+  void _showSnackBar(String message, Color backgroundColor) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isTablet = screenWidth > 600; // Menentukan apakah perangkat tablet
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: backgroundColor,
+      ),
+    );
   }
 
   void simpanDataKeFirestore(BuildContext context) async {
@@ -293,12 +298,7 @@ class _Tipe_LState extends State<Tipe_L> {
       aksesorisController.text,
       uangMukaController.text
     ].any((element) => element.isEmpty)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Harap isi semua kolom sebelum menyimpan."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
     }
 
@@ -340,30 +340,52 @@ class _Tipe_LState extends State<Tipe_L> {
       };
 
       await FirebaseFirestore.instance
-          .collection("pesanan kitchen L")
-          .add(data);
+      .collection("pesanan kitchen L")
+      .add(data);
+
+  double screenWidth = MediaQuery.of(context).size.width;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Data berhasil disimpan!"),
-          backgroundColor: Colors.green,
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: EdgeInsets.symmetric(
+        horizontal: screenWidth > 600 ? 50 : 20,
+        vertical: 20,
+      ),
+      content: SizedBox(
+        height: screenWidth > 600 ? 50 : 30,
+        child: Center(
+          child: Text(
+            "Data berhasil disimpan!",
+            style: TextStyle(
+              fontSize: screenWidth > 600 ? 20 : 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-      );
+      ),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 3),
+    ),
+  );
 
       Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const INV_Tipe_L(),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menyimpan data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    context,
+    MaterialPageRoute(
+      builder: (context) => const INV_Tipe_L(),
+    ),
+  );
+} catch (e) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Gagal menyimpan data: $e"),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
   }
 
   @override
@@ -474,8 +496,8 @@ class _Tipe_LState extends State<Tipe_L> {
                           },
                           child: Image.asset(
                             "assets/images/back.png",
-                            height: screenHeight * 0.03,
-                            width: screenHeight * 0.03,
+                            height: screenHeight * 0.035,
+                            width: screenHeight * 0.035,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -523,11 +545,14 @@ class _Tipe_LState extends State<Tipe_L> {
                               // Ikon Keranjang
                               Image.asset(
                                 "assets/images/keranjang_merah.png",
-                                height: screenHeight * 0.035,
-                                width: screenHeight * 0.035,
+                                height: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
                                 fit: BoxFit.contain,
                               ),
-
                               // Badge Jumlah Item (Ditampilkan jika jumlahItem > 0)
                               if (jumlahItem > 0)
                                 Positioned(
@@ -624,7 +649,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                     child: Text(
                                       "Nama Klien",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -661,7 +686,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                     child: Text(
                                       "Alamat",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -707,7 +732,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                                   ? "Kitchen Set Atas"
                                                   : "Atas",
                                               style: GoogleFonts.lato(
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.normal,
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -719,7 +744,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                           Text(
                                             "Harga",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -884,7 +909,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                       Text(
                                         "Hasil Jumlah",
                                         style: GoogleFonts.lato(
-                                          fontWeight: FontWeight.w900,
+                                          fontWeight: FontWeight.normal,
                                           fontSize: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -933,7 +958,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                                   ? "Kitchen Set Bawah"
                                                   : "Bawah",
                                               style: GoogleFonts.lato(
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.normal,
                                                 fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -945,7 +970,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                           Text(
                                             "Harga",
                                             style: GoogleFonts.lato(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -1109,7 +1134,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                       Text(
                                         "Hasil Jumlah",
                                         style: GoogleFonts.lato(
-                                          fontWeight: FontWeight.w900,
+                                          fontWeight: FontWeight.normal,
                                           fontSize: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -1150,7 +1175,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                     child: Text(
                                       "Backsplash",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -1186,7 +1211,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                     child: Text(
                                       "Aksesoris",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -1222,7 +1247,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                     child: Text(
                                       "Uang Muka",
                                       style: GoogleFonts.lato(
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.normal,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.035,
@@ -1252,8 +1277,8 @@ class _Tipe_LState extends State<Tipe_L> {
                               ),
                             ),
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: screenHeight * 0.025,
+                              right: screenHeight * 0.025,
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -1264,8 +1289,8 @@ class _Tipe_LState extends State<Tipe_L> {
                                 },
                                 child: Image.asset(
                                   "assets/images/back_rotasi.png",
-                                  width: 30,
-                                  height: 30,
+                                  height: screenHeight * 0.035,
+                                  width: screenHeight * 0.035,
                                 ),
                               ),
                             ),
@@ -1281,65 +1306,73 @@ class _Tipe_LState extends State<Tipe_L> {
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: ElevatedButton(
-                onPressed: () {
-                  tambahKeKeranjang("Kitchen Tipe letter l", hitungSubTotal());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00BFA5),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/keranjang_putih.png",
-                      height: MediaQuery.of(context).size.height *
-                          (MediaQuery.of(context).size.width > 600
-                              ? 0.04
-                              : 0.03),
-                      width: MediaQuery.of(context).size.height * 0.035,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
-              ),
+  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+  child: Row(
+    children: [
+      Expanded(
+        flex: 1,
+        child: ElevatedButton(
+          onPressed: () {
+            tambahKeKeranjang("Kitchen Tipe Letter L", hitungSubTotal());
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF00BFA5),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
-            const SizedBox(width: 1),
-            Expanded(
-              flex: 1,
-              child: ElevatedButton(
-                onPressed: () {
-                  simpanDataKeFirestore(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5252),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-                child: Text(
-                  'Hitung',
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                Text(
+                  "Keranjang",
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: MediaQuery.of(context).size.width * 0.045,
                   ),
+                )
+              else // Jika mobile, pakai gambar
+                Image.asset(
+                  "assets/images/keranjang_putih.png",
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  width: MediaQuery.of(context).size.height * 0.035,
+                  fit: BoxFit.contain,
                 ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
+      const SizedBox(width: 1),
+      Expanded(
+        flex: 1,
+        child: ElevatedButton(
+          onPressed: () {
+            simpanDataKeFirestore(context);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFF5252),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+          ),
+          child: Text(
+            'Hitung',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: MediaQuery.of(context).size.width * 0.045,
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
     );
   }
 

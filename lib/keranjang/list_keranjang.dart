@@ -93,11 +93,13 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Text(
+                     Text(
                       "Estimasi Harga",
                       style: TextStyle(
                         color: Color(0xFFFF5252),
-                        fontSize: 18,
+                        fontSize: MediaQuery.of(context).size.width < 600
+                                ? MediaQuery.of(context).size.width * 0.045
+                                : MediaQuery.of(context).size.width * 0.04,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
