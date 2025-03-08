@@ -112,8 +112,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Image.asset(
                                 "assets/images/keranjang_merah.png",
-                                height: screenHeight * 0.035,
-                                width: screenHeight * 0.035,
+                                height: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
                                 fit: BoxFit.contain,
                               ),
                               if (jumlahItem > 0)

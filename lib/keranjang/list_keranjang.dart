@@ -93,13 +93,13 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                     Text(
+                    Text(
                       "Estimasi Harga",
                       style: TextStyle(
                         color: Color(0xFFFF5252),
                         fontSize: MediaQuery.of(context).size.width < 600
-                                ? MediaQuery.of(context).size.width * 0.045
-                                : MediaQuery.of(context).size.width * 0.04,
+                            ? MediaQuery.of(context).size.width * 0.045
+                            : MediaQuery.of(context).size.width * 0.04,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -167,7 +167,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                                         child: Text(
                                           "List Keranjang",
                                           style: GoogleFonts.manrope(
-                                            fontSize: screenWidth * 0.05,
+                                            fontSize: screenWidth * 0.045,
                                             fontWeight: FontWeight.w900,
                                             color: Color(0xFFFF5252),
                                           ),
@@ -186,6 +186,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                                               MediaQuery.of(context).size.width;
 
                                           if (screenWidth < 600) {
+                                            // Jika layar kecil (mobile)
                                             namaBarang = namaBarang
                                                 .replaceAll(
                                                     RegExp(r'kitchen',
@@ -194,52 +195,82 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                                                 .trim();
                                           }
 
-                                          return Card(
-                                            color: Color(0xFFD5D5D5),
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: ListTile(
-                                              leading: Text(
-                                                "${index + 1}.",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    screenWidth > 600 ? 20 : 8,
+                                                vertical:
+                                                    5), // ✅ Padding dinamis
+                                            child: Card(
+                                              color: Color(0xFFD5D5D5),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: ListTile(
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  horizontal: screenWidth > 600
+                                                      ? 20
+                                                      : 10, // ✅ Padding lebih besar di tablet
+                                                  vertical: screenWidth > 600
+                                                      ? 16
+                                                      : 10, // ✅ Tambah tinggi di tablet
                                                 ),
-                                              ),
-                                              title: Text(
-                                                namaBarang,
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                              trailing: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    "Rp ${formatCurrency.format(items[index]["harga"])}",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14,
-                                                      color: Color(0xFFFF5252),
-                                                    ),
+                                                leading: Text(
+                                                  "${index + 1}.",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: screenWidth > 600
+                                                        ? 18
+                                                        : 14, // ✅ Ukuran teks lebih besar di tablet
                                                   ),
-                                                  SizedBox(width: 8),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      String itemKey =
-                                                          items[index]["key"];
-                                                      hapusItemKeranjang(
-                                                          itemKey);
-                                                    },
-                                                    child: Icon(
-                                                      Icons.close,
-                                                      color: Colors.red,
+                                                ),
+                                                title: Text(
+                                                  namaBarang,
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          screenWidth > 600
+                                                              ? 18
+                                                              : 14),
+                                                ),
+                                                trailing: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "Rp ${formatCurrency.format(items[index]["harga"])}",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: screenWidth >
+                                                                600
+                                                            ? 18
+                                                            : 14, // ✅ Ukuran teks harga lebih besar
+                                                        color:
+                                                            Color(0xFFFF5252),
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                    SizedBox(
+                                                        width:
+                                                            12), // ✅ Jarak lebih besar untuk tablet
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        String itemKey =
+                                                            items[index]["key"];
+                                                        hapusItemKeranjang(
+                                                            itemKey);
+                                                      },
+                                                      child: Icon(
+                                                        Icons.close,
+                                                        size: screenWidth > 600
+                                                            ? 28
+                                                            : 24, // ✅ Icon lebih besar untuk tablet
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           );
@@ -262,7 +293,12 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
         ],
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(12),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 600
+              ? 20
+              : 12, // ✅ Padding lebih besar di tablet
+          vertical: 16,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
@@ -306,35 +342,54 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total List:", style: TextStyle(fontSize: 14)),
+                    Text(
+                      "Total List:",
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 25
+                            : 14, // ✅ Ukuran teks lebih besar di tablet
+                      ),
+                    ),
                     Text(
                       jumlahItem.toString(),
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 25 : 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total Harga:", style: TextStyle(fontSize: 14)),
+                    Text(
+                      "Total Harga:",
+                      style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 25: 14,
+                      ),
+                    ),
                     Text(
                       "Rp ${formatCurrency.format(totalHarga)}",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 25 : 14,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFFFF5252),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  height: 45,
-                  child: GestureDetector(
-                    onTap: () {
+                  height: MediaQuery.of(context).size.width > 600
+                      ? 55
+                      : 45, // ✅ Tombol lebih tinggi di tablet
+                  child: ElevatedButton(
+                    onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -342,29 +397,20 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                         ),
                       );
                     },
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const Daftar_KeranjangScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFFF5252),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFF5252),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text(
-                        "Bayar",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    child: Text(
+                      "Bayar",
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 25
+                            : 16, // ✅ Teks lebih besar di tablet
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),

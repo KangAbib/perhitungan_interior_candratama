@@ -230,7 +230,7 @@ class _INV_TipeU extends State<INV_Tipe_U> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "Kitchen Letter L" : "Letter L"}",
+                    "Pembayaran : ${isTablet ? "Kitchen Letter U" : "Letter U"}",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,

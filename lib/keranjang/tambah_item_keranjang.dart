@@ -272,11 +272,14 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                               // Ikon Keranjang
                               Image.asset(
                                 "assets/images/keranjang_merah.png",
-                                height: screenHeight * 0.035,
-                                width: screenHeight * 0.035,
+                                height: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
                                 fit: BoxFit.contain,
                               ),
-
                               // Badge Jumlah Item (Ditampilkan jika jumlahItem > 0)
                               if (jumlahItem > 0)
                                 Positioned(
@@ -715,16 +718,23 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      "assets/images/keranjang_putih.png",
-                      height: MediaQuery.of(context).size.height *
-                          (MediaQuery.of(context).size.width > 600
-                              ? 0.04
-                              : 0.03),
-                      width: MediaQuery.of(context).size.height * 0.035,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
+              if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                Text(
+                  "Keranjang",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: MediaQuery.of(context).size.width * 0.045,
+                  ),
+                )
+              else // Jika mobile, pakai gambar
+                Image.asset(
+                  "assets/images/keranjang_putih.png",
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  width: MediaQuery.of(context).size.height * 0.035,
+                  fit: BoxFit.contain,
+                ),
+            ],
                 ),
               ),
             ),

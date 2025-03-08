@@ -81,6 +81,24 @@ class _LemariScreenState extends State<LemariScreen> {
     return parseValue(jumlahController.text);
   }
 
+  void _showSnackBar(String message, Color backgroundColor) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isTablet = screenWidth > 600; // Menentukan apakah perangkat tablet
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: backgroundColor,
+      ),
+    );
+  }
+
   void tambahKeKeranjang(String namaInterior, double harga) async {
     try {
       var keranjangRef = FirebaseFirestore.instance
@@ -115,12 +133,7 @@ class _LemariScreenState extends State<LemariScreen> {
           "$existingBarangKey.harga": harga,
           "$existingBarangKey.timestamp": timestamp,
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Harga $namaInterior berhasil diperbarui "),
-            backgroundColor: Colors.blue,
-          ),
-        );
+        _showSnackBar("Harga $namaInterior berhasil diperbarui", Colors.blue);
       } else {
         String barangKey = "barang$nomorBarang";
 
@@ -132,21 +145,11 @@ class _LemariScreenState extends State<LemariScreen> {
           }
         }, SetOptions(merge: true));
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("$namaInterior ditambahkan ke keranjang"),
-            backgroundColor: Colors.green,
-          ),
-        );
+         _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
       }
     } catch (e) {
       print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menambahkan ke keranjang."),
-          backgroundColor: Colors.red,
-        ),
-      );
+       _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
     }
   }
 
@@ -155,12 +158,7 @@ class _LemariScreenState extends State<LemariScreen> {
         alamatController.text.isEmpty ||
         ukuranLemariController.text.isEmpty ||
         LemariController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Harap isi semua kolom sebelum menyimpan."),
-          backgroundColor: Colors.red,
-        ),
-      );
+       _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
     }
 
@@ -191,28 +189,53 @@ class _LemariScreenState extends State<LemariScreen> {
     };
 
     try {
-      await FirebaseFirestore.instance.collection("pesanan Lemari").add(data);
+      await FirebaseFirestore.instance
+      .collection("pesanan Lemari")
+      .add(data);
+
+  double screenWidth = MediaQuery.of(context).size.width;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Data berhasil disimpan!"),
-          backgroundColor: Colors.green,
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: EdgeInsets.symmetric(
+        horizontal: screenWidth > 600 ? 50 : 20,
+        vertical: 20,
+      ),
+      content: SizedBox(
+        height: screenWidth > 600 ? 50 : 30,
+        child: Center(
+          child: Text(
+            "Data berhasil disimpan!",
+            style: TextStyle(
+              fontSize: screenWidth > 600 ? 20 : 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-      );
+      ),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 3),
+    ),
+  );
 
       Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const INV_Lemari(),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menyimpan data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    context,
+    MaterialPageRoute(
+      builder: (context) => const INV_Lemari(),
+    ),
+  );
+} catch (e) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Gagal menyimpan data: $e"),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
   }
 
   @override
@@ -324,8 +347,12 @@ class _LemariScreenState extends State<LemariScreen> {
                             children: [
                               Image.asset(
                                 "assets/images/keranjang_merah.png",
-                                height: screenHeight * 0.035,
-                                width: screenHeight * 0.035,
+                                height: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? screenHeight * 0.045
+                                    : screenHeight * 0.035,
                                 fit: BoxFit.contain,
                               ),
                               if (jumlahItem > 0)
@@ -736,16 +763,23 @@ class _LemariScreenState extends State<LemariScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      "assets/images/keranjang_putih.png",
-                      height: MediaQuery.of(context).size.height *
-                          (MediaQuery.of(context).size.width > 600
-                              ? 0.04
-                              : 0.03),
-                      width: MediaQuery.of(context).size.height * 0.035,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
+              if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                Text(
+                  "Keranjang",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: MediaQuery.of(context).size.width * 0.045,
+                  ),
+                )
+              else // Jika mobile, pakai gambar
+                Image.asset(
+                  "assets/images/keranjang_putih.png",
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  width: MediaQuery.of(context).size.height * 0.035,
+                  fit: BoxFit.contain,
+                ),
+            ],
                 ),
               ),
             ),
