@@ -46,6 +46,25 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
     });
   }
 
+  void _showSnackBar(String message, Color backgroundColor) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isTablet = screenWidth > 600; // Menentukan apakah perangkat tablet
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: backgroundColor,
+      ),
+    );
+  }
+
+
   void _hitungInteriorCustom() {
     double parseUkuran(String text) {
       String cleanedText =
@@ -137,13 +156,12 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
           }
         }, SetOptions(merge: true));
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("$namaInterior ditambahkan ke keranjang"),
-            backgroundColor: Colors.green,
-          ),
-        );
+        
+          
+            _showSnackBar("$namaInterior ditambahkan ke keranjang",Colors.green);
+            
       }
+      
 
       // Navigasi ke Daftar_KeranjangScreen setelah sukses
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -231,11 +249,11 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                         Text(
                           "Tambah Interior",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
-                            fontSize: 18,
+                           fontSize: MediaQuery.of(context).size.width > 600 ? 25 : 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -697,13 +715,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                 onPressed: () {
                   String namaInterior = namacustomController.text.trim();
                   if (namaInterior.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            "Harap isi nama interior sebelum menambahkan ke keranjang"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    _showSnackBar("Gagal menambahkan.", Colors.red);
                     return;
                   }
                   tambahKeKeranjang(namaInterior, hitungSubTotal(), context);
@@ -746,12 +758,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                   String namaInterior = namacustomController.text.trim();
 
                   if (namaInterior.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Harap isi nama interior."),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
                     return;
                   }
                   tambahKeKeranjang(namaInterior, hitungSubTotal(), context);

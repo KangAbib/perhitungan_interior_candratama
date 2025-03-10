@@ -1165,101 +1165,111 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: ElevatedButton(
-                onPressed: () {
-                  tambahKeKeranjang("Kitchen Tipe Straight", hitungSubTotal());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00BFA5),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+      bottomNavigationBar: Container(
+  height: MediaQuery.of(context).size.width > 600 ? 70 : 50, // Maksimal 70 untuk tablet, 50 untuk HP
+  child: Padding(
+    padding: EdgeInsets.zero,
+    child: Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              tambahKeKeranjang("Kitchen Tipe Straight", hitungSubTotal());
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00BFA5),
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                bool isTablet = MediaQuery.of(context).size.width > 600;
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight, // Batasi agar tidak melebihi height tombol
                   ),
-                ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    bool isTablet = MediaQuery.of(context).size.width > 600;
-
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isTablet)
-                          Text(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isTablet)
+                        FittedBox(
+                          child: Text(
                             "Keranjang",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: MediaQuery.of(context).size.width *
-                                  0.045, // Responsif
+                              fontSize: constraints.maxHeight * 0.4, // Maksimal 40% dari tinggi tombol
                             ),
-                          )
-                        else
-                          Image.asset(
-                            "assets/images/keranjang_putih.png",
-                            height: MediaQuery.of(context).size.height *
-                                (MediaQuery.of(context).size.width > 600
-                                    ? 0.04
-                                    : 0.03),
-                            width: MediaQuery.of(context).size.height * 0.035,
-                            fit: BoxFit.contain,
                           ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(width: 1),
-            Expanded(
-              flex: 1,
-              child: ElevatedButton(
-                onPressed: () {
-                  simpanDataKeFirestore();
-
-                  if (namaController.text.isNotEmpty &&
-                      alamatController.text.isNotEmpty &&
-                      hargaAtasController.text.isNotEmpty &&
-                      hargaBawahController.text.isNotEmpty &&
-                      hasilJumlahAtasController.text.isNotEmpty &&
-                      hasilJumlahBawahController.text.isNotEmpty &&
-                      topTableController.text.isNotEmpty &&
-                      backsplashController.text.isNotEmpty &&
-                      aksesorisController.text.isNotEmpty &&
-                      uangMukaController.text.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const INV_TipeStraight(),
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5252),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+                        )
+                      else
+                        Image.asset(
+                          "assets/images/keranjang_putih.png",
+                          height: constraints.maxHeight * 0.5, // Maksimal 60% dari tinggi tombol
+                          width: constraints.maxHeight * 0.5,
+                          fit: BoxFit.contain,
+                        ),
+                    ],
                   ),
-                ),
-                child: Text(
-                  'Hitung',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: MediaQuery.of(context).size.width * 0.045,
-                  ),
-                ),
-              ),
+                );
+              },
             ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(width: 1),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              simpanDataKeFirestore();
+              if (namaController.text.isNotEmpty &&
+                  alamatController.text.isNotEmpty &&
+                  hargaAtasController.text.isNotEmpty &&
+                  hargaBawahController.text.isNotEmpty &&
+                  hasilJumlahAtasController.text.isNotEmpty &&
+                  hasilJumlahBawahController.text.isNotEmpty &&
+                  topTableController.text.isNotEmpty &&
+                  backsplashController.text.isNotEmpty &&
+                  aksesorisController.text.isNotEmpty &&
+                  uangMukaController.text.isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const INV_TipeStraight(),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF5252),
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight, // Batasi agar tidak melebihi tinggi tombol
+                  ),
+                  child: FittedBox(
+                    child: Text(
+                      'Hitung',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: constraints.maxHeight * 0.4, // Maksimal 40% dari tinggi tombol
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
     );
   }
 

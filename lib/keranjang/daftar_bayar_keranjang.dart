@@ -62,6 +62,25 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
     });
   }
 
+  void _showSnackBar(String message, Color backgroundColor) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isTablet = screenWidth > 600; // Menentukan apakah perangkat tablet
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: backgroundColor,
+      ),
+    );
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -342,7 +361,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                     .width >
                                                 600
                                             ? 250
-                                            : 180, // ✅ Lebih tinggi di tablet
+                                            : 180, 
                                         child: ListView.builder(
                                           physics:
                                               AlwaysScrollableScrollPhysics(),
@@ -372,14 +391,14 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                             .width >
                                                         600
                                                     ? 8
-                                                    : 5, // ✅ Jarak lebih luas di tablet
+                                                    : 5, 
                                                 horizontal: MediaQuery.of(
                                                                 context)
                                                             .size
                                                             .width >
                                                         600
                                                     ? 16
-                                                    : 0, // ✅ Padding samping lebih luas
+                                                    : 0, 
                                               ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -394,7 +413,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                               .width >
                                                           600
                                                       ? 12
-                                                      : 8, // ✅ Padding lebih besar di tablet
+                                                      : 8, 
                                                   horizontal:
                                                       MediaQuery.of(context)
                                                                   .size
@@ -413,7 +432,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                                 .width >
                                                             600
                                                         ? 18
-                                                        : 14, // ✅ Ukuran font lebih besar di tablet
+                                                        : 14, 
                                                   ),
                                                 ),
                                                 title: Text(
@@ -443,7 +462,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                                     .width >
                                                                 600
                                                             ? 18
-                                                            : 14, // ✅ Font lebih besar
+                                                            : 14, 
                                                         color:
                                                             Color(0xFFFF5252),
                                                       ),
@@ -465,7 +484,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                                     .width >
                                                                 600
                                                             ? 28
-                                                            : 24, // ✅ Icon lebih besar di tablet
+                                                            : 24, 
                                                       ),
                                                     ),
                                                   ],
@@ -487,13 +506,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                         .width >
                                                     600
                                                 ? 55
-                                                : 45, // ✅ Lebih tinggi di tablet
+                                                : 45, 
                                             width: MediaQuery.of(context)
                                                         .size
                                                         .width >
                                                     600
                                                 ? 150
-                                                : 100, // ✅ Lebih lebar di tablet
+                                                : 100, 
                                             child: ElevatedButton(
                                               onPressed: () {
                                                 Navigator.push(
@@ -522,7 +541,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                               .width >
                                                           600
                                                       ? 18
-                                                      : 12, // ✅ Font lebih besar di tablet
+                                                      : 12, 
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -540,14 +559,38 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         ),
                                         decoration: InputDecoration(
                                           labelText: "Masukkan Diskon",
-                                          border: OutlineInputBorder(),
-                                          suffixIcon: Icon(
-                                            isDiskonValid
-                                                ? Icons.check_circle
-                                                : Icons.cancel,
-                                            color: isDiskonValid
-                                                ? Colors.green
-                                                : Colors.red,
+                                          labelStyle: GoogleFonts.manrope(
+                                            
+                                            fontSize: screenWidth *
+                                                0.04, 
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey[
+                                                700], 
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                8), 
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                            
+                                            horizontal: 12,
+                                            vertical: 14,
+                                          ),
+                                          suffixIcon: Padding(
+                                            padding: const EdgeInsets.only(
+                                                right:
+                                                    8), 
+                                            child: Icon(
+                                              isDiskonValid
+                                                  ? Icons.check_circle
+                                                  : Icons.cancel,
+                                              color: isDiskonValid
+                                                  ? Colors.green.shade600
+                                                  : Colors.red
+                                                      .shade600, 
+                                              size: screenWidth *
+                                                  0.05, 
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -561,14 +604,23 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         ),
                                         decoration: InputDecoration(
                                           labelText: "Uang Muka",
+                                          labelStyle: GoogleFonts.manrope(
+                                            
+                                            fontSize: screenWidth *
+                                                0.04, 
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey[
+                                                700], 
+                                          ),
                                           border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                                8), 
                                           ),
                                           contentPadding: EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 12),
-                                          filled: true,
-                                          fillColor: Colors.grey[200],
+                                            
+                                            horizontal: 12,
+                                            vertical: 14,
+                                          ),
                                         ),
                                         keyboardType: TextInputType.none,
                                       ),
@@ -589,166 +641,205 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
         ],
       ),
       bottomNavigationBar: Container(
-  padding: EdgeInsets.all(MediaQuery.of(context).size.width > 600 ? 20 : 12), // ✅ Padding lebih besar di tablet
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black12,
-        blurRadius: 5,
-        spreadRadius: 2,
-      ),
-    ],
-  ),
-  child: StreamBuilder<DocumentSnapshot>(
-    stream: FirebaseFirestore.instance
-        .collection("keranjang")
-        .doc("listKeranjang")
-        .snapshots(),
-    builder: (context, snapshot) {
-      if (!snapshot.hasData || !snapshot.data!.exists) {
-        return SizedBox.shrink();
-      }
-
-      var data = snapshot.data!.data() as Map<String, dynamic>;
-      List<Map<String, dynamic>> items = [];
-
-      data.forEach((key, value) {
-        if (key.startsWith("barang")) {
-          items.add({
-            "nama": value["nama"],
-            "harga": value["harga"],
-          });
-        }
-      });
-
-      totalHarga = items.fold(0, (sum, item) => sum + item["harga"]);
-      uangMuka = totalHarga * 0.6;
-      WidgetsBinding.instance.addPostFrameCallback((_) { // ✅ Menghindari error pada setState dalam Future.delayed
-        uangMukaController.text = "Rp ${formatCurrency.format(uangMuka)}";
-      });
-      int jumlahItem = items.length;
-
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Total List:", style: TextStyle(fontSize: 14)),
-              Text(
-                jumlahItem.toString(),
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Total Harga:", style: TextStyle(fontSize: 14)),
-              Text(
-                "Rp ${formatCurrency.format(totalHarga)}",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFFF5252),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.width > 600 ? 55 : 45, // ✅ Tombol lebih besar di tablet
-            child: ElevatedButton(
-              onPressed: () async {
-                if (namaController.text.isEmpty || alamatController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Harap isi nama dan alamat sebelum membayar!"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-
-                DocumentSnapshot keranjangSnapshot =
-                    await FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang").get();
-
-                if (!keranjangSnapshot.exists || keranjangSnapshot.data() == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Keranjang masih kosong!"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-
-                Map<String, dynamic> keranjangData = keranjangSnapshot.data() as Map<String, dynamic>;
-
-                double totalHargaItem = 0;
-                List<Map<String, dynamic>> daftarBarang = [];
-
-                keranjangData.forEach((key, value) {
-                  if (value is Map<String, dynamic>) {
-                    daftarBarang.add(value);
-                    totalHargaItem += (value["harga"] ?? 0).toDouble();
-                  }
-                });
-
-                double uangMukaInput = double.tryParse(uangMukaController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-                double diskonInput = double.tryParse(diskonController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-
-                double totalHargaSetelahDiskon = totalHargaItem - diskonInput;
-                if (totalHargaSetelahDiskon < 0) totalHargaSetelahDiskon = 0;
-
-                double sisaPembayaran = totalHargaSetelahDiskon - uangMukaInput;
-                if (sisaPembayaran < 0) sisaPembayaran = 0;
-
-                await FirebaseFirestore.instance.collection("pesanan_keranjang").add({
-                  "nama": namaController.text.trim(),
-                  "alamat": alamatController.text.trim(),
-                  "items": daftarBarang,
-                  "total_harga": totalHargaItem,
-                  "diskon": diskonInput,
-                  "total_setelah_diskon": totalHargaSetelahDiskon,
-                  "uang_muka": uangMukaInput,
-                  "sisa_pembayaran": sisaPembayaran,
-                  "timestamp": FieldValue.serverTimestamp(),
-                });
-
-                await FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang").set({});
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => INV_Keranjang()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFF5252),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                "Bayar",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: MediaQuery.of(context).size.width > 600 ? 25 : 16, // ✅ Font lebih besar di tablet
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+        padding: EdgeInsets.all(MediaQuery.of(context).size.width > 600
+            ? 20
+            : 12), 
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              spreadRadius: 2,
             ),
-          ),
-        ],
-      );
-    },
-  ),
-),
+          ],
+        ),
+        child: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection("keranjang")
+              .doc("listKeranjang")
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return SizedBox.shrink();
+            }
 
+            var data = snapshot.data!.data() as Map<String, dynamic>;
+            List<Map<String, dynamic>> items = [];
+
+            data.forEach((key, value) {
+              if (key.startsWith("barang")) {
+                items.add({
+                  "nama": value["nama"],
+                  "harga": value["harga"],
+                });
+              }
+            });
+
+            totalHarga = items.fold(0, (sum, item) => sum + item["harga"]);
+            uangMuka = totalHarga * 0.6;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              
+              uangMukaController.text = "Rp ${formatCurrency.format(uangMuka)}";
+            });
+            int jumlahItem = items.length;
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Total List:",
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 22
+                            : 12, 
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      jumlahItem.toString(),
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 22
+                            : 12, 
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Total Harga:",
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 25
+                            : 14, 
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "Rp ${formatCurrency.format(totalHarga)}",
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 25
+                            : 14, 
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFFF5252),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.width > 600
+                      ? 55
+                      : 45, 
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (namaController.text.isEmpty ||
+                          alamatController.text.isEmpty) {
+                         _showSnackBar("Harap isi nama dan alamat sebelum membayar!.", Colors.red);
+                        return;
+                      }
+
+                      DocumentSnapshot keranjangSnapshot =
+                          await FirebaseFirestore.instance
+                              .collection("keranjang")
+                              .doc("listKeranjang")
+                              .get();
+
+                      if (!keranjangSnapshot.exists ||
+                          keranjangSnapshot.data() == null) {
+                         _showSnackBar("Keranjang masih kosong.", Colors.red);
+                        return;
+                      }
+
+                      Map<String, dynamic> keranjangData =
+                          keranjangSnapshot.data() as Map<String, dynamic>;
+
+                      double totalHargaItem = 0;
+                      List<Map<String, dynamic>> daftarBarang = [];
+
+                      keranjangData.forEach((key, value) {
+                        if (value is Map<String, dynamic>) {
+                          daftarBarang.add(value);
+                          totalHargaItem += (value["harga"] ?? 0).toDouble();
+                        }
+                      });
+
+                      double uangMukaInput = double.tryParse(uangMukaController
+                              .text
+                              .replaceAll(RegExp(r'[^0-9]'), '')) ??
+                          0;
+                      double diskonInput = double.tryParse(diskonController.text
+                              .replaceAll(RegExp(r'[^0-9]'), '')) ??
+                          0;
+
+                      double totalHargaSetelahDiskon =
+                          totalHargaItem - diskonInput;
+                      if (totalHargaSetelahDiskon < 0)
+                        totalHargaSetelahDiskon = 0;
+
+                      double sisaPembayaran =
+                          totalHargaSetelahDiskon - uangMukaInput;
+                      if (sisaPembayaran < 0) sisaPembayaran = 0;
+
+                      await FirebaseFirestore.instance
+                          .collection("pesanan_keranjang")
+                          .add({
+                        "nama": namaController.text.trim(),
+                        "alamat": alamatController.text.trim(),
+                        "items": daftarBarang,
+                        "total_harga": totalHargaItem,
+                        "diskon": diskonInput,
+                        "total_setelah_diskon": totalHargaSetelahDiskon,
+                        "uang_muka": uangMukaInput,
+                        "sisa_pembayaran": sisaPembayaran,
+                        "timestamp": FieldValue.serverTimestamp(),
+                      });
+
+                      await FirebaseFirestore.instance
+                          .collection("keranjang")
+                          .doc("listKeranjang")
+                          .set({});
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => INV_Keranjang()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFF5252),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      "Bayar",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.width > 600
+                            ? 25
+                            : 16, 
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }
