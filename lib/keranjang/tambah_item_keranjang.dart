@@ -253,7 +253,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                           "Tambah Interior",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
-                           fontSize: MediaQuery.of(context).size.width > 600 ? 25 : 14,
+                           fontSize: MediaQuery.of(context).size.width > 600 ? 25 : 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -741,11 +741,15 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                 )
               else // Jika mobile, pakai gambar
                 Image.asset(
-                  "assets/images/keranjang_putih.png",
-                  height: MediaQuery.of(context).size.height * 0.04,
-                  width: MediaQuery.of(context).size.height * 0.035,
-                  fit: BoxFit.contain,
-                ),
+                            "assets/images/keranjang_putih.png",
+                            height: MediaQuery.of(context).size.height <= 700
+                                ? MediaQuery.of(context).size.height * 0.035
+                                : MediaQuery.of(context).size.height * 0.03,
+                            width: MediaQuery.of(context).size.height <= 700
+                                ? MediaQuery.of(context).size.height * 0.035
+                                : MediaQuery.of(context).size.height * 0.03,
+                            fit: BoxFit.contain,
+                          ),
             ],
                 ),
               ),

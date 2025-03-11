@@ -830,11 +830,15 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
                 )
               else // Jika mobile, pakai gambar
                 Image.asset(
-                  "assets/images/keranjang_putih.png",
-                  height: MediaQuery.of(context).size.height * 0.04,
-                  width: MediaQuery.of(context).size.height * 0.035,
-                  fit: BoxFit.contain,
-                ),
+                            "assets/images/keranjang_putih.png",
+                            height: MediaQuery.of(context).size.height <= 700
+                                ? MediaQuery.of(context).size.height * 0.035
+                                : MediaQuery.of(context).size.height * 0.03,
+                            width: MediaQuery.of(context).size.height <= 700
+                                ? MediaQuery.of(context).size.height * 0.035
+                                : MediaQuery.of(context).size.height * 0.03,
+                            fit: BoxFit.contain,
+                          ),
             ],
                 ),
               ),

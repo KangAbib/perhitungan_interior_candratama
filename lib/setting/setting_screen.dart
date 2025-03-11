@@ -75,46 +75,57 @@ class _SettingScreenState extends State<SettingScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        "$jenis berhasil disimpan",
-        style: TextStyle(
-          fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 20, // Perbesar teks jika di tablet
-          fontWeight: FontWeight.bold,
+        SnackBar(
+          content: Text(
+            "$jenis berhasil disimpan",
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width < 600
+                  ? 14
+                  : 20, // Perbesar teks jika di tablet
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
       _kitchenSetAtasController.clear();
       _kitchenSetBawahController.clear();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal menyimpan: $e",style: TextStyle(
-          fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 20, // Perbesar teks jika di tablet
-          fontWeight: FontWeight.bold,
-        ),),),
+        SnackBar(
+          content: Text(
+            "Gagal menyimpan: $e",
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width < 600
+                  ? 14
+                  : 20, // Perbesar teks jika di tablet
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       );
     }
   }
+
   void _showSnackBar(String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(
-          fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 20, // Ukuran teks sesuai layar
-          fontWeight: FontWeight.bold,
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: MediaQuery.of(context).size.width < 600
+                ? 14
+                : 20, // Ukuran teks sesuai layar
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        behavior: SnackBarBehavior.floating, // Membuat SnackBar lebih menonjol
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
-      behavior: SnackBarBehavior.floating, // Membuat SnackBar lebih menonjol
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-    ),
-  );
-}
-
+    );
+  }
 
   void listenToHargaKitchenSet(String docId, TextEditingController controller) {
     StreamSubscription? subscription = _firestore
@@ -151,38 +162,37 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void _saveUkuranKitchenSet(String jenis, String atas, String bawah) async {
-  if (atas.isEmpty || bawah.isEmpty) {
-    _showSnackBar("Harap isi ukuran sebelum menyimpan");
-    return;
+    if (atas.isEmpty || bawah.isEmpty) {
+      _showSnackBar("Harap isi ukuran sebelum menyimpan");
+      return;
+    }
+
+    String atasFormatted = atas.replaceAll(',', '.');
+    String bawahFormatted = bawah.replaceAll(',', '.');
+
+    double rawAtas = double.tryParse(atasFormatted) ?? 0.0;
+    double rawBawah = double.tryParse(bawahFormatted) ?? 0.0;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("ukuran_kitchen_set")
+          .doc(jenis)
+          .set({
+        "jenis": jenis,
+        "set_atas": rawAtas,
+        "set_bawah": rawBawah,
+      });
+
+      _showSnackBar("$jenis berhasil disimpan");
+
+      _kitchenSetLController.clear();
+      _kitchenSetUController.clear();
+      _kitchenSetULController.clear();
+      _kitchenSetUUController.clear();
+    } catch (e) {
+      _showSnackBar("Gagal menyimpan: $e");
+    }
   }
-
-  String atasFormatted = atas.replaceAll(',', '.');
-  String bawahFormatted = bawah.replaceAll(',', '.');
-
-  double rawAtas = double.tryParse(atasFormatted) ?? 0.0;
-  double rawBawah = double.tryParse(bawahFormatted) ?? 0.0;
-
-  try {
-    await FirebaseFirestore.instance
-        .collection("ukuran_kitchen_set")
-        .doc(jenis)
-        .set({
-      "jenis": jenis,
-      "set_atas": rawAtas,
-      "set_bawah": rawBawah,
-    });
-
-    _showSnackBar("$jenis berhasil disimpan");
-
-    _kitchenSetLController.clear();
-    _kitchenSetUController.clear();
-    _kitchenSetULController.clear();
-    _kitchenSetUUController.clear();
-  } catch (e) {
-    _showSnackBar("Gagal menyimpan: $e");
-  }
-}
-
 
   void listenToUkuranKitchenSet(
       String docId,
@@ -258,6 +268,7 @@ class _SettingScreenState extends State<SettingScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           Container(
@@ -794,20 +805,18 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height,
+                  height: MediaQuery.of(context).size.height *
+                      0.3, // 🔥 Pastikan tidak full height
                   child: Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Container(
+                    child: Padding(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize:
+                            MainAxisSize.min, // 🔥 Card menyesuaikan kontennya
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Align(
@@ -816,30 +825,15 @@ class _SettingScreenState extends State<SettingScreen> {
                               "List Data",
                               style: GoogleFonts.manrope(
                                 color: Color(0xFFFF5252),
-                                fontSize: screenWidth * 0.045,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.045,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height < 750
-                                ? MediaQuery.of(context).size.height *
-                                    0.1 // HP kecil (misal iPhone SE)
-                                : MediaQuery.of(context).size.width > 1200
-                                    ? MediaQuery.of(context).size.height *
-                                        0.22 // iPad Pro (layar besar)
-                                    : MediaQuery.of(context).size.width > 900
-                                        ? MediaQuery.of(context).size.height *
-                                            0.2 // Tablet umum (misal iPad Air)
-                                        : MediaQuery.of(context).size.width >
-                                                750
-                                            ? MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.18 // iPad Mini
-                                            : null, // HP besar (misal iPhone XR), tidak mengambil space
-
+                          Expanded(
+                            // 🔥 Agar ListView bisa scroll tanpa mempengaruhi ukuran Card
                             child: Scrollbar(
                               controller: _scrollController,
                               child: ListView(
@@ -850,12 +844,9 @@ class _SettingScreenState extends State<SettingScreen> {
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
                                     children: [
                                       Expanded(
-                                        flex:
-                                            2, // Memastikan teks dan kotak output seimbang
+                                        flex: 2,
                                         child: Text(
                                           "1. Kitchen Set Atas",
                                           style: GoogleFonts.manrope(
