@@ -211,11 +211,11 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
                                                   horizontal: screenWidth > 600
-                                                      ? 20
-                                                      : 10, // ✅ Padding lebih besar di tablet
+                                                      ? 15
+                                                      : 5, // ✅ Padding lebih besar di tablet
                                                   vertical: screenWidth > 600
-                                                      ? 16
-                                                      : 10, // ✅ Tambah tinggi di tablet
+                                                      ? 12
+                                                      : 2, // ✅ Tambah tinggi di tablet
                                                 ),
                                                 leading: Text(
                                                   "${index + 1}.",

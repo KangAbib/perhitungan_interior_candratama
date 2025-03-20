@@ -273,7 +273,7 @@ class _Tipe_LState extends State<Tipe_L> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -851,7 +851,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                                             .size
                                                             .width >
                                                         600
-                                                    ? 25
+                                                    ? 30
                                                     : 16,
                                                 fontWeight: FontWeight.w500,
                                               ),
@@ -1079,7 +1079,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                                             .size
                                                             .width >
                                                         600
-                                                    ? 25
+                                                    ? 30
                                                     : 16,
                                                 fontWeight: FontWeight.w500,
                                               ),

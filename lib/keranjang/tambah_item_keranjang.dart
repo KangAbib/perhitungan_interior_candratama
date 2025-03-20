@@ -55,7 +55,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
             fontWeight: FontWeight.bold,
           ),
         ),

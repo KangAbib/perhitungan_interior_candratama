@@ -71,7 +71,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -412,8 +412,8 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                               .size
                                                               .width >
                                                           600
-                                                      ? 12
-                                                      : 8, 
+                                                      ? 10
+                                                      : 2, 
                                                   horizontal:
                                                       MediaQuery.of(context)
                                                                   .size

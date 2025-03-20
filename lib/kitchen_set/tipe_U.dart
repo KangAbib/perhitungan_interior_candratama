@@ -76,7 +76,7 @@ class _Tipe_UState extends State<Tipe_U> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -308,7 +308,7 @@ class _Tipe_UState extends State<Tipe_U> {
     try {
       double jumlahAtas = (parseValue(jumlahAtas1Controller.text) +
               parseValue(jumlahAtas2Controller.text) +
-              parseValue(jumlahAtas2Controller.text) -
+              parseValue(jumlahAtas3Controller.text) -
               parseValue(_kitchenLetterLAtasController.text))
           .abs();
 

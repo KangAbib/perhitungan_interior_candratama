@@ -115,7 +115,7 @@ class _SettingScreenState extends State<SettingScreen> {
           style: TextStyle(
             fontSize: MediaQuery.of(context).size.width < 600
                 ? 14
-                : 20, // Ukuran teks sesuai layar
+                : 18, // Ukuran teks sesuai layar
             fontWeight: FontWeight.bold,
           ),
         ),

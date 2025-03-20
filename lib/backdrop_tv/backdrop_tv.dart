@@ -92,7 +92,7 @@ class _BackdropState extends State<BackdropTV> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -576,6 +576,7 @@ class _BackdropState extends State<BackdropTV> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
+                                                    hintText: "Masukkan ukuran",
                                           ),
                                           keyboardType:
                                               TextInputType.numberWithOptions(
@@ -586,6 +587,18 @@ class _BackdropState extends State<BackdropTV> {
                                           },
                                         ),
                                       ),
+                                      SizedBox(width: 10),
+
+                                      // Teks "×" di tengah
+                                      Text(
+                                        "×",
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.075,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+
+                                      // Tambahkan jarak kecil
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: TextField(
