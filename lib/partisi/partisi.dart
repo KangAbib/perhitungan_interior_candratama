@@ -21,7 +21,9 @@ class _PartisiScreenState extends State<PartisiScreen> {
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController ukuranpartisiController = TextEditingController();
+  // TextEditingController ukuranpartisiController = TextEditingController();
+  TextEditingController panjangPartisiController = TextEditingController();
+  TextEditingController tinggiPartisiController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -35,7 +37,9 @@ class _PartisiScreenState extends State<PartisiScreen> {
     ));
 
     _setupControllerListener(partisiController);
-    _setupControllerListener(ukuranpartisiController);
+    // _setupControllerListener(ukuranpartisiController);
+    _setupControllerListener(panjangPartisiController);
+    _setupControllerListener(tinggiPartisiController);
   }
 
   void _setupControllerListener(TextEditingController controller) {
@@ -77,13 +81,16 @@ class _PartisiScreenState extends State<PartisiScreen> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double ukuranPartisi = parseUkuran(ukuranpartisiController.text);
+    // double ukuranPartisi = parseUkuran(ukuranpartisiController.text);
+    double panjangPartisi = parseUkuran(panjangPartisiController.text);
+    double tinggiPartisi = parseUkuran(tinggiPartisiController.text);
     double hargaPartisi = parseHarga(partisiController.text);
 
-    double totalHarga = ukuranPartisi * hargaPartisi;
+    double totalHarga = panjangPartisi * tinggiPartisi * hargaPartisi;
     double uangMuka = totalHarga * 0.6;
 
-    print("Ukuran: $ukuranPartisi, Harga: $hargaPartisi, Total: $totalHarga");
+    print(
+        "panjang: $panjangPartisi, tinggi:$tinggiPartisi Harga: $hargaPartisi, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -142,23 +149,25 @@ class _PartisiScreenState extends State<PartisiScreen> {
       }
     } catch (e) {
       print("Error: $e");
-       _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
+      _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
     }
   }
 
   void simpanDataKeFirestore() async {
     if (namaController.text.isEmpty ||
         alamatController.text.isEmpty ||
-        ukuranpartisiController.text.isEmpty ||
+        panjangPartisiController.text.isEmpty ||
+        tinggiPartisiController.text.isEmpty ||
         partisiController.text.isEmpty) {
-       _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
+      _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
     }
 
     // Debugging untuk melihat data sebelum dikirim ke Firestore
     print("Nama: ${namaController.text}");
     print("Alamat: ${alamatController.text}");
-    print("Ukuran Partisi: ${ukuranpartisiController.text}");
+    print("Panjang Partisi: ${panjangPartisiController.text}");
+    print("Tinggi Partisi: ${tinggiPartisiController.text}");
     print("Harga Partisi: ${partisiController.text}");
 
     double parseValue(String text) {
@@ -167,69 +176,78 @@ class _PartisiScreenState extends State<PartisiScreen> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
+        double parseUkuran(String text) {
+      String cleanedText =
+          text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double panjangPartisi = parseUkuran(panjangPartisiController.text);
+    double tinggiPartisi = parseUkuran(tinggiPartisiController.text);
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
     double pelunasan = subTotal - uangMuka;
+    double jumlahKali = panjangPartisi * tinggiPartisi;
 
     Map<String, dynamic> data = {
       "nama": namaController.text,
       "alamat": alamatController.text,
-      "ukuranPartisi": ukuranpartisiController.text,
+      "panjangPartisi": panjangPartisiController.text,
+      "tinggiPartisi": tinggiPartisiController.text,
       "hargaPartisi": partisiController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "jumlahKali": jumlahKali % 1 == 0 ? jumlahKali.toInt().toString() : jumlahKali.toStringAsFixed(2),// 🔥 Simpan dengan format yang benar
       "tanggal": Timestamp.now(),
     };
 
     try {
-      await FirebaseFirestore.instance
-      .collection("pesanan Partisi")
-      .add(data);
+      await FirebaseFirestore.instance.collection("pesanan Partisi").add(data);
 
-  double screenWidth = MediaQuery.of(context).size.width;
+      double screenWidth = MediaQuery.of(context).size.width;
 
       ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth > 600 ? 50 : 20,
-        vertical: 20,
-      ),
-      content: SizedBox(
-        height: screenWidth > 600 ? 50 : 30,
-        child: Center(
-          child: Text(
-            "Data berhasil disimpan!",
-            style: TextStyle(
-              fontSize: screenWidth > 600 ? 20 : 14,
-              fontWeight: FontWeight.bold,
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.symmetric(
+            horizontal: screenWidth > 600 ? 50 : 20,
+            vertical: 20,
+          ),
+          content: SizedBox(
+            height: screenWidth > 600 ? 50 : 30,
+            child: Center(
+              child: Text(
+                "Data berhasil disimpan!",
+                style: TextStyle(
+                  fontSize: screenWidth > 600 ? 20 : 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
         ),
-      ),
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
-    ),
-  );
+      );
 
       Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const INV_Partisi(),
-    ),
-  );
-} catch (e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Gagal menyimpan data: $e"),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_Partisi(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -239,7 +257,8 @@ class _PartisiScreenState extends State<PartisiScreen> {
     jumlahController.dispose();
     namaController.dispose();
     alamatController.dispose();
-    ukuranpartisiController.dispose();
+    panjangPartisiController.dispose();
+    tinggiPartisiController.dispose();
     super.dispose();
   }
 
@@ -516,11 +535,11 @@ class _PartisiScreenState extends State<PartisiScreen> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        flex: 2,
+                                        flex: 2, // Panjang di kiri
                                         child: Padding(
                                           padding: EdgeInsets.only(left: 5),
                                           child: Text(
-                                            "Ukuran",
+                                            "Panjang",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
@@ -532,11 +551,11 @@ class _PartisiScreenState extends State<PartisiScreen> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 10,
+                                        flex: 1, // Tinggi di tengah
                                         child: Padding(
-                                          padding: EdgeInsets.only(left: 20),
+                                          padding: EdgeInsets.only(left: 6),
                                           child: Text(
-                                            "Harga",
+                                            "Tinggi",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
@@ -548,14 +567,35 @@ class _PartisiScreenState extends State<PartisiScreen> {
                                           ),
                                         ),
                                       ),
+                                      Expanded(
+                                        flex:
+                                            4, // Harga di kanan dengan padding
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                              right:
+                                                  80), // Tambahkan jarak dari kanan
+                                          child: Text(
+                                            "Harga",
+                                            style: GoogleFonts.lato(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.035,
+                                            ),
+                                            textAlign: TextAlign.right,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   SizedBox(height: 5),
                                   Row(
                                     children: [
                                       Expanded(
+                                        flex: 1,
                                         child: TextField(
-                                          controller: ukuranpartisiController,
+                                          controller: panjangPartisiController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -569,7 +609,42 @@ class _PartisiScreenState extends State<PartisiScreen> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                            hintText: "Masukkan ukuran",
+                                          ),
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+                                          textAlign: TextAlign.center,
+                                          onChanged: (value) {
+                                            _hitungPartisi();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "×",
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.075,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: TextField(
+                                          controller: tinggiPartisiController,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
                                           ),
                                           keyboardType:
                                               TextInputType.numberWithOptions(
@@ -594,6 +669,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
                                       // Tambahkan jarak kecil
                                       SizedBox(width: 10),
                                       Expanded(
+                                        flex : 2,
                                         child: TextField(
                                           controller: partisiController,
                                           style: GoogleFonts.manrope(
@@ -609,7 +685,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                            hintText: "Masukkan harga",
+                                           
                                           ),
                                           keyboardType: TextInputType.number,
                                           onChanged: (value) {
@@ -764,27 +840,27 @@ class _PartisiScreenState extends State<PartisiScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              if (MediaQuery.of(context).size.width > 600) // Jika tablet
-                Text(
-                  "Keranjang",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: MediaQuery.of(context).size.width * 0.045,
-                  ),
-                )
-              else // Jika mobile, pakai gambar
-                Image.asset(
-                            "assets/images/keranjang_putih.png",
-                            height: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            width: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            fit: BoxFit.contain,
-                          ),
-            ],
+                    if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                      Text(
+                        "Keranjang",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.045,
+                        ),
+                      )
+                    else // Jika mobile, pakai gambar
+                      Image.asset(
+                        "assets/images/keranjang_putih.png",
+                        height: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        width: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        fit: BoxFit.contain,
+                      ),
+                  ],
                 ),
               ),
             ),

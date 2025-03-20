@@ -687,7 +687,7 @@ class _BackdropState extends State<Backdrop> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                            hintText: "Masukkan harga",
+                                          
                                           ),
                                           keyboardType: TextInputType.number,
                                           onChanged: (value) {

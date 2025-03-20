@@ -519,11 +519,11 @@ class _LemariScreenState extends State<LemariScreen> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        flex: 2,
+                                        flex: 2, // Panjang di kiri
                                         child: Padding(
                                           padding: EdgeInsets.only(left: 5),
                                           child: Text(
-                                            "Ukuran",
+                                            "Panjang",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
@@ -535,9 +535,29 @@ class _LemariScreenState extends State<LemariScreen> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 10,
+                                        flex: 1, // Tinggi di tengah
                                         child: Padding(
-                                          padding: EdgeInsets.only(left: 20),
+                                          padding: EdgeInsets.only(left: 6),
+                                          child: Text(
+                                            "Tinggi",
+                                            style: GoogleFonts.lato(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.035,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex:
+                                            4, // Harga di kanan dengan padding
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                              right:
+                                                  80), // Tambahkan jarak dari kanan
                                           child: Text(
                                             "Harga",
                                             style: GoogleFonts.lato(
@@ -547,7 +567,7 @@ class _LemariScreenState extends State<LemariScreen> {
                                                       .width *
                                                   0.035,
                                             ),
-                                            textAlign: TextAlign.center,
+                                            textAlign: TextAlign.right,
                                           ),
                                         ),
                                       ),

@@ -22,7 +22,9 @@ class _BackdropState extends State<BackdropTV> {
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController ukuranBackdropTVController = TextEditingController();
+  // TextEditingController ukuranBackdropTVController = TextEditingController();
+  TextEditingController panjangBackdropTVController = TextEditingController();
+  TextEditingController tinggiBackdropTVController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -36,7 +38,8 @@ class _BackdropState extends State<BackdropTV> {
     ));
 
     _setupControllerListener(BackdropTVController);
-    _setupControllerListener(ukuranBackdropTVController);
+    _setupControllerListener(panjangBackdropTVController);
+    _setupControllerListener(tinggiBackdropTVController);
   }
 
   void _setupControllerListener(TextEditingController controller) {
@@ -60,14 +63,15 @@ class _BackdropState extends State<BackdropTV> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double ukuranBackdropTV = parseUkuran(ukuranBackdropTVController.text);
+    double panjangBackdropTV = parseUkuran(panjangBackdropTVController.text);
+    double tinggiBackdropTV = parseUkuran(tinggiBackdropTVController.text);
     double hargaBackdropTV = parseHarga(BackdropTVController.text);
 
-    double totalHarga = ukuranBackdropTV * hargaBackdropTV;
+    double totalHarga = panjangBackdropTV * tinggiBackdropTV * hargaBackdropTV;
     double uangMuka = totalHarga * 0.6;
 
     print(
-        "Ukuran: $ukuranBackdropTV, Harga: $hargaBackdropTV, Total: $totalHarga");
+        "panjang: $panjangBackdropTV, tinggi : $tinggiBackdropTV Harga: $hargaBackdropTV, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -154,7 +158,8 @@ class _BackdropState extends State<BackdropTV> {
   void simpanDataKeFirestore() async {
     if (namaController.text.isEmpty ||
         alamatController.text.isEmpty ||
-        ukuranBackdropTVController.text.isEmpty ||
+        panjangBackdropTVController.text.isEmpty ||
+        tinggiBackdropTVController.text.isEmpty ||
         BackdropTVController.text.isEmpty) {
       _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
@@ -163,7 +168,8 @@ class _BackdropState extends State<BackdropTV> {
     // Debugging untuk melihat data sebelum dikirim ke Firestore
     print("Nama: ${namaController.text}");
     print("Alamat: ${alamatController.text}");
-    print("Ukuran BackdropTV: ${ukuranBackdropTVController.text}");
+    print("Panjang BackdropTV: ${panjangBackdropTVController.text}");
+    print("Tinggi BackdropTV: ${tinggiBackdropTVController.text}");
     print("Harga BackdropTV: ${BackdropTVController.text}");
 
     double parseValue(String text) {
@@ -179,7 +185,8 @@ class _BackdropState extends State<BackdropTV> {
     Map<String, dynamic> data = {
       "nama": namaController.text,
       "alamat": alamatController.text,
-      "ukuranBackdropTV": ukuranBackdropTVController.text,
+      "panjangBackdropTV": panjangBackdropTVController.text,
+      "tinggiBackdropTV": tinggiBackdropTVController.text,
       "hargaBackdropTV": BackdropTVController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
@@ -244,7 +251,8 @@ class _BackdropState extends State<BackdropTV> {
     jumlahController.dispose();
     namaController.dispose();
     alamatController.dispose();
-    ukuranBackdropTVController.dispose();
+    panjangBackdropTVController.dispose();
+    tinggiBackdropTVController.dispose();
     super.dispose();
   }
 
@@ -522,11 +530,11 @@ class _BackdropState extends State<BackdropTV> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        flex: 2,
+                                        flex: 2, // Panjang di kiri
                                         child: Padding(
                                           padding: EdgeInsets.only(left: 5),
                                           child: Text(
-                                            "Ukuran",
+                                            "Panjang",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
@@ -538,11 +546,11 @@ class _BackdropState extends State<BackdropTV> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 10,
+                                        flex: 1, // Tinggi di tengah
                                         child: Padding(
-                                          padding: EdgeInsets.only(left: 20),
+                                          padding: EdgeInsets.only(left: 6),
                                           child: Text(
-                                            "Harga",
+                                            "Tinggi",
                                             style: GoogleFonts.lato(
                                               fontWeight: FontWeight.normal,
                                               fontSize: MediaQuery.of(context)
@@ -554,15 +562,35 @@ class _BackdropState extends State<BackdropTV> {
                                           ),
                                         ),
                                       ),
+                                      Expanded(
+                                        flex:
+                                            4, // Harga di kanan dengan padding
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                              right:
+                                                  80), // Tambahkan jarak dari kanan
+                                          child: Text(
+                                            "Harga",
+                                            style: GoogleFonts.lato(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.035,
+                                            ),
+                                            textAlign: TextAlign.right,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   SizedBox(height: 5),
                                   Row(
                                     children: [
                                       Expanded(
+                                        flex: 1,
                                         child: TextField(
-                                          controller:
-                                              ukuranBackdropTVController,
+                                          controller: panjangBackdropTVController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -576,7 +604,42 @@ class _BackdropState extends State<BackdropTV> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                                    hintText: "Masukkan ukuran",
+                                          ),
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+                                          textAlign: TextAlign.center,
+                                          onChanged: (value) {
+                                            _hitungBackdropTV();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "×",
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.075,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: TextField(
+                                          controller: tinggiBackdropTVController,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
                                           ),
                                           keyboardType:
                                               TextInputType.numberWithOptions(
@@ -616,7 +679,7 @@ class _BackdropState extends State<BackdropTV> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                            hintText: "Masukkan harga",
+                                            
                                           ),
                                           keyboardType: TextInputType.number,
                                           onChanged: (value) {

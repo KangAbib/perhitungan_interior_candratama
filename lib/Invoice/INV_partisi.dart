@@ -43,7 +43,7 @@ class _INV_Partsi extends State<INV_Partisi> {
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaPartisi = data["hargaPartisi"] ?? "Rp 0";
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
-          ukuranPartisi = data["ukuranPartisi"] ?? "0";
+          ukuranPartisi = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           subTotal =
               "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
