@@ -145,6 +145,7 @@ class _MinibarState extends State<Minibar> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -215,7 +216,7 @@ class _MinibarState extends State<Minibar> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 

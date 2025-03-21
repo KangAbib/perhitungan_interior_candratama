@@ -227,6 +227,7 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -307,7 +308,7 @@ class _Tipe_StraightState extends State<Tipe_Straight> {
             ),
           ),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 1),
         ),
       );
     } catch (e) {

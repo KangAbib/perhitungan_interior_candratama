@@ -17,11 +17,14 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
   TextEditingController alamatController = TextEditingController();
   TextEditingController uangMukaController = TextEditingController(text: "Rp ");
   TextEditingController diskonController = TextEditingController(text: "Rp ");
+  TextEditingController diskonTambahanController =
+      TextEditingController(text: "Rp ");
 
   double totalHarga = 0;
   double uangMuka = 0;
   double diskon = 0;
   bool isDiskonValid = true;
+  bool isDiskonVisible = false;
   final formatCurrency = NumberFormat("#,###", "id_ID");
 
   String formatRupiah(String value) {
@@ -68,18 +71,17 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
-            fontWeight: FontWeight.bold,
+          content: Text(
+            message,
+            style: TextStyle(
+              fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        backgroundColor: backgroundColor,
-      ),
+          backgroundColor: backgroundColor,
+          duration: Duration(seconds: 1)),
     );
   }
-
 
   @override
   void initState() {
@@ -113,11 +115,31 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
         });
       }
     });
+    diskonTambahanController.addListener(() {
+      String text = diskonTambahanController.text;
+
+      // Pastikan awalan "Rp " tidak hilang
+      if (!text.startsWith("Rp ")) {
+        diskonTambahanController.text = "Rp ";
+        diskonTambahanController.selection = TextSelection.collapsed(offset: 3);
+        return; // Hentikan proses jika baru mengembalikan "Rp "
+      }
+
+      // Format ulang angka ke format rupiah
+      String formattedText = formatRupiah(text);
+
+      if (diskonTambahanController.text != formattedText) {
+        diskonTambahanController.text = formattedText;
+        diskonTambahanController.selection =
+            TextSelection.collapsed(offset: formattedText.length);
+      }
+    });
   }
 
   @override
   void dispose() {
     diskonController.dispose();
+    diskonTambahanController.dispose();
     super.dispose();
   }
 
@@ -356,12 +378,11 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: MediaQuery.of(context)
-                                                    .size
-                                                    .width >
-                                                600
-                                            ? 250
-                                            : 180, 
+                                        height:
+                                            MediaQuery.of(context).size.width >
+                                                    600
+                                                ? 250
+                                                : 180,
                                         child: ListView.builder(
                                           physics:
                                               AlwaysScrollableScrollPhysics(),
@@ -391,14 +412,14 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                             .width >
                                                         600
                                                     ? 8
-                                                    : 5, 
-                                                horizontal: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width >
-                                                        600
-                                                    ? 16
-                                                    : 0, 
+                                                    : 5,
+                                                horizontal:
+                                                    MediaQuery.of(context)
+                                                                .size
+                                                                .width >
+                                                            600
+                                                        ? 16
+                                                        : 0,
                                               ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -407,13 +428,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                               child: ListTile(
                                                 contentPadding:
                                                     EdgeInsets.symmetric(
-                                                  vertical: MediaQuery.of(
-                                                                  context)
-                                                              .size
-                                                              .width >
-                                                          600
-                                                      ? 10
-                                                      : 2, 
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 10
+                                                          : 2,
                                                   horizontal:
                                                       MediaQuery.of(context)
                                                                   .size
@@ -426,13 +447,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                   "${index + 1}.",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width >
-                                                            600
-                                                        ? 18
-                                                        : 14, 
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .width >
+                                                                600
+                                                            ? 18
+                                                            : 14,
                                                   ),
                                                 ),
                                                 title: Text(
@@ -462,7 +483,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                                     .width >
                                                                 600
                                                             ? 18
-                                                            : 14, 
+                                                            : 14,
                                                         color:
                                                             Color(0xFFFF5252),
                                                       ),
@@ -484,7 +505,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                                     .width >
                                                                 600
                                                             ? 28
-                                                            : 24, 
+                                                            : 24,
                                                       ),
                                                     ),
                                                   ],
@@ -506,13 +527,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                         .width >
                                                     600
                                                 ? 55
-                                                : 45, 
+                                                : 45,
                                             width: MediaQuery.of(context)
                                                         .size
                                                         .width >
                                                     600
                                                 ? 150
-                                                : 100, 
+                                                : 100,
                                             child: ElevatedButton(
                                               onPressed: () {
                                                 Navigator.push(
@@ -535,13 +556,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                 "Tambah",
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: MediaQuery.of(
-                                                                  context)
-                                                              .size
-                                                              .width >
-                                                          600
-                                                      ? 18
-                                                      : 12, 
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 18
+                                                          : 12,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -560,39 +581,125 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         decoration: InputDecoration(
                                           labelText: "Masukkan Diskon",
                                           labelStyle: GoogleFonts.manrope(
-                                            
-                                            fontSize: screenWidth *
-                                                0.04, 
+                                            fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.grey[
-                                                700], 
+                                            color: Colors.grey[700],
                                           ),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                8), 
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                           contentPadding: EdgeInsets.symmetric(
-                                            
                                             horizontal: 12,
                                             vertical: 14,
                                           ),
                                           suffixIcon: Padding(
-                                            padding: const EdgeInsets.only(
-                                                right:
-                                                    8), 
+                                            padding:
+                                                const EdgeInsets.only(right: 8),
                                             child: Icon(
                                               isDiskonValid
                                                   ? Icons.check_circle
                                                   : Icons.cancel,
                                               color: isDiskonValid
                                                   ? Colors.green.shade600
-                                                  : Colors.red
-                                                      .shade600, 
-                                              size: screenWidth *
-                                                  0.05, 
+                                                  : Colors.red.shade600,
+                                              size: screenWidth * 0.05,
                                             ),
                                           ),
                                         ),
+                                      ),
+                                      StreamBuilder<DocumentSnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection("keranjang")
+                                            .doc("listKeranjang")
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          if (!snapshot.hasData ||
+                                              snapshot.data == null ||
+                                              !snapshot.data!.exists) {
+                                            return SizedBox
+                                                .shrink(); // Sembunyikan jika tidak ada data
+                                          }
+
+                                          var data = snapshot.data!.data()
+                                                  as Map<String, dynamic>? ??
+                                              {};
+
+                                          // Jika Firestore menyimpan items sebagai ARRAY
+                                          List<dynamic> items =
+                                              data["items"] ?? [];
+
+                                          // Jika Firestore menyimpan item sebagai field individual
+                                          if (items.isEmpty) {
+                                            items = data.entries
+                                                .where((entry) => entry.key
+                                                    .startsWith("barang"))
+                                                .map((entry) => entry.value)
+                                                .toList();
+                                          }
+
+                                          // Cek apakah jumlah item lebih dari 1
+                                          bool isDiskonVisible =
+                                              items.length > 1;
+
+                                          return Column(
+                                            children: [
+                                              Visibility(
+                                                visible: isDiskonVisible,
+                                                child: Column(
+                                                  children: [
+                                                    SizedBox(height: 20),
+                                                    TextField(
+                                                      controller:
+                                                          diskonTambahanController,
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      style:
+                                                          GoogleFonts.manrope(
+                                                        fontSize: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.04,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                      decoration:
+                                                          InputDecoration(
+                                                        labelText:
+                                                            "Diskon Tambahan",
+                                                        labelStyle:
+                                                            GoogleFonts.manrope(
+                                                          fontSize: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.04,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Colors.grey[700],
+                                                        ),
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                        contentPadding:
+                                                            EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 14,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       ),
                                       SizedBox(height: 20),
                                       TextField(
@@ -605,19 +712,15 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         decoration: InputDecoration(
                                           labelText: "Uang Muka",
                                           labelStyle: GoogleFonts.manrope(
-                                            
-                                            fontSize: screenWidth *
-                                                0.04, 
+                                            fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.grey[
-                                                700], 
+                                            color: Colors.grey[700],
                                           ),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                8), 
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                           contentPadding: EdgeInsets.symmetric(
-                                            
                                             horizontal: 12,
                                             vertical: 14,
                                           ),
@@ -641,9 +744,8 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
         ],
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(MediaQuery.of(context).size.width > 600
-            ? 20
-            : 12), 
+        padding:
+            EdgeInsets.all(MediaQuery.of(context).size.width > 600 ? 20 : 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
@@ -680,7 +782,6 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
             totalHarga = items.fold(0, (sum, item) => sum + item["harga"]);
             uangMuka = totalHarga * 0.6;
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              
               uangMukaController.text = "Rp ${formatCurrency.format(uangMuka)}";
             });
             int jumlahItem = items.length;
@@ -694,18 +795,16 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                     Text(
                       "Total List:",
                       style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width > 600
-                            ? 22
-                            : 12, 
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 22 : 12,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       jumlahItem.toString(),
                       style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width > 600
-                            ? 22
-                            : 12, 
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 22 : 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -718,18 +817,16 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                     Text(
                       "Total Harga:",
                       style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width > 600
-                            ? 25
-                            : 14, 
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 25 : 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       "Rp ${formatCurrency.format(totalHarga)}",
                       style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width > 600
-                            ? 25
-                            : 14, 
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 25 : 14,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFFFF5252),
                       ),
@@ -739,14 +836,14 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                 SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.width > 600
-                      ? 55
-                      : 45, 
+                  height: MediaQuery.of(context).size.width > 600 ? 55 : 45,
                   child: ElevatedButton(
                     onPressed: () async {
                       if (namaController.text.isEmpty ||
                           alamatController.text.isEmpty) {
-                         _showSnackBar("Harap isi nama dan alamat sebelum membayar!.", Colors.red);
+                        _showSnackBar(
+                            "Harap isi nama dan alamat sebelum membayar!.",
+                            Colors.red);
                         return;
                       }
 
@@ -758,7 +855,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
 
                       if (!keranjangSnapshot.exists ||
                           keranjangSnapshot.data() == null) {
-                         _showSnackBar("Keranjang masih kosong.", Colors.red);
+                        _showSnackBar("Keranjang masih kosong.", Colors.red);
                         return;
                       }
 
@@ -782,9 +879,14 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                       double diskonInput = double.tryParse(diskonController.text
                               .replaceAll(RegExp(r'[^0-9]'), '')) ??
                           0;
+                      double diskonTambahan = double.tryParse(
+                              diskonTambahanController.text
+                                  .replaceAll(RegExp(r'[^0-9]'), '')) ??
+                          0;
+                      double diskontotal = diskonInput + diskonTambahan;
 
                       double totalHargaSetelahDiskon =
-                          totalHargaItem - diskonInput;
+                          totalHargaItem - diskonInput - diskonTambahan;
                       if (totalHargaSetelahDiskon < 0)
                         totalHargaSetelahDiskon = 0;
 
@@ -800,16 +902,13 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                         "items": daftarBarang,
                         "total_harga": totalHargaItem,
                         "diskon": diskonInput,
+                        "diskon_tambahan": diskonTambahan,
+                        "diskon_total": diskontotal,
                         "total_setelah_diskon": totalHargaSetelahDiskon,
                         "uang_muka": uangMukaInput,
                         "sisa_pembayaran": sisaPembayaran,
                         "timestamp": FieldValue.serverTimestamp(),
                       });
-
-                      await FirebaseFirestore.instance
-                          .collection("keranjang")
-                          .doc("listKeranjang")
-                          .set({});
 
                       Navigator.pushReplacement(
                         context,
@@ -827,9 +926,8 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                       "Bayar",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: MediaQuery.of(context).size.width > 600
-                            ? 25
-                            : 16, 
+                        fontSize:
+                            MediaQuery.of(context).size.width > 600 ? 25 : 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

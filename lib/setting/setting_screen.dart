@@ -574,7 +574,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                           decimal: true),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.allow(
-                                        RegExp(r'^[0-9,]*$')),
+                                        RegExp(r'^\d+([.,]\d*)?$')),
                                   ],
                                 ),
                               ),
@@ -617,7 +617,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                           decimal: true),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.allow(
-                                        RegExp(r'^[0-9,]*$')),
+                                        RegExp(r'^\d+([.,]\d*)?$')),
                                   ],
                                 ),
                               ),
@@ -808,6 +808,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   height: MediaQuery.of(context).size.height *
                       0.3, // 🔥 Pastikan tidak full height
                   child: Card(
+                    color: Colors.white,
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

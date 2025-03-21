@@ -130,10 +130,9 @@ class _INV_Partsi extends State<INV_MejaRias> {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -148,22 +147,25 @@ class _INV_Partsi extends State<INV_MejaRias> {
                         Text(
                           nama,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           alamat,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 16), // Jarak antara dua bagian
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -178,22 +180,9 @@ class _INV_Partsi extends State<INV_MejaRias> {
                       Text(
                         todayDate,
                         style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "No Bayar :",
-                        style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
-                      ),
-                      Text(
-                        noBayar,
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
                       ),
                     ],
                   ),
@@ -216,7 +205,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
                     _buildTableRow(["Keterangan", "Harga", "Vol (m)", "Total"],
                         isHeader: true, context: context),
                     _buildTableRow([
-                      "Meja Rias set",
+                      "Meja Rias",
                       hargaMejaRias,
                       ukuranMejaRias,
                       jumlahAtas
@@ -232,7 +221,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "Mej Rias set" : "Meja Rias set"}",
+                    "Pembayaran : ${isTablet ? "Meja Rias" : "Meja Rias"}",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,
@@ -320,5 +309,3 @@ class _INV_Partsi extends State<INV_MejaRias> {
     );
   }
 }
-
-

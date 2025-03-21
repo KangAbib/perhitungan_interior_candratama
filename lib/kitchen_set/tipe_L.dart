@@ -278,6 +278,7 @@ class _Tipe_LState extends State<Tipe_L> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -368,7 +369,7 @@ class _Tipe_LState extends State<Tipe_L> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 

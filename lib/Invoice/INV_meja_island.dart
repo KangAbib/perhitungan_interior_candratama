@@ -130,10 +130,9 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -148,22 +147,25 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
                         Text(
                           nama,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           alamat,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 16), // Jarak antara dua bagian
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -178,22 +180,9 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
                       Text(
                         todayDate,
                         style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "No Bayar :",
-                        style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
-                      ),
-                      Text(
-                        noBayar,
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
                       ),
                     ],
                   ),
@@ -216,7 +205,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
                     _buildTableRow([
-                      "Meja Island set",
+                      "Meja Island",
                       hargaMejaIsland,
                       ukuranMejaIsland,
                       jumlahAtas
@@ -232,7 +221,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "Meja Island set" : "Meja Island set"}",
+                    "Pembayaran : ${isTablet ? "Meja Island" : "Meja Island"}",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,
@@ -320,4 +309,3 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
     );
   }
 }
-

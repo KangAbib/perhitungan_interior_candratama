@@ -81,6 +81,7 @@ class _Tipe_UState extends State<Tipe_U> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -373,7 +374,7 @@ class _Tipe_UState extends State<Tipe_U> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 

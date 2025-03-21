@@ -144,11 +144,12 @@ class _MejaScreenState extends State<MejaScreen> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: isTablet ? 20.0 : 16.0, // Lebih besar di tablet
+            fontSize: isTablet ? 18.0 : 12.0, // Lebih besar di tablet
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1),
       ),
     );
   }
@@ -158,7 +159,7 @@ class _MejaScreenState extends State<MejaScreen> {
         alamatController.text.isEmpty ||
         ukuranMejaRiasController.text.isEmpty ||
         MejaRiasController.text.isEmpty) {
-     _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
+      _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
     }
 
@@ -190,53 +191,51 @@ class _MejaScreenState extends State<MejaScreen> {
     };
 
     try {
-      await FirebaseFirestore.instance
-      .collection("pesanan MejaRias")
-      .add(data);
+      await FirebaseFirestore.instance.collection("pesanan MejaRias").add(data);
 
-  double screenWidth = MediaQuery.of(context).size.width;
+      double screenWidth = MediaQuery.of(context).size.width;
 
       ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth > 600 ? 50 : 20,
-        vertical: 20,
-      ),
-      content: SizedBox(
-        height: screenWidth > 600 ? 50 : 30,
-        child: Center(
-          child: Text(
-            "Data berhasil disimpan!",
-            style: TextStyle(
-              fontSize: screenWidth > 600 ? 20 : 14,
-              fontWeight: FontWeight.bold,
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.symmetric(
+            horizontal: screenWidth > 600 ? 50 : 20,
+            vertical: 20,
+          ),
+          content: SizedBox(
+            height: screenWidth > 600 ? 50 : 30,
+            child: Center(
+              child: Text(
+                "Data berhasil disimpan!",
+                style: TextStyle(
+                  fontSize: screenWidth > 600 ? 20 : 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
         ),
-      ),
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
-    ),
-  );
+      );
 
       Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const INV_MejaRias(),
-    ),
-  );
-} catch (e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Gagal menyimpan data: $e"),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_MejaRias(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -306,13 +305,14 @@ class _MejaScreenState extends State<MejaScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                         Text(
+                        Text(
                           "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
                             fontSize: MediaQuery.of(context).size.width < 600
                                 ? MediaQuery.of(context).size.width * 0.045
-                                : MediaQuery.of(context).size.width * 0.04,fontWeight: FontWeight.bold,
+                                : MediaQuery.of(context).size.width * 0.04,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
@@ -736,7 +736,7 @@ class _MejaScreenState extends State<MejaScreen> {
                                 },
                                 child: Image.asset(
                                   "assets/images/back_rotasi.png",
-                                   height: screenHeight * 0.035,
+                                  height: screenHeight * 0.035,
                                   width: screenHeight * 0.035,
                                 ),
                               ),
@@ -772,27 +772,27 @@ class _MejaScreenState extends State<MejaScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              if (MediaQuery.of(context).size.width > 600) // Jika tablet
-                Text(
-                  "Keranjang",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: MediaQuery.of(context).size.width * 0.045,
-                  ),
-                )
-              else // Jika mobile, pakai gambar
-                Image.asset(
-                            "assets/images/keranjang_putih.png",
-                            height: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            width: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            fit: BoxFit.contain,
-                          ),
-            ],
+                    if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                      Text(
+                        "Keranjang",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.045,
+                        ),
+                      )
+                    else // Jika mobile, pakai gambar
+                      Image.asset(
+                        "assets/images/keranjang_putih.png",
+                        height: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        width: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        fit: BoxFit.contain,
+                      ),
+                  ],
                 ),
               ),
             ),

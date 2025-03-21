@@ -35,7 +35,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "";
           subTotal = (data["total_harga"] ?? 0).toDouble();
-          diskon = (data["diskon"] ?? 0).toDouble();
+          diskon = (data["diskon_total"] ?? 0).toDouble();
           uangMuka = (data["uang_muka"] ?? 0).toDouble();
           pelunasan = (data["sisa_pembayaran"] ?? 0).toDouble();
           listKeranjang = List<Map<String, dynamic>>.from(data["items"] ?? []);
@@ -98,10 +98,9 @@ class _INV_Keranjang extends State<INV_Keranjang> {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -116,22 +115,25 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                         Text(
                           nama,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           alamat,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 16), // Jarak antara dua bagian
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -146,22 +148,9 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                       Text(
                         todayDate,
                         style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "No Bayar :",
-                        style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
-                      ),
-                      Text(
-                        noBayar,
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
                       ),
                     ],
                   ),
@@ -200,7 +189,6 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -234,7 +222,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                       ),
                     ),
                     Text(
-                       "Uang Muka : ${formatRupiah(uangMuka)}",
+                      "Uang Muka : ${formatRupiah(uangMuka)}",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),

@@ -149,6 +149,7 @@ class _BackdropState extends State<Backdrop> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1),
       ),
     );
   }
@@ -235,7 +236,7 @@ class _BackdropState extends State<Backdrop> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 

@@ -101,6 +101,7 @@ class _BackdropState extends State<BackdropTV> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -177,10 +178,18 @@ class _BackdropState extends State<BackdropTV> {
           text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
       return double.tryParse(cleanedText) ?? 0.0;
     }
+    double parseUkuran(String text) {
+      String cleanedText =
+          text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
 
+    double panjangBackdropTV = parseUkuran(panjangBackdropTVController.text);
+    double tinggiBackdropTV = parseUkuran(tinggiBackdropTVController.text);
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
     double pelunasan = subTotal - uangMuka;
+    double jumlahKali = panjangBackdropTV * tinggiBackdropTV;
 
     Map<String, dynamic> data = {
       "nama": namaController.text,
@@ -191,6 +200,7 @@ class _BackdropState extends State<BackdropTV> {
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "jumlahKali": jumlahKali % 1 == 0 ? jumlahKali.toInt().toString() : jumlahKali.toStringAsFixed(2),// 🔥 Simpan dengan format yang benar
       "tanggal": Timestamp.now(),
     };
 
@@ -224,7 +234,7 @@ class _BackdropState extends State<BackdropTV> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 
@@ -664,6 +674,7 @@ class _BackdropState extends State<BackdropTV> {
                                       // Tambahkan jarak kecil
                                       SizedBox(width: 10),
                                       Expanded(
+                                        flex : 2,
                                         child: TextField(
                                           controller: BackdropTVController,
                                           style: GoogleFonts.manrope(

@@ -171,12 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Container(
-                  width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
+                  width:
+                      isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                   height: screenHeight * 0.205,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,7 +403,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Container(
-                    width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
+                    width: isTablet
+                        ? (screenWidth * 0.479)
+                        : (screenWidth / 2) - 4,
                     height: screenHeight * 0.22,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -483,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             topRight: Radius.circular(10),
                           ),
                           child: Image.asset(
-                            "assets/images/lemari.png",
+                            "assets/images/lemari1.jpg",
                             width: double.infinity,
                             height: screenHeight * 0.169,
                             fit: BoxFit.cover,
@@ -532,7 +534,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Container(
-                  width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
+                  width:
+                      isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                   height: screenHeight * 0.22,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -547,7 +550,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           topRight: Radius.circular(10),
                         ),
                         child: Image.asset(
-                          "assets/images/backdrop2.jpg",
+                          "assets/images/backdrop1.jpg",
                           width: double.infinity,
                           height: screenHeight * 0.169,
                           fit: BoxFit.cover,
@@ -647,7 +650,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Positioned(
             top: screenHeight * 0.764,
-             left: isTablet ? screenWidth * 0.01 : 0,
+            left: isTablet ? screenWidth * 0.01 : 0,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -662,7 +665,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Container(
-                  width: isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
+                  width:
+                      isTablet ? (screenWidth * 0.479) : (screenWidth / 2) - 4,
                   height: screenHeight * 0.223,
                   decoration: BoxDecoration(
                     color: Colors.white,

@@ -88,8 +88,8 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
 
   @override
   Widget build(BuildContext context) {
-    String todayDate = DateFormat("EEEE, dd MMM yyyy").format(DateTime.now());
-    String noBayar = DateFormat("dd/MM/yyyy").format(DateTime.now());
+    String todayDate =
+        DateFormat("EEEE, dd MMM yyyy", "id_ID").format(DateTime.now());
 
     bool isTablet = MediaQuery.of(context).size.width > 600;
 
@@ -119,10 +119,9 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -137,22 +136,25 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                         Text(
                           nama,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           alamat,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 16), // Jarak antara dua bagian
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -167,22 +169,9 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
                       Text(
                         todayDate,
                         style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "No Bayar :",
-                        style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
-                      ),
-                      Text(
-                        noBayar,
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
                       ),
                     ],
                   ),

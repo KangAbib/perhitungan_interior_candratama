@@ -100,6 +100,7 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -220,7 +221,7 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 

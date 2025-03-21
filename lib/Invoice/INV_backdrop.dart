@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -131,10 +130,9 @@ class _INV_Partsi extends State<INV_Backdrop> {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -149,22 +147,25 @@ class _INV_Partsi extends State<INV_Backdrop> {
                         Text(
                           nama,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           alamat,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 16), // Jarak antara dua bagian
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -179,22 +180,9 @@ class _INV_Partsi extends State<INV_Backdrop> {
                       Text(
                         todayDate,
                         style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "No Bayar :",
-                        style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
-                      ),
-                      Text(
-                        noBayar,
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
                       ),
                     ],
                   ),
@@ -216,12 +204,9 @@ class _INV_Partsi extends State<INV_Backdrop> {
                   children: [
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
-                    _buildTableRow([
-                      "Backdrop set",
-                      hargaBackdrop,
-                      ukuranBackdrop,
-                      jumlahAtas
-                    ], context: context),
+                    _buildTableRow(
+                        ["Backdrop", hargaBackdrop, ukuranBackdrop, jumlahAtas],
+                        context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
@@ -233,7 +218,7 @@ class _INV_Partsi extends State<INV_Backdrop> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "Backdrop set" : "Backdrop set"}",
+                    "Pembayaran : ${isTablet ? "Backdrop" : "Backdrop"}",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,
@@ -321,5 +306,3 @@ class _INV_Partsi extends State<INV_Backdrop> {
     );
   }
 }
-
-

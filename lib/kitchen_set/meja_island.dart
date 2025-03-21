@@ -59,6 +59,7 @@ class _MejaIslandState extends State<MejaIsland> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
@@ -217,7 +218,7 @@ class _MejaIslandState extends State<MejaIsland> {
         ),
       ),
       backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     ),
   );
 

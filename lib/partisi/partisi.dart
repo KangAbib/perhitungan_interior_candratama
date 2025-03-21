@@ -62,6 +62,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1),
       ),
     );
   }
@@ -230,7 +231,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
             ),
           ),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 1),
         ),
       );
 

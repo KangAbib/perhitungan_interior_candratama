@@ -21,7 +21,8 @@ class _LemariScreenState extends State<LemariScreen> {
   TextEditingController jumlahController = TextEditingController(text: "Rp ");
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController ukuranLemariController = TextEditingController();
+  TextEditingController panjangLemariController = TextEditingController();
+  TextEditingController tinggiLemariController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -35,7 +36,8 @@ class _LemariScreenState extends State<LemariScreen> {
     ));
 
     _setupControllerListener(LemariController);
-    _setupControllerListener(ukuranLemariController);
+    _setupControllerListener(panjangLemariController);
+    _setupControllerListener(tinggiLemariController);
   }
 
   void _setupControllerListener(TextEditingController controller) {
@@ -59,13 +61,15 @@ class _LemariScreenState extends State<LemariScreen> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    double ukuranLemari = parseUkuran(ukuranLemariController.text);
+    double panjangLemari = parseUkuran(panjangLemariController.text);
+    double tinggiLemari = parseUkuran(tinggiLemariController.text);
     double hargaLemari = parseHarga(LemariController.text);
 
-    double totalHarga = ukuranLemari * hargaLemari;
+    double totalHarga = panjangLemari * tinggiLemari * hargaLemari;
     double uangMuka = totalHarga * 0.6;
 
-    print("Ukuran: $ukuranLemari, Harga: $hargaLemari, Total: $totalHarga");
+    print(
+        "panjang: $panjangLemari, tinggi : $tinggiLemari  Harga: $hargaLemari, Total: $totalHarga");
 
     setState(() {
       jumlahController.text = "Rp ${_formatter.format(totalHarga)}";
@@ -95,6 +99,7 @@ class _LemariScreenState extends State<LemariScreen> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1),
       ),
     );
   }
@@ -145,26 +150,28 @@ class _LemariScreenState extends State<LemariScreen> {
           }
         }, SetOptions(merge: true));
 
-         _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
+        _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
       }
     } catch (e) {
       print("Error: $e");
-       _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
+      _showSnackBar("Gagal menambahkan ke keranjang.", Colors.red);
     }
   }
 
   void simpanDataKeFirestore() async {
     if (namaController.text.isEmpty ||
         alamatController.text.isEmpty ||
-        ukuranLemariController.text.isEmpty ||
+        panjangLemariController.text.isEmpty ||
+        tinggiLemariController.text.isEmpty ||
         LemariController.text.isEmpty) {
-       _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
+      _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
     }
 
     print("Nama: ${namaController.text}");
     print("Alamat: ${alamatController.text}");
-    print("Ukuran Lemari: ${ukuranLemariController.text}");
+    print("Panjang Lemari: ${panjangLemariController.text}");
+    print("Tinggi Lemari: ${tinggiLemariController.text}");
     print("Harga Lemari: ${LemariController.text}");
 
     double parseValue(String text) {
@@ -173,69 +180,79 @@ class _LemariScreenState extends State<LemariScreen> {
       return double.tryParse(cleanedText) ?? 0.0;
     }
 
+    double parseUkuran(String text) {
+      String cleanedText =
+          text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double panjangLemari = parseUkuran(panjangLemariController.text);
+    double tinggiLemari = parseUkuran(tinggiLemariController.text);
+
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
     double pelunasan = subTotal - uangMuka;
+    double jumlahKali = panjangLemari * tinggiLemari;
 
     Map<String, dynamic> data = {
       "nama": namaController.text,
       "alamat": alamatController.text,
-      "ukuranLemari": ukuranLemariController.text,
+      "panjangLemari": panjangLemariController.text,
+      "tinggiLemari": tinggiLemariController.text,
       "hargaLemari": LemariController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "jumlahKali": jumlahKali % 1 == 0 ? jumlahKali.toInt().toString() : jumlahKali.toStringAsFixed(2),// 🔥 Simpan dengan format yang benar
       "tanggal": Timestamp.now(),
     };
 
     try {
-      await FirebaseFirestore.instance
-      .collection("pesanan Lemari")
-      .add(data);
+      await FirebaseFirestore.instance.collection("pesanan Lemari").add(data);
 
-  double screenWidth = MediaQuery.of(context).size.width;
+      double screenWidth = MediaQuery.of(context).size.width;
 
       ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth > 600 ? 50 : 20,
-        vertical: 20,
-      ),
-      content: SizedBox(
-        height: screenWidth > 600 ? 50 : 30,
-        child: Center(
-          child: Text(
-            "Data berhasil disimpan!",
-            style: TextStyle(
-              fontSize: screenWidth > 600 ? 20 : 14,
-              fontWeight: FontWeight.bold,
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.symmetric(
+            horizontal: screenWidth > 600 ? 50 : 20,
+            vertical: 20,
+          ),
+          content: SizedBox(
+            height: screenWidth > 600 ? 50 : 30,
+            child: Center(
+              child: Text(
+                "Data berhasil disimpan!",
+                style: TextStyle(
+                  fontSize: screenWidth > 600 ? 20 : 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
         ),
-      ),
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
-    ),
-  );
+      );
 
       Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const INV_Lemari(),
-    ),
-  );
-} catch (e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Gagal menyimpan data: $e"),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_Lemari(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -245,7 +262,8 @@ class _LemariScreenState extends State<LemariScreen> {
     jumlahController.dispose();
     namaController.dispose();
     alamatController.dispose();
-    ukuranLemariController.dispose();
+    panjangLemariController.dispose();
+    tinggiLemariController.dispose();
     super.dispose();
   }
 
@@ -305,7 +323,7 @@ class _LemariScreenState extends State<LemariScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                         Text(
+                        Text(
                           "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
@@ -577,8 +595,9 @@ class _LemariScreenState extends State<LemariScreen> {
                                   Row(
                                     children: [
                                       Expanded(
+                                        flex: 1,
                                         child: TextField(
-                                          controller: ukuranLemariController,
+                                          controller: panjangLemariController,
                                           style: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w400,
@@ -592,7 +611,6 @@ class _LemariScreenState extends State<LemariScreen> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                            hintText: "Masukkan ukuran",
                                           ),
                                           keyboardType:
                                               TextInputType.numberWithOptions(
@@ -613,6 +631,43 @@ class _LemariScreenState extends State<LemariScreen> {
                                       ),
                                       SizedBox(width: 10),
                                       Expanded(
+                                        flex: 1,
+                                        child: TextField(
+                                          controller: tinggiLemariController,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
+                                          ),
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+                                          textAlign: TextAlign.center,
+                                          onChanged: (value) {
+                                            _hitungLemari();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "×",
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.075,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 2,
                                         child: TextField(
                                           controller: LemariController,
                                           style: GoogleFonts.manrope(
@@ -783,27 +838,27 @@ class _LemariScreenState extends State<LemariScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              if (MediaQuery.of(context).size.width > 600) // Jika tablet
-                Text(
-                  "Keranjang",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: MediaQuery.of(context).size.width * 0.045,
-                  ),
-                )
-              else // Jika mobile, pakai gambar
-                Image.asset(
-                            "assets/images/keranjang_putih.png",
-                            height: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            width: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            fit: BoxFit.contain,
-                          ),
-            ],
+                    if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                      Text(
+                        "Keranjang",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.045,
+                        ),
+                      )
+                    else // Jika mobile, pakai gambar
+                      Image.asset(
+                        "assets/images/keranjang_putih.png",
+                        height: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        width: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        fit: BoxFit.contain,
+                      ),
+                  ],
                 ),
               ),
             ),

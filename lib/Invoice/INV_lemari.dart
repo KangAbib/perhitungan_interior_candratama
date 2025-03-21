@@ -43,7 +43,7 @@ class _INV_Partsi extends State<INV_Lemari> {
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaLemari = data["hargaLemari"] ?? "Rp 0";
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
-          ukuranLemari = data["ukuranLemari"] ?? "0";
+          ukuranLemari = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           subTotal =
               "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
@@ -130,10 +130,9 @@ class _INV_Partsi extends State<INV_Lemari> {
               ),
               Divider(thickness: 1),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -148,22 +147,25 @@ class _INV_Partsi extends State<INV_Lemari> {
                         Text(
                           nama,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           alamat,
                           style: TextStyle(
-                              fontSize:
-                                  getResponsiveFontSize(context, factor: 0.03)),
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.03),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 16), // Jarak antara dua bagian
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -178,22 +180,9 @@ class _INV_Partsi extends State<INV_Lemari> {
                       Text(
                         todayDate,
                         style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
-                      ),
-                      Text(
-                        "No Bayar :",
-                        style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
-                      ),
-                      Text(
-                        noBayar,
-                        style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03)),
                       ),
                     ],
                   ),
@@ -215,12 +204,9 @@ class _INV_Partsi extends State<INV_Lemari> {
                   children: [
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
-                    _buildTableRow([
-                      "Lemari set",
-                      hargaLemari,
-                      ukuranLemari,
-                      jumlahAtas
-                    ], context: context),
+                    _buildTableRow(
+                        ["Lemari", hargaLemari, ukuranLemari, jumlahAtas],
+                        context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
@@ -232,7 +218,7 @@ class _INV_Partsi extends State<INV_Lemari> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pembayaran : ${isTablet ? "Lemari set" : "Lemari set"}",
+                    "Pembayaran : ${isTablet ? "Lemari" : "Lemari"}",
                     style: TextStyle(
                       fontSize: getResponsiveFontSize(context, factor: 0.0355),
                       fontWeight: FontWeight.bold,
@@ -320,6 +306,3 @@ class _INV_Partsi extends State<INV_Lemari> {
     );
   }
 }
-
-
-

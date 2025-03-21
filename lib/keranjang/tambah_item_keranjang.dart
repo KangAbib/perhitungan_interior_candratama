@@ -60,6 +60,7 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
           ),
         ),
         backgroundColor: backgroundColor,
+        duration: Duration(seconds: 1)
       ),
     );
   }
