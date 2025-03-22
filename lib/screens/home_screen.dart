@@ -673,18 +673,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 8,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                          ),
                           child: Image.asset(
-                            "assets/images/custom.webp",
-                            fit: BoxFit.contain,
+                            "assets/images/custom_1.png",
+                            width: double.infinity,
+                            height: screenHeight * 0.169,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                      ),
                       Expanded(
                         flex: 2,
                         child: Align(

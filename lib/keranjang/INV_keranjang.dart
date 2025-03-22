@@ -157,38 +157,35 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                 ],
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Table(
-                        columnWidths: const {
-                          0: FlexColumnWidth(2),
-                          1: FlexColumnWidth(2),
-                          2: FlexColumnWidth(2),
-                        },
-                        border: TableBorder.all(color: Colors.black),
-                        children: [
-                          _buildTableRow(["Kategori", "Harga", "Total"],
-                              isHeader: true, context: context),
-                          ...List<TableRow>.from((listKeranjang
-                                  .where((item) => item["timestamp"] != null)
-                                  .toList()
-                                ..sort((a, b) =>
-                                    b["timestamp"].compareTo(a["timestamp"])))
-                              .map((item) => _buildTableRow([
-                                    item["nama"]?.toString() ?? "-",
-                                    formatRupiah(
-                                        (item["harga"] ?? 0).toDouble()),
-                                    formatRupiah(
-                                        (item["harga"] ?? 0).toDouble()),
-                                  ], context: context))),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+  child: SingleChildScrollView(
+    scrollDirection: Axis.vertical,
+    child: Column(
+      children: [
+        Table(
+          columnWidths: const {
+            0: FlexColumnWidth(4),
+            1: FlexColumnWidth(2),
+          },
+          border: TableBorder.all(color: Colors.black),
+          children: [
+            _buildTableRow(["Kategori", "Harga"], isHeader: true, context: context), // Hanya dua kolom
+            ...List<TableRow>.from(
+              (listKeranjang
+                    .where((item) => item["timestamp"] != null)
+                    .toList()
+                    ..sort((a, b) => b["timestamp"].compareTo(a["timestamp"])))
+                  .map((item) => _buildTableRow([
+                        item["nama"]?.toString() ?? "-",
+                        formatRupiah((item["harga"] ?? 0).toDouble()),
+                      ], context: context)),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ),
+),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -276,6 +273,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
             style: TextStyle(
               fontSize: getResponsiveFontSize(context, factor: 0.0355),
               fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+              
             ),
           ),
         );
