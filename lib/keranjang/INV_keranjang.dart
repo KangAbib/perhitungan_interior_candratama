@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ganesha_interior/keranjang/daftar_bayar_keranjang.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,16 +65,21 @@ class _INV_Keranjang extends State<INV_Keranjang> {
     ambilDataKeranjang();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     String todayDate =
         DateFormat("EEEE, dd MMM yyyy", "id_ID").format(DateTime.now());
-    String noBayar = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
-    bool isTablet = MediaQuery.of(context).size.width > 600;
-
-    return Scaffold(
-      body: SafeArea(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Daftar_KeranjangScreen()),
+        );
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -258,6 +264,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
           ),
         ),
       ),
+    ),
     );
   }
 
