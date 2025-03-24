@@ -35,18 +35,78 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
     return "Rp ${number.format(int.parse(value))}";
   }
 
-  void hapusItemKeranjang(String itemKey) {
-    FirebaseFirestore.instance
-        .collection("keranjang")
-        .doc("listKeranjang")
-        .update({
-      itemKey: FieldValue.delete(),
-    }).then((_) {
-      print("Item $itemKey berhasil dihapus");
-    }).catchError((error) {
-      print("Gagal menghapus item: $error");
+  void hapusItemKeranjang(String itemKey) async {
+  var keranjangRef =
+      FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang");
+
+  await keranjangRef.update({
+    itemKey: FieldValue.delete(),
+  }).then((_) async {
+    print("✅ Item $itemKey berhasil dihapus");
+
+    // Cek ulang apakah masih ada item dengan isFromTambah: true
+    var docSnapshot = await keranjangRef.get();
+    if (docSnapshot.exists) {
+      Map<String, dynamic>? data = docSnapshot.data();
+      bool masihAdaDiskon = false;
+
+      data?.forEach((key, value) {
+        if (value is Map<String, dynamic> && value["isFromTambah"] == true) {
+          masihAdaDiskon = true;
+        }
+      });
+
+      setState(() {
+        isDiskonVisible = masihAdaDiskon;
+      });
+
+      print("🔄 isDiskonVisible setelah hapus: $isDiskonVisible");
+    }
+  }).catchError((error) {
+    print("❌ Gagal menghapus item: $error");
+  });
+}
+
+  void tambahItem() async {
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Tambah_ItemScreen(),
+    ),
+  );
+
+  // Cek apakah ada barang baru dengan isFromTambah: true
+  cekDiskonTambahan();
+}
+
+void cekDiskonTambahan() async {
+  var keranjangRef =
+      FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang");
+
+  var docSnapshot = await keranjangRef.get();
+  if (docSnapshot.exists) {
+    Map<String, dynamic>? data = docSnapshot.data();
+
+    bool adaDiskonTambahan = false;
+
+    data?.forEach((key, value) {
+      if (value is Map<String, dynamic> && value["isFromTambah"] == true) {
+        adaDiskonTambahan = true;
+      }
     });
+
+    // Update state jika ada barang yang berasal dari Tambah_ItemScreen
+    if (adaDiskonTambahan) {
+      setState(() {
+        isDiskonVisible = true;
+      });
+
+      print("✅ Form Diskon Tambahan muncul!");
+      print("✅ isFromTambah tetap ada di Firestore!");
+    }
   }
+}
+
 
   void tambahItemKeranjang(String nama, int harga) {
     FirebaseFirestore.instance
@@ -86,6 +146,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
   @override
   void initState() {
     super.initState();
+    cekDiskonTambahan();
 
     diskonController.addListener(() {
       String text = diskonController.text;
@@ -536,13 +597,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                                 : 100,
                                             child: ElevatedButton(
                                               onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Tambah_ItemScreen(),
-                                                  ),
-                                                );
+                                                tambahItem(); // ✅ Memanggil fungsi tambahItem()
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
@@ -608,98 +663,48 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                           ),
                                         ),
                                       ),
-                                      StreamBuilder<DocumentSnapshot>(
-                                        stream: FirebaseFirestore.instance
-                                            .collection("keranjang")
-                                            .doc("listKeranjang")
-                                            .snapshots(),
-                                        builder: (context, snapshot) {
-                                          if (!snapshot.hasData ||
-                                              snapshot.data == null ||
-                                              !snapshot.data!.exists) {
-                                            return SizedBox
-                                                .shrink(); // Sembunyikan jika tidak ada data
-                                          }
-
-                                          var data = snapshot.data!.data()
-                                                  as Map<String, dynamic>? ??
-                                              {};
-
-                                          // Jika Firestore menyimpan items sebagai ARRAY
-                                          List<dynamic> items =
-                                              data["items"] ?? [];
-
-                                          // Jika Firestore menyimpan item sebagai field individual
-                                          if (items.isEmpty) {
-                                            items = data.entries
-                                                .where((entry) => entry.key
-                                                    .startsWith("barang"))
-                                                .map((entry) => entry.value)
-                                                .toList();
-                                          }
-
-                                          // Cek apakah jumlah item lebih dari 1
-                                          bool isDiskonVisible =
-                                              items.length > 1;
-
-                                          return Column(
-                                            children: [
-                                              Visibility(
-                                                visible: isDiskonVisible,
-                                                child: Column(
-                                                  children: [
-                                                    SizedBox(height: 20),
-                                                    TextField(
-                                                      controller:
-                                                          diskonTambahanController,
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      style:
-                                                          GoogleFonts.manrope(
-                                                        fontSize: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.04,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                      decoration:
-                                                          InputDecoration(
-                                                        labelText:
-                                                            "Diskon Tambahan",
-                                                        labelStyle:
-                                                            GoogleFonts.manrope(
-                                                          fontSize: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.04,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color:
-                                                              Colors.grey[700],
-                                                        ),
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                        ),
-                                                        contentPadding:
-                                                            EdgeInsets
-                                                                .symmetric(
-                                                          horizontal: 12,
-                                                          vertical: 14,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
+                                      Visibility(
+                                        visible:
+                                            isDiskonVisible, // ✅ Pastikan form hanya muncul saat isDiskonVisible = true
+                                        child: Column(
+                                          children: [
+                                            SizedBox(height: 20),
+                                            TextField(
+                                              controller:
+                                                  diskonTambahanController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                labelText: "Diskon Tambahan",
+                                                labelStyle: GoogleFonts.manrope(
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.04,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.grey[700],
+                                                ),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 14,
                                                 ),
                                               ),
-                                            ],
-                                          );
-                                        },
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                       SizedBox(height: 20),
                                       TextField(

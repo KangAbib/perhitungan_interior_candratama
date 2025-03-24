@@ -24,6 +24,8 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
   TextEditingController alamatController = TextEditingController();
   TextEditingController ukuranInteriorCustomController =
       TextEditingController();
+  bool isDiskonVisible = false;
+
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -106,81 +108,83 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
   }
 
   void tambahKeKeranjang(
-      String namaInterior, double harga, BuildContext context) async {
-    try {
-      var keranjangRef = FirebaseFirestore.instance
-          .collection("keranjang")
-          .doc("listKeranjang");
+    String namaInterior, double harga, BuildContext context) async {
+  try {
+    var keranjangRef = FirebaseFirestore.instance
+        .collection("keranjang")
+        .doc("listKeranjang");
 
-      var docSnapshot = await keranjangRef.get();
-      Map<String, dynamic>? data = docSnapshot.data() ?? {};
+    var docSnapshot = await keranjangRef.get();
+    Map<String, dynamic>? data = docSnapshot.data() ?? {};
 
-      int nomorBarang = 1;
-      for (var key in data.keys) {
-        if (key.startsWith("barang")) {
-          int nomor = int.parse(key.replaceAll("barang", ""));
-          if (nomor >= nomorBarang) {
-            nomorBarang = nomor + 1;
-          }
+    int nomorBarang = 1;
+    for (var key in data.keys) {
+      if (key.startsWith("barang")) {
+        int nomor = int.parse(key.replaceAll("barang", ""));
+        if (nomor >= nomorBarang) {
+          nomorBarang = nomor + 1;
         }
       }
-
-      String existingBarangKey = "";
-      for (var key in data.keys) {
-        if (data[key]["nama"] == namaInterior) {
-          existingBarangKey = key;
-          break;
-        }
-      }
-
-      int timestamp = DateTime.now().millisecondsSinceEpoch;
-
-      if (existingBarangKey.isNotEmpty) {
-        await keranjangRef.update({
-          "$existingBarangKey.harga": harga,
-          "$existingBarangKey.timestamp": timestamp,
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Harga $namaInterior berhasil diperbarui"),
-            backgroundColor: Colors.blue,
-          ),
-        );
-      } else {
-        String barangKey = "barang$nomorBarang";
-
-        await keranjangRef.set({
-          barangKey: {
-            "nama": namaInterior,
-            "harga": harga,
-            "timestamp": timestamp
-          }
-        }, SetOptions(merge: true));
-
-        
-          
-            _showSnackBar("$namaInterior ditambahkan ke keranjang",Colors.green);
-            
-      }
-      
-
-      // Navigasi ke Daftar_KeranjangScreen setelah sukses
-      Future.delayed(const Duration(milliseconds: 500), () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Daftar_KeranjangScreen()),
-        );
-      });
-    } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menambahkan ke keranjang."),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
+
+    String existingBarangKey = "";
+    for (var key in data.keys) {
+      if (data[key]["nama"] == namaInterior) {
+        existingBarangKey = key;
+        break;
+      }
+    }
+
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    if (existingBarangKey.isNotEmpty) {
+      await keranjangRef.update({
+        "$existingBarangKey.harga": harga,
+        "$existingBarangKey.timestamp": timestamp,
+        "$existingBarangKey.isFromTambah": true,
+      });
+
+      _showSnackBar("Harga $namaInterior berhasil diperbarui", Colors.blue);
+    } else {
+      String barangKey = "barang$nomorBarang";
+
+      await keranjangRef.set({
+        barangKey: {
+          "nama": namaInterior,
+          "harga": harga,
+          "timestamp": timestamp,
+          "isFromTambah": true,
+        }
+      }, SetOptions(merge: true));
+
+      _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
+    }
+
+    // **Cek jika produk tertentu ditambahkan, aktifkan form diskon**
+    if (namaInterior == "Interior Custom") {
+      setState(() {
+        isDiskonVisible = true;
+      });
+    }
+
+    // Navigasi ke daftar keranjang setelah sukses
+    Future.delayed(const Duration(milliseconds: 500), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Daftar_KeranjangScreen()),
+      );
+    });
+  } catch (e) {
+    print("Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Gagal menambahkan ke keranjang."),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
 
   @override
   void dispose() {
@@ -236,12 +240,8 @@ class _Tambah_ItemScreenState extends State<Tambah_ItemScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                            );
-                          },
+                        Navigator.pop(context);
+                      },
                           child: Image.asset(
                             "assets/images/back.png",
                             height: screenHeight * 0.035,

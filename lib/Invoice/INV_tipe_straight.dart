@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class INV_TipeStraight extends StatefulWidget {
   const INV_TipeStraight({super.key});
@@ -28,7 +29,9 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
   @override
   void initState() {
     super.initState();
-    ambilDataTerakhir();
+    initializeDateFormatting().then((_) {
+      ambilDataTerakhir();
+    });
   }
 
   void ambilDataTerakhir() async {
