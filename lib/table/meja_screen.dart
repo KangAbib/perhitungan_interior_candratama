@@ -691,7 +691,7 @@ class _MejaScreenState extends State<MejaScreen> {
                                             MediaQuery.of(context).size.width *
                                                 0.005),
                                     child: Text(
-                                      "Uang Muka",
+                                      "DP (60%)",
                                       style: GoogleFonts.lato(
                                         fontWeight: FontWeight.normal,
                                         fontSize:

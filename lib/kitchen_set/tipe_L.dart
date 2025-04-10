@@ -1246,7 +1246,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                             MediaQuery.of(context).size.width *
                                                 0.005),
                                     child: Text(
-                                      "Uang Muka",
+                                      "DP (60%)",
                                       style: GoogleFonts.lato(
                                         fontWeight: FontWeight.normal,
                                         fontSize:

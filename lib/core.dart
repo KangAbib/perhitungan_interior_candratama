@@ -10,7 +10,6 @@ export 'package:ganesha_interior/core_package.dart';
 export 'package:ganesha_interior/Invoice/INV_backdrop.dart';
 export 'package:ganesha_interior/Invoice/INV_backdrop_tv.dart';
 export 'package:ganesha_interior/Invoice/INV_custom.dart';
-export 'package:ganesha_interior/Invoice/INV_keranjang.dart';
 export 'package:ganesha_interior/Invoice/INV_lemari.dart';
 export 'package:ganesha_interior/Invoice/INV_meja_island.dart';
 export 'package:ganesha_interior/Invoice/INV_meja_rias.dart';

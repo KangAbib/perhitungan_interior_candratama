@@ -715,7 +715,7 @@ void cekDiskonTambahan() async {
                                           fontWeight: FontWeight.w400,
                                         ),
                                         decoration: InputDecoration(
-                                          labelText: "Uang Muka",
+                                          labelText: "DP (60%)",
                                           labelStyle: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w500,
@@ -915,7 +915,7 @@ void cekDiskonTambahan() async {
                         "timestamp": FieldValue.serverTimestamp(),
                       });
 
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => INV_Keranjang()),

@@ -681,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             topRight: Radius.circular(10),
                           ),
                           child: Image.asset(
-                            "assets/images/custom_1.png",
+                            "assets/images/custom_2.png",
                             width: double.infinity,
                             height: screenHeight * 0.169,
                             fit: BoxFit.cover,

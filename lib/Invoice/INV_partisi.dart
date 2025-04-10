@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,6 +21,8 @@ class _INV_Partsi extends State<INV_Partisi> {
   String subTotal = "";
   String pelunasan = "";
   String tanggal = "";
+  String biayaSurvey = "";
+
   double parseCurrency(String text) {
     String cleanedText = text.replaceAll("Rp ", "").replaceAll(".", "").trim();
     return double.tryParse(cleanedText) ?? 0.0;
@@ -45,6 +48,7 @@ class _INV_Partsi extends State<INV_Partisi> {
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
           ukuranPartisi = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
+          biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
               "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
@@ -67,6 +71,7 @@ class _INV_Partsi extends State<INV_Partisi> {
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
           pelunasan = "Rp 0";
+          biayaSurvey = "Rp 0";
         });
       }
     } catch (e) {
@@ -79,6 +84,7 @@ class _INV_Partsi extends State<INV_Partisi> {
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
         pelunasan = "Rp 0";
+        biayaSurvey = "Rp 0";
       });
     }
   }
@@ -111,18 +117,18 @@ class _INV_Partsi extends State<INV_Partisi> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Detail Pembayaran",
-                    style: TextStyle(
-                      fontSize: getResponsiveFontSize(context, factor: 0.05),
+                    "INVOICE",
+                    style: GoogleFonts.roboto(
+                      fontSize: getResponsiveFontSize(context, factor: 0.065),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Image.asset(
-                    "assets/images/logo_inv1.png",
+                    "assets/images/logo_inv2.png",
                     width: MediaQuery.of(context).size.width * 0.35,
                     fit: BoxFit.contain,
                   ),
@@ -245,6 +251,12 @@ class _INV_Partsi extends State<INV_Partisi> {
                   children: [
                     Text(
                       "Uang Muka : $uangMuka",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                    Text(
+                      "Biaya Survey : $uangMuka",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),

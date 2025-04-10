@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ganesha_interior/keranjang/daftar_bayar_keranjang.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -89,14 +90,14 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Detail Pembayaran",
-                    style: TextStyle(
-                      fontSize: getResponsiveFontSize(context, factor: 0.05),
+                    "INVOICE",
+                    style: GoogleFonts.roboto(
+                      fontSize: getResponsiveFontSize(context, factor: 0.065),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Image.asset(
-                    "assets/images/logo_inv1.png",
+                    "assets/images/logo_inv2.png",
                     width: MediaQuery.of(context).size.width * 0.35,
                     fit: BoxFit.contain,
                   ),
