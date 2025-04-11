@@ -23,6 +23,7 @@ class _MejaIslandState extends State<MejaIsland> {
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
   TextEditingController ukuranmejaislandController = TextEditingController();
+  TextEditingController biayaSurveyController = TextEditingController(text : "Rp");
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -175,7 +176,8 @@ class _MejaIslandState extends State<MejaIsland> {
 
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
-    double pelunasan = subTotal - uangMuka;
+    double biayaSurvey = parseValue(biayaSurveyController.text);
+    double pelunasan = subTotal - uangMuka - biayaSurvey;
 
     Map<String, dynamic> data = {
       "nama": namaController.text,
@@ -184,6 +186,7 @@ class _MejaIslandState extends State<MejaIsland> {
       "hargaMejaisland": mejaislandController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
+      "biayaSurvey" : biayaSurveyController.text,
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "tanggal": Timestamp.now(),
     };
@@ -246,6 +249,7 @@ class _MejaIslandState extends State<MejaIsland> {
     namaController.dispose();
     alamatController.dispose();
     ukuranmejaislandController.dispose();
+    biayaSurveyController.dispose();
     super.dispose();
   }
 
@@ -719,6 +723,72 @@ class _MejaIslandState extends State<MejaIsland> {
                                     ),
                                     keyboardType: TextInputType.none,
                                   ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Biaya Survey",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  
+                                      Expanded(
+                                        flex : 2,
+                                        child: TextField(
+                                          controller: biayaSurveyController,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
+                                           
+                                          ),
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            String cleanedText =
+                                                value.replaceAll(
+                                                    RegExp(r'[^0-9]'), '');
+
+                                            if (cleanedText.isNotEmpty) {
+                                              double parsedValue =
+                                                  double.tryParse(
+                                                          cleanedText) ??
+                                                      0;
+                                              String formattedValue = _formatter
+                                                  .format(parsedValue);
+
+                                              biayaSurveyController.value =
+                                                  TextEditingValue(
+                                                text: "Rp $formattedValue",
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                        offset:
+                                                            "Rp $formattedValue"
+                                                                .length),
+                                              );
+                                            } else {
+                                              biayaSurveyController.text = "Rp ";
+                                            }
+                                          },
+                                        ),
+                                      ),
                                 ],
                               ),
                             ),

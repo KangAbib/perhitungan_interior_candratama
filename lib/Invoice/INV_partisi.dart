@@ -256,7 +256,7 @@ class _INV_Partsi extends State<INV_Partisi> {
                       ),
                     ),
                     Text(
-                      "Biaya Survey : $uangMuka",
+                      "Biaya Survey : $biayaSurvey",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),

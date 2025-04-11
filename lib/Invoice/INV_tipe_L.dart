@@ -25,6 +25,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
   String uangMuka = "";
   String subTotal = "";
   String pelunasan = "";
+  String biayaSurvey = "";
 
   @override
   void initState() {
@@ -62,6 +63,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
           uangMuka = data["uangMuka"] ?? "Rp 0";
           subTotal = data["subTotal"] ?? "Rp 0";
           pelunasan = data["pelunasan"] ?? "Rp 0";
+          biayaSurvey = data["biayaSurvey"] ?? "RP 0";
         });
       } else {
         setState(() {
@@ -70,6 +72,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
           subTotal = "Rp 0";
           pelunasan = "Rp 0";
           uangMuka = "Rp 0";
+          biayaSurvey = "Rp 0";
         });
       }
     } catch (e) {
@@ -79,6 +82,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
         subTotal = "Rp 0";
         pelunasan = "Rp 0";
         uangMuka = "Rp 0";
+        biayaSurvey = "Rp 0";
       });
     }
   }
@@ -243,6 +247,12 @@ class _INV_TipeL extends State<INV_Tipe_L> {
                   children: [
                     Text(
                       "Uang Muka : $uangMuka",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                    Text(
+                      "Biaya Survey : $biayaSurvey",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),

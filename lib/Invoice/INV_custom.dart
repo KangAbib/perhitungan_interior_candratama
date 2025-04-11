@@ -22,6 +22,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
   String subTotal = "";
   String pelunasan = "";
   String tanggal = "";
+  String biayaSurvey = "";
   double parseCurrency(String text) {
     String cleanedText = text.replaceAll("Rp ", "").replaceAll(".", "").trim();
     return double.tryParse(cleanedText) ?? 0.0;
@@ -49,6 +50,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
           jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
           ukuranInteriorCustom = data["ukuranInteriorCustom"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
+          biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
               "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
@@ -72,6 +74,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
           pelunasan = "Rp 0";
+          biayaSurvey = "Rp 0";
         });
       }
     } catch (e) {
@@ -85,6 +88,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
         pelunasan = "Rp 0";
+        biayaSurvey = "Rp 0";
       });
     }
   }
@@ -251,6 +255,12 @@ class _INV_Custom extends State<INV_InteriorCustom> {
                   children: [
                     Text(
                       "Uang Muka : $uangMuka",
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                      ),
+                    ),
+                    Text(
+                      "Biaya Survey : $biayaSurvey",
                       style: TextStyle(
                         fontSize: getResponsiveFontSize(context, factor: 0.03),
                       ),

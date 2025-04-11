@@ -35,6 +35,7 @@ class _Tipe_LState extends State<Tipe_L> {
   TextEditingController jumlahAtas2Controller = TextEditingController();
   TextEditingController jumlahBawah1Controller = TextEditingController();
   TextEditingController jumlahBawah2Controller = TextEditingController();
+  TextEditingController biayaSurveyController = TextEditingController(text : "Rp ");
   final TextEditingController _kitchenLetterLAtasController =
       TextEditingController();
   final TextEditingController _kitchenLetterLBawahController =
@@ -297,6 +298,7 @@ class _Tipe_LState extends State<Tipe_L> {
       hasilJumlahBawahController.text,
       backsplashController.text,
       aksesorisController.text,
+      biayaSurveyController.text,
       uangMukaController.text
     ].any((element) => element.isEmpty)) {
       _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
@@ -320,8 +322,9 @@ class _Tipe_LState extends State<Tipe_L> {
               parseValue(aksesorisController.text)) *
           1000;
 
+      double biayaSurvey = parseValue(biayaSurveyController.text);
       double uangMuka = parseValue(uangMukaController.text) * 1000;
-      double pelunasan = subTotal - uangMuka;
+      double pelunasan = subTotal - uangMuka - biayaSurvey ;
 
       Map<String, dynamic> data = {
         "nama": namaController.text,
@@ -334,6 +337,7 @@ class _Tipe_LState extends State<Tipe_L> {
         "hasilJumlahBawah": hasilJumlahBawahController.text,
         "backsplash": backsplashController.text,
         "aksesoris": aksesorisController.text,
+        "biayaSurvey": biayaSurveyController.text,
         "uangMuka": "Rp ${_formatter.format(uangMuka.round())}",
         "subTotal": "Rp ${_formatter.format(subTotal.round())}",
         "pelunasan": "Rp ${_formatter.format(pelunasan.round())}",
@@ -409,6 +413,7 @@ class _Tipe_LState extends State<Tipe_L> {
     jumlahBawah1Controller.dispose();
     jumlahBawah2Controller.dispose();
     _kitchenLetterLBawahController.dispose();
+    biayaSurveyController.dispose();
 
     super.dispose();
   }
@@ -1274,6 +1279,72 @@ class _Tipe_LState extends State<Tipe_L> {
                                     ),
                                     keyboardType: TextInputType.none,
                                   ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.005),
+                                    child: Text(
+                                      "Biaya Survey",
+                                      style: GoogleFonts.lato(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.035,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  
+                                      Expanded(
+                                        flex : 2,
+                                        child: TextField(
+                                          controller: biayaSurveyController,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
+                                           
+                                          ),
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            String cleanedText =
+                                                value.replaceAll(
+                                                    RegExp(r'[^0-9]'), '');
+
+                                            if (cleanedText.isNotEmpty) {
+                                              double parsedValue =
+                                                  double.tryParse(
+                                                          cleanedText) ??
+                                                      0;
+                                              String formattedValue = _formatter
+                                                  .format(parsedValue);
+
+                                              biayaSurveyController.value =
+                                                  TextEditingValue(
+                                                text: "Rp $formattedValue",
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                        offset:
+                                                            "Rp $formattedValue"
+                                                                .length),
+                                              );
+                                            } else {
+                                              biayaSurveyController.text = "Rp ";
+                                            }
+                                          },
+                                        ),
+                                      ),
                                 ],
                               ),
                             ),
