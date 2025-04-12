@@ -322,7 +322,11 @@ class _Tipe_LState extends State<Tipe_L> {
               parseValue(aksesorisController.text)) *
           1000;
 
-      double biayaSurvey = parseValue(biayaSurveyController.text);
+      String biayaSurveyText = biayaSurveyController.text.trim();
+      double biayaSurvey = biayaSurveyText.isEmpty
+    ? 0
+    : parseValue(biayaSurveyText);
+
       double uangMuka = parseValue(uangMukaController.text) * 1000;
       double pelunasan = subTotal - uangMuka - biayaSurvey ;
 
@@ -337,7 +341,7 @@ class _Tipe_LState extends State<Tipe_L> {
         "hasilJumlahBawah": hasilJumlahBawahController.text,
         "backsplash": backsplashController.text,
         "aksesoris": aksesorisController.text,
-        "biayaSurvey": biayaSurveyController.text,
+       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
         "uangMuka": "Rp ${_formatter.format(uangMuka.round())}",
         "subTotal": "Rp ${_formatter.format(subTotal.round())}",
         "pelunasan": "Rp ${_formatter.format(pelunasan.round())}",

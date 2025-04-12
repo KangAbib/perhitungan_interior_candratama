@@ -188,7 +188,10 @@ class _BackdropState extends State<Backdrop> {
     double hargaBackdrop = parseValue(BackdropController.text);
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
-    double biayaSurvey = parseValue(biayaSurveyController.text);
+    String biayaSurveyText = biayaSurveyController.text.trim();
+      double biayaSurvey = biayaSurveyText.isEmpty
+    ? 0
+    : parseValue(biayaSurveyText);
     double pelunasan = subTotal - uangMuka - biayaSurvey;
     double jumlahKali = panjangBackdrop * tinggiBackdrop;
 
@@ -200,7 +203,7 @@ class _BackdropState extends State<Backdrop> {
       "hargaBackdrop": BackdropController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
-      "biayaSurvey": biayaSurveyController.text,
+      "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "jumlahKali": jumlahKali % 1 == 0 ? jumlahKali.toInt().toString() : jumlahKali.toStringAsFixed(2),// 🔥 Simpan dengan format yang benar
       "tanggal": Timestamp.now(),

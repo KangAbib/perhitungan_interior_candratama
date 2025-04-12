@@ -19,13 +19,15 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
   TextEditingController diskonController = TextEditingController(text: "Rp ");
   TextEditingController diskonTambahanController =
       TextEditingController(text: "Rp ");
-
+  TextEditingController biayaSurveyController =
+      TextEditingController(text: "Rp ");
   double totalHarga = 0;
   double uangMuka = 0;
   double diskon = 0;
   bool isDiskonValid = true;
   bool isDiskonVisible = false;
   final formatCurrency = NumberFormat("#,###", "id_ID");
+  final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
 
   String formatRupiah(String value) {
     value = value.replaceAll(RegExp(r'[^0-9]'), '');
@@ -36,77 +38,76 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
   }
 
   void hapusItemKeranjang(String itemKey) async {
-  var keranjangRef =
-      FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang");
+    var keranjangRef =
+        FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang");
 
-  await keranjangRef.update({
-    itemKey: FieldValue.delete(),
-  }).then((_) async {
-    print("✅ Item $itemKey berhasil dihapus");
+    await keranjangRef.update({
+      itemKey: FieldValue.delete(),
+    }).then((_) async {
+      print("✅ Item $itemKey berhasil dihapus");
 
-    // Cek ulang apakah masih ada item dengan isFromTambah: true
+      // Cek ulang apakah masih ada item dengan isFromTambah: true
+      var docSnapshot = await keranjangRef.get();
+      if (docSnapshot.exists) {
+        Map<String, dynamic>? data = docSnapshot.data();
+        bool masihAdaDiskon = false;
+
+        data?.forEach((key, value) {
+          if (value is Map<String, dynamic> && value["isFromTambah"] == true) {
+            masihAdaDiskon = true;
+          }
+        });
+
+        setState(() {
+          isDiskonVisible = masihAdaDiskon;
+        });
+
+        print("🔄 isDiskonVisible setelah hapus: $isDiskonVisible");
+      }
+    }).catchError((error) {
+      print("❌ Gagal menghapus item: $error");
+    });
+  }
+
+  void tambahItem() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Tambah_ItemScreen(),
+      ),
+    );
+
+    // Cek apakah ada barang baru dengan isFromTambah: true
+    cekDiskonTambahan();
+  }
+
+  void cekDiskonTambahan() async {
+    var keranjangRef =
+        FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang");
+
     var docSnapshot = await keranjangRef.get();
     if (docSnapshot.exists) {
       Map<String, dynamic>? data = docSnapshot.data();
-      bool masihAdaDiskon = false;
+
+      bool adaDiskonTambahan = false;
 
       data?.forEach((key, value) {
         if (value is Map<String, dynamic> && value["isFromTambah"] == true) {
-          masihAdaDiskon = true;
+          adaDiskonTambahan = true;
         }
       });
 
-      setState(() {
-        isDiskonVisible = masihAdaDiskon;
-      });
+      // Update state jika ada barang yang berasal dari Tambah_ItemScreen
+      if (adaDiskonTambahan) {
+        setState(() {
+          isDiskonVisible = true;
+        });
 
-      print("🔄 isDiskonVisible setelah hapus: $isDiskonVisible");
-    }
-  }).catchError((error) {
-    print("❌ Gagal menghapus item: $error");
-  });
-}
-
-  void tambahItem() async {
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => Tambah_ItemScreen(),
-    ),
-  );
-
-  // Cek apakah ada barang baru dengan isFromTambah: true
-  cekDiskonTambahan();
-}
-
-void cekDiskonTambahan() async {
-  var keranjangRef =
-      FirebaseFirestore.instance.collection("keranjang").doc("listKeranjang");
-
-  var docSnapshot = await keranjangRef.get();
-  if (docSnapshot.exists) {
-    Map<String, dynamic>? data = docSnapshot.data();
-
-    bool adaDiskonTambahan = false;
-
-    data?.forEach((key, value) {
-      if (value is Map<String, dynamic> && value["isFromTambah"] == true) {
-        adaDiskonTambahan = true;
+        print("✅ Form Diskon Tambahan muncul!");
+        print("✅ isFromTambah tetap ada di Firestore!");
       }
-    });
-
-    // Update state jika ada barang yang berasal dari Tambah_ItemScreen
-    if (adaDiskonTambahan) {
-      setState(() {
-        isDiskonVisible = true;
-      });
-
-      print("✅ Form Diskon Tambahan muncul!");
-      print("✅ isFromTambah tetap ada di Firestore!");
     }
   }
-}
-
 
   void tambahItemKeranjang(String nama, int harga) {
     FirebaseFirestore.instance
@@ -732,6 +733,31 @@ void cekDiskonTambahan() async {
                                         ),
                                         keyboardType: TextInputType.none,
                                       ),
+                                      SizedBox(height: 20),
+                                      TextField(
+                                        controller: biayaSurveyController,
+                                        keyboardType: TextInputType.number,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: screenWidth * 0.04,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        decoration: InputDecoration(
+                                          labelText: "Biaya Survey",
+                                          labelStyle: GoogleFonts.manrope(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey[700],
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 14,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -844,6 +870,13 @@ void cekDiskonTambahan() async {
                   height: MediaQuery.of(context).size.width > 600 ? 55 : 45,
                   child: ElevatedButton(
                     onPressed: () async {
+                      if (!isDiskonValid) {
+                        _showSnackBar(
+                            "Turunkan diskon hingga hijau!",
+                            Colors.red);
+                        return;
+                      }
+
                       if (namaController.text.isEmpty ||
                           alamatController.text.isEmpty) {
                         _showSnackBar(
@@ -851,7 +884,6 @@ void cekDiskonTambahan() async {
                             Colors.red);
                         return;
                       }
-
                       DocumentSnapshot keranjangSnapshot =
                           await FirebaseFirestore.instance
                               .collection("keranjang")
@@ -876,6 +908,12 @@ void cekDiskonTambahan() async {
                           totalHargaItem += (value["harga"] ?? 0).toDouble();
                         }
                       });
+                      double parseValue(String text) {
+                        String cleanedText = text
+                            .replaceAll("Rp ", "")
+                            .replaceAll(RegExp(r'[^0-9]'), '');
+                        return double.tryParse(cleanedText) ?? 0.0;
+                      }
 
                       double uangMukaInput = double.tryParse(uangMukaController
                               .text
@@ -889,14 +927,18 @@ void cekDiskonTambahan() async {
                                   .replaceAll(RegExp(r'[^0-9]'), '')) ??
                           0;
                       double diskontotal = diskonInput + diskonTambahan;
-
+                      String biayaSurveyText =
+                          biayaSurveyController.text.trim();
+                      double biayaSurvey = biayaSurveyText.isEmpty
+                          ? 0
+                          : parseValue(biayaSurveyText);
                       double totalHargaSetelahDiskon =
                           totalHargaItem - diskonInput - diskonTambahan;
                       if (totalHargaSetelahDiskon < 0)
                         totalHargaSetelahDiskon = 0;
 
                       double sisaPembayaran =
-                          totalHargaSetelahDiskon - uangMukaInput;
+                          totalHargaSetelahDiskon - uangMukaInput - biayaSurvey;
                       if (sisaPembayaran < 0) sisaPembayaran = 0;
 
                       await FirebaseFirestore.instance
@@ -912,6 +954,8 @@ void cekDiskonTambahan() async {
                         "total_setelah_diskon": totalHargaSetelahDiskon,
                         "uang_muka": uangMukaInput,
                         "sisa_pembayaran": sisaPembayaran,
+                        "biayaSurvey":
+                            "Rp ${_formatter.format(biayaSurvey.round())}",
                         "timestamp": FieldValue.serverTimestamp(),
                       });
 

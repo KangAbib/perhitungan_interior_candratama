@@ -19,6 +19,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
   double diskon = 0;
   double uangMuka = 0;
   double pelunasan = 0;
+  String biayaSurvey = "";
   List<Map<String, dynamic>> listKeranjang = [];
   final formatCurrency = NumberFormat("#,###", "id_ID");
 
@@ -39,6 +40,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
           subTotal = (data["total_harga"] ?? 0).toDouble();
           diskon = (data["diskon_total"] ?? 0).toDouble();
           uangMuka = (data["uang_muka"] ?? 0).toDouble();
+          biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           pelunasan = (data["sisa_pembayaran"] ?? 0).toDouble();
           listKeranjang = List<Map<String, dynamic>>.from(data["items"] ?? []);
         });
@@ -66,7 +68,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
     ambilDataKeranjang();
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     String todayDate =
         DateFormat("EEEE, dd MMM yyyy", "id_ID").format(DateTime.now());
@@ -81,38 +83,71 @@ class _INV_Keranjang extends State<INV_Keranjang> {
       },
       child: Scaffold(
         body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "INVOICE",
-                    style: GoogleFonts.roboto(
-                      fontSize: getResponsiveFontSize(context, factor: 0.065),
-                      fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "INVOICE",
+                      style: GoogleFonts.roboto(
+                        fontSize: getResponsiveFontSize(context, factor: 0.065),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Image.asset(
-                    "assets/images/logo_inv2.png",
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    fit: BoxFit.contain,
-                  ),
-                ],
-              ),
-              Divider(thickness: 1),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
+                    Image.asset(
+                      "assets/images/logo_inv2.png",
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+                Divider(thickness: 1),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Kepada :",
+                            style: TextStyle(
+                              fontSize: getResponsiveFontSize(context,
+                                  factor: 0.0355),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            nama,
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            alamat,
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 16), // Jarak antara dua bagian
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Kepada :",
+                          "Tanggal :",
                           style: TextStyle(
                             fontSize:
                                 getResponsiveFontSize(context, factor: 0.0355),
@@ -120,53 +155,21 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                           ),
                         ),
                         Text(
-                          nama,
+                          todayDate,
                           style: TextStyle(
                             fontSize:
                                 getResponsiveFontSize(context, factor: 0.03),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          alamat,
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(width: 16), // Jarak antara dua bagian
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Tanggal :",
-                        style: TextStyle(
-                          fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        todayDate,
-                        style: TextStyle(
-                          fontSize:
-                              getResponsiveFontSize(context, factor: 0.03),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Expanded(
+                  ],
+                ),
+                Expanded(
   child: SingleChildScrollView(
     scrollDirection: Axis.vertical,
     child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Table(
           columnWidths: const {
@@ -175,12 +178,14 @@ class _INV_Keranjang extends State<INV_Keranjang> {
           },
           border: TableBorder.all(color: Colors.black),
           children: [
-            _buildTableRow(["Kategori", "Harga"], isHeader: true, context: context), // Hanya dua kolom
+            _buildTableRow(["Kategori", "Harga"],
+                isHeader: true, context: context),
             ...List<TableRow>.from(
               (listKeranjang
-                    .where((item) => item["timestamp"] != null)
-                    .toList()
-                    ..sort((a, b) => b["timestamp"].compareTo(a["timestamp"])))
+                      .where((item) => item["timestamp"] != null)
+                      .toList()
+                    ..sort((a, b) => b["timestamp"]
+                        .compareTo(a["timestamp"])))
                   .map((item) => _buildTableRow([
                         item["nama"]?.toString() ?? "-",
                         formatRupiah((item["harga"] ?? 0).toDouble()),
@@ -188,84 +193,90 @@ class _INV_Keranjang extends State<INV_Keranjang> {
             ),
           ],
         ),
-      ],
-    ),
-  ),
-),
-
+        const SizedBox(height: 16), // Spasi antara tabel dan pembayaran
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Pembayaran : ",
+              style: TextStyle(
+                fontSize: getResponsiveFontSize(context, factor: 0.0355),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Text(
+                "Sub Total : ${formatRupiah(subTotal)}",
+                style: TextStyle(
+                  fontSize: getResponsiveFontSize(context, factor: 0.03),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 0.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                "Diskon : ${formatRupiah(diskon)}",
+                style: TextStyle(
+                  fontSize: getResponsiveFontSize(context, factor: 0.03),
+                ),
+              ),
+              Text(
+                "Uang Muka : ${formatRupiah(uangMuka)}",
+                style: TextStyle(
+                  fontSize: getResponsiveFontSize(context, factor: 0.03),
+                ),
+              ),
+              Text(
+                "Biaya Survey : $biayaSurvey",
+                style: TextStyle(
+                  fontSize: getResponsiveFontSize(context, factor: 0.03),
+                ),
+              ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    "Pembayaran : ",
-                    style: TextStyle(
-                      fontSize: getResponsiveFontSize(context, factor: 0.0355),
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Divider(
+                      thickness: 2,
+                      color: Colors.black,
+                      indent: MediaQuery.of(context).size.width * 0.7,
+                      endIndent: 5,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      "Sub Total : ${formatRupiah(subTotal)}",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
+                  Text(
+                    "-",
+                    style: TextStyle(
+                      fontSize: getResponsiveFontSize(context, factor: 0.04),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 0.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Diskon : ${formatRupiah(diskon)}",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                    Text(
-                      "Uang Muka : ${formatRupiah(uangMuka)}",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 2,
-                            color: Colors.black,
-                            indent: MediaQuery.of(context).size.width * 0.7,
-                            endIndent: 5,
-                          ),
-                        ),
-                        Text(
-                          "-",
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.04),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "Pelunasan : ${formatRupiah(pelunasan)}",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                  ],
+              Text(
+                "Pelunasan : ${formatRupiah(pelunasan)}",
+                style: TextStyle(
+                  fontSize: getResponsiveFontSize(context, factor: 0.03),
                 ),
               ),
             ],
           ),
         ),
-      ),
+      ],
     ),
+  ),
+),
+
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -281,7 +292,6 @@ class _INV_Keranjang extends State<INV_Keranjang> {
             style: TextStyle(
               fontSize: getResponsiveFontSize(context, factor: 0.0355),
               fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-              
             ),
           ),
         );

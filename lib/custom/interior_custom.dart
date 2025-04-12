@@ -177,7 +177,10 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
 
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
-    double biayaSurvey = parseValue(biayaSurveyController.text);
+    String biayaSurveyText = biayaSurveyController.text.trim();
+      double biayaSurvey = biayaSurveyText.isEmpty
+    ? 0
+    : parseValue(biayaSurveyText);
     double pelunasan = subTotal - uangMuka - biayaSurvey;
 
     Map<String, dynamic> data = {
@@ -188,7 +191,7 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
       "NamaInterior": namacustomController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
-      "biayaSurvey" : biayaSurveyController.text,
+      "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "tanggal": Timestamp.now(),
     };

@@ -23,7 +23,7 @@ class _MejaIslandState extends State<MejaIsland> {
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
   TextEditingController ukuranmejaislandController = TextEditingController();
-  TextEditingController biayaSurveyController = TextEditingController(text : "Rp");
+  TextEditingController biayaSurveyController = TextEditingController(text : "Rp ");
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -176,7 +176,10 @@ class _MejaIslandState extends State<MejaIsland> {
 
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
-    double biayaSurvey = parseValue(biayaSurveyController.text);
+    String biayaSurveyText = biayaSurveyController.text.trim();
+      double biayaSurvey = biayaSurveyText.isEmpty
+    ? 0
+    : parseValue(biayaSurveyText);
     double pelunasan = subTotal - uangMuka - biayaSurvey;
 
     Map<String, dynamic> data = {
@@ -186,7 +189,7 @@ class _MejaIslandState extends State<MejaIsland> {
       "hargaMejaisland": mejaislandController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
-      "biayaSurvey" : biayaSurveyController.text,
+       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "tanggal": Timestamp.now(),
     };

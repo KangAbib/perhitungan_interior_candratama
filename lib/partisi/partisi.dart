@@ -135,16 +135,19 @@ class _PartisiScreenState extends State<PartisiScreen> {
         }
       }
 
+      int timestamp = DateTime.now().millisecondsSinceEpoch;
+
       if (existingBarangKey.isNotEmpty) {
         await keranjangRef.update({
           "$existingBarangKey.harga": harga,
+          "$existingBarangKey.timestamp": timestamp,
         });
         _showSnackBar("Harga $namaInterior berhasil diperbarui", Colors.blue);
       } else {
         String barangKey = "barang$nomorBarang";
 
         await keranjangRef.set({
-          barangKey: {"nama": namaInterior, "harga": harga}
+          barangKey: {"nama": namaInterior, "harga": harga, "timestamp": timestamp}
         }, SetOptions(merge: true));
 
         _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
@@ -188,7 +191,10 @@ class _PartisiScreenState extends State<PartisiScreen> {
     double tinggiPartisi = parseUkuran(tinggiPartisiController.text);
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
-    double biayaSurvey = parseValue(biayaSurveyController.text);
+    String biayaSurveyText = biayaSurveyController.text.trim();
+      double biayaSurvey = biayaSurveyText.isEmpty
+    ? 0
+    : parseValue(biayaSurveyText);
     double pelunasan = subTotal - uangMuka - biayaSurvey;
     double jumlahKali = panjangPartisi * tinggiPartisi;
 
@@ -200,7 +206,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
       "hargaPartisi": partisiController.text,
       "jumlahAtas": jumlahController.text,
       "uangMuka": uangMukaController.text,
-      "biayaSurvey" : biayaSurveyController.text,
+       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
       "jumlahKali": jumlahKali % 1 == 0 ? jumlahKali.toInt().toString() : jumlahKali.toStringAsFixed(2),// 🔥 Simpan dengan format yang benar
       "tanggal": Timestamp.now(),
