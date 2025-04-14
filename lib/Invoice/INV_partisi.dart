@@ -1,8 +1,18 @@
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class INV_Partisi extends StatefulWidget {
   const INV_Partisi({super.key});
@@ -12,6 +22,7 @@ class INV_Partisi extends StatefulWidget {
 }
 
 class _INV_Partsi extends State<INV_Partisi> {
+  ScreenshotController screenshotController = ScreenshotController();
   String nama = "Memuat...";
   String alamat = "";
   String hargaPartisi = "";
@@ -22,6 +33,7 @@ class _INV_Partsi extends State<INV_Partisi> {
   String pelunasan = "";
   String tanggal = "";
   String biayaSurvey = "";
+  final GlobalKey _globalKey = GlobalKey();
 
   double parseCurrency(String text) {
     String cleanedText = text.replaceAll("Rp ", "").replaceAll(".", "").trim();
@@ -102,6 +114,53 @@ class _INV_Partsi extends State<INV_Partisi> {
     });
   }
 
+  Future<void> captureAndGeneratePDF() async {
+  // Tambahkan delay untuk memastikan UI selesai dirender
+  await Future.delayed(Duration(milliseconds: 300));
+
+  try {
+    RenderRepaintBoundary boundary =
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+
+    if (boundary.debugNeedsPaint) {
+      // Tunggu satu frame jika masih butuh repaint
+      await Future.delayed(Duration(milliseconds: 300));
+    }
+
+    var image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+    Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+    final pdf = pw.Document();
+    final imageProvider = pw.MemoryImage(pngBytes);
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Center(child: pw.Image(imageProvider)),
+              pw.SizedBox(height: 20),
+              pw.Text('Note:', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+              pw.Text('Pembayaran dapat dilakukan melalui rekening:', style: pw.TextStyle(fontSize: 12)),
+              pw.SizedBox(height: 5),
+              pw.Text('• BCA a.n. Candra Puput Hapsari, Rek: 0331797811', style: pw.TextStyle(fontSize: 12, color: PdfColors.red)),
+              pw.Text('• Mandiri a.n. Candra Puput Hapsari, Rek: 9000033904781', style: pw.TextStyle(fontSize: 12, color: PdfColors.red)),
+              pw.Text('• BRI a.n. Candra Puput Hapsari, Rek: 050801000243567', style: pw.TextStyle(fontSize: 12, color: PdfColors.red)),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.sharePdf(bytes: await pdf.save(), filename: 'invoice_partisi.pdf');
+  } catch (e) {
+    print("Error saat membuat PDF: $e");
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     String todayDate =
@@ -111,39 +170,82 @@ class _INV_Partsi extends State<INV_Partisi> {
     bool isTablet = MediaQuery.of(context).size.width > 600;
 
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.picture_as_pdf),
+            onPressed: captureAndGeneratePDF,
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-             Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "INVOICE",
-                    style: GoogleFonts.roboto(
-                      fontSize: getResponsiveFontSize(context, factor: 0.065),
-                      fontWeight: FontWeight.bold,
+        child: RepaintBoundary(
+          key: _globalKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "INVOICE",
+                      style: GoogleFonts.roboto(
+                        fontSize: getResponsiveFontSize(context, factor: 0.065),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Image.asset(
-                    "assets/images/logo_inv2.png",
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    fit: BoxFit.contain,
-                  ),
-                ],
-              ),
-              Divider(thickness: 1),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
+                    Image.asset(
+                      "assets/images/logo_inv2.png",
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+                Divider(thickness: 1),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Kepada :",
+                            style: TextStyle(
+                              fontSize: getResponsiveFontSize(context,
+                                  factor: 0.0355),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            nama,
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            alamat,
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 16), // Jarak antara dua bagian
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Kepada :",
+                          "Tanggal :",
                           style: TextStyle(
                             fontSize:
                                 getResponsiveFontSize(context, factor: 0.0355),
@@ -151,40 +253,108 @@ class _INV_Partsi extends State<INV_Partisi> {
                           ),
                         ),
                         Text(
-                          nama,
+                          todayDate,
                           style: TextStyle(
                             fontSize:
                                 getResponsiveFontSize(context, factor: 0.03),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          alamat,
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
                   ),
-                  SizedBox(width: 16), // Jarak antara dua bagian
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Table(
+                    columnWidths: const {
+                      0: FlexColumnWidth(1.8),
+                      1: FlexColumnWidth(2),
+                      2: FlexColumnWidth(1),
+                      3: FlexColumnWidth(2),
+                    },
+                    border: TableBorder.all(color: Colors.black),
                     children: [
-                      Text(
-                        "Tanggal :",
+                      _buildTableRow(
+                          ["Keterangan", "Harga", "Jml (m)", "Total"],
+                          isHeader: true, context: context),
+                      _buildTableRow(
+                          ["Partisi", hargaPartisi, ukuranPartisi, jumlahAtas],
+                          context: context),
+                      _buildTableRow(["", "", "", ""], context: context),
+                      _buildTableRow(["", "", "", ""], context: context),
+                      _buildTableRow(["", "", "", ""], context: context),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Pembayaran : ${isTablet ? "Partisi" : "Partisi"}",
+                      style: TextStyle(
+                        fontSize:
+                            getResponsiveFontSize(context, factor: 0.0355),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Text(
+                        "Sub Total : $subTotal",
                         style: TextStyle(
                           fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
+                              getResponsiveFontSize(context, factor: 0.03),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 0.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Uang Muka : $uangMuka",
+                        style: TextStyle(
+                          fontSize:
+                              getResponsiveFontSize(context, factor: 0.03),
                         ),
                       ),
                       Text(
-                        todayDate,
+                        "Biaya Survey : $biayaSurvey",
+                        style: TextStyle(
+                          fontSize:
+                              getResponsiveFontSize(context, factor: 0.03),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              thickness: 2,
+                              color: Colors.black,
+                              indent: MediaQuery.of(context).size.width * 0.7,
+                              endIndent: 5,
+                            ),
+                          ),
+                          Text(
+                            "-",
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.04),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        "Pelunasan : $pelunasan",
                         style: TextStyle(
                           fontSize:
                               getResponsiveFontSize(context, factor: 0.03),
@@ -192,106 +362,9 @@ class _INV_Partsi extends State<INV_Partisi> {
                       ),
                     ],
                   ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
                 ),
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.8),
-                    1: FlexColumnWidth(2),
-                    2: FlexColumnWidth(1),
-                    3: FlexColumnWidth(2),
-                  },
-                  border: TableBorder.all(color: Colors.black),
-                  children: [
-                    _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
-                        isHeader: true, context: context),
-                    _buildTableRow([
-                      "Partisi",
-                      hargaPartisi,
-                      ukuranPartisi,
-                      jumlahAtas
-                    ], context: context),
-                    _buildTableRow(["", "", "", ""], context: context),
-                    _buildTableRow(["", "", "", ""], context: context),
-                    _buildTableRow(["", "", "", ""], context: context),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Pembayaran : ${isTablet ? "Partisi" : "Partisi"}",
-                    style: TextStyle(
-                      fontSize: getResponsiveFontSize(context, factor: 0.0355),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      "Sub Total : $subTotal",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 0.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Uang Muka : $uangMuka",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                    Text(
-                      "Biaya Survey : $biayaSurvey",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 2,
-                            color: Colors.black,
-                            indent: MediaQuery.of(context).size.width * 0.7,
-                            endIndent: 5,
-                          ),
-                        ),
-                        Text(
-                          "-",
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.04),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "Pelunasan : $pelunasan",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
