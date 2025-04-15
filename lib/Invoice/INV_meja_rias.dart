@@ -3,6 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'dart:ui';
 
 class INV_MejaRias extends StatefulWidget {
   const INV_MejaRias({super.key});
@@ -12,6 +17,7 @@ class INV_MejaRias extends StatefulWidget {
 }
 
 class _INV_Partsi extends State<INV_MejaRias> {
+    ScreenshotController screenshotController = ScreenshotController();
   String nama = "Memuat...";
   String alamat = "";
   String hargaMejaRias = "";
@@ -88,6 +94,47 @@ class _INV_Partsi extends State<INV_MejaRias> {
     }
   }
 
+  Future<void> captureAndGeneratePDF() async {
+  try {
+    final image = await screenshotController.capture(delay: Duration(milliseconds: 300));
+    if (image == null) return;
+
+    final pdf = pw.Document();
+    final imageProvider = pw.MemoryImage(image);
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Center(child: pw.Image(imageProvider)),
+              pw.SizedBox(height: 20),
+              pw.Text(
+                'Pembayaran dapat dilakukan melalui rekening:',
+                style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+              ),
+              pw.SizedBox(height: 8),
+              pw.Text(' BCA        a.n. Candra Puput Hapsari, Rek: 0331797811'),
+              pw.Text(' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781'),
+              pw.Text(' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567'),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: 'invoice_meja rias.pdf',
+    );
+  } catch (e) {
+    print("Error saat membuat PDF: $e");
+  }
+}
+
+
   double getResponsiveFontSize(BuildContext context, {double factor = 0.05}) {
     double screenWidth = MediaQuery.of(context).size.width;
     return screenWidth * factor;
@@ -110,13 +157,32 @@ class _INV_Partsi extends State<INV_MejaRias> {
     bool isTablet = MediaQuery.of(context).size.width > 600;
 
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.picture_as_pdf),
+            onPressed: () async {
+              print("Tombol PDF ditekan");
+
+              await Future.delayed(
+                  Duration(milliseconds: 500)); // Tambahan delay
+              captureAndGeneratePDF();
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-             Row(
+        child: Screenshot(
+          controller: screenshotController,
+          child: Container(
+            // tanpa RepaintBoundary
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+               child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -291,6 +357,9 @@ class _INV_Partsi extends State<INV_MejaRias> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
           ),
         ),
       ),
