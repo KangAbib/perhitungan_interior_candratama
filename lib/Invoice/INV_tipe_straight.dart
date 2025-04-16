@@ -103,22 +103,32 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
     final pdf = pw.Document();
     final imageProvider = pw.MemoryImage(image);
 
+    // Ukuran kertas sedikit lebih tinggi dari A4
+    final customPageFormat = PdfPageFormat.a4.copyWith(
+      height: PdfPageFormat.a4.height * 1.1,
+    );
+
     pdf.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.a4,
+        pageFormat: customPageFormat,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 40, vertical: 40),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Center(child: pw.Image(imageProvider)),
+              pw.SizedBox(height: 10),
               pw.Text(
                 'Pembayaran dapat dilakukan melalui rekening:',
-                style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
               ),
-              pw.SizedBox(height: 8),
-              pw.Text(' BCA        a.n. Candra Puput Hapsari, Rek: 0331797811'),
-              pw.Text(' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781'),
-              pw.Text(' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567'),
+              pw.SizedBox(height: 10),
+              pw.Text('• BCA     a.n. Candra Puput Hapsari, Rek: 0331797811',
+                  style: pw.TextStyle(fontSize: 13)),
+              pw.Text('• Mandiri a.n. Candra Puput Hapsari, Rek: 9000033904781',
+                  style: pw.TextStyle(fontSize: 13)),
+              pw.Text('• BRI     a.n. Candra Puput Hapsari, Rek: 050801000243567',
+                  style: pw.TextStyle(fontSize: 13)),
             ],
           );
         },
@@ -127,12 +137,13 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_kitchen_straight.pdf',
+      filename: 'invoice_kitchen_straight_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");
   }
 }
+
 
 
   double getResponsiveFontSize(BuildContext context, {double factor = 0.05}) {

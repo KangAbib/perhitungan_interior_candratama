@@ -127,7 +127,7 @@ class _INV_Partsi extends State<INV_Backdrop> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_backdrop.pdf',
+      filename: 'invoice_backdrop_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");

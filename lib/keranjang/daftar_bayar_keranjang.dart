@@ -149,6 +149,26 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
     super.initState();
     cekDiskonTambahan();
 
+    biayaSurveyController.addListener(() {
+  String text = biayaSurveyController.text;
+
+  // Cegah penghapusan awalan "Rp "
+  if (!text.startsWith("Rp ")) {
+    biayaSurveyController.text = "Rp ";
+    biayaSurveyController.selection = TextSelection.collapsed(offset: 3);
+    return;
+  }
+
+  // Format ulang angka ke format rupiah
+  String formattedText = formatRupiah(text);
+
+  if (biayaSurveyController.text != formattedText) {
+    biayaSurveyController.text = formattedText;
+    biayaSurveyController.selection =
+        TextSelection.collapsed(offset: formattedText.length);
+  }
+});
+
     diskonController.addListener(() {
       String text = diskonController.text;
 
@@ -733,7 +753,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                         ),
                                         keyboardType: TextInputType.none,
                                       ),
-                                      SizedBox(height: 20),
+                                      SizedBox(height: 10),
                                       TextField(
                                         controller: biayaSurveyController,
                                         keyboardType: TextInputType.number,
@@ -872,8 +892,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                     onPressed: () async {
                       if (!isDiskonValid) {
                         _showSnackBar(
-                            "Turunkan diskon hingga hijau!",
-                            Colors.red);
+                            "Turunkan diskon hingga hijau!", Colors.red);
                         return;
                       }
 

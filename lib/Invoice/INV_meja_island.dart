@@ -109,15 +109,15 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Center(child: pw.Image(imageProvider)),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 10),
               pw.Text(
                 'Pembayaran dapat dilakukan melalui rekening:',
-                style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
               ),
-              pw.SizedBox(height: 8),
-              pw.Text(' BCA        a.n. Candra Puput Hapsari, Rek: 0331797811'),
-              pw.Text(' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781'),
-              pw.Text(' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567'),
+              pw.SizedBox(height: 10),
+              pw.Text(' BCA        a.n. Candra Puput Hapsari, Rek: 0331797811',style: pw.TextStyle(fontSize: 13)),
+              pw.Text(' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781',style: pw.TextStyle(fontSize: 13)),
+              pw.Text(' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567',style: pw.TextStyle(fontSize: 13)),
             ],
           );
         },
@@ -126,7 +126,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_meja island.pdf',
+      filename: 'invoice_meja island_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");

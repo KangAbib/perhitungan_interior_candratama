@@ -132,7 +132,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_$namainterior.pdf',
+      filename: 'invoice_$namainterior $nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");
