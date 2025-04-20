@@ -22,7 +22,7 @@ class _MejaScreenState extends State<MejaScreen> {
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
   TextEditingController ukuranMejaRiasController = TextEditingController();
-  TextEditingController biayaSurveyController = TextEditingController();
+  TextEditingController biayaSurveyController = TextEditingController(text: "Rp ");
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");

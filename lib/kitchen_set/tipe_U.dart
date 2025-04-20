@@ -1381,7 +1381,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                             MediaQuery.of(context).size.width *
                                                 0.005),
                                     child: Text(
-                                      "DP 60%",
+                                      "DP (60%)",
                                       style: GoogleFonts.lato(
                                         fontWeight: FontWeight.normal,
                                         fontSize:
