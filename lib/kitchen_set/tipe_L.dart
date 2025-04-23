@@ -325,7 +325,7 @@ class _Tipe_LState extends State<Tipe_L> {
       String biayaSurveyText = biayaSurveyController.text.trim();
       double biayaSurvey = biayaSurveyText.isEmpty
     ? 0
-    : parseValue(biayaSurveyText);
+    : parseValue(biayaSurveyText) * 1000;
 
       double uangMuka = parseValue(uangMukaController.text) * 1000;
       double pelunasan = subTotal - uangMuka - biayaSurvey ;
@@ -1290,7 +1290,7 @@ class _Tipe_LState extends State<Tipe_L> {
                                             MediaQuery.of(context).size.width *
                                                 0.005),
                                     child: Text(
-                                      "Biaya Survey",
+                                      "Biaya Survei",
                                       style: GoogleFonts.lato(
                                         fontWeight: FontWeight.normal,
                                         fontSize:

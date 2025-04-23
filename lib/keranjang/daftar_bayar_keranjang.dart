@@ -762,7 +762,7 @@ class _Daftar_KeranjangScreenState extends State<Daftar_KeranjangScreen> {
                                           fontWeight: FontWeight.w400,
                                         ),
                                         decoration: InputDecoration(
-                                          labelText: "Biaya Survey",
+                                          labelText: "Biaya Survei",
                                           labelStyle: GoogleFonts.manrope(
                                             fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.w500,

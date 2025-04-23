@@ -116,7 +116,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
                 style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
               ),
               pw.SizedBox(height: 10),
-              pw.Text(' BCA        a.n. Candra Puput Hapsari, Rek: 0331797811',style: pw.TextStyle(fontSize: 13)),
+              pw.Text(' BCA       a.n. Candra Puput Hapsari, Rek: 0331797811',style: pw.TextStyle(fontSize: 13)),
               pw.Text(' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781',style: pw.TextStyle(fontSize: 13)),
               pw.Text(' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567',style: pw.TextStyle(fontSize: 13)),
             ],

@@ -96,55 +96,57 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
   }
 
   Future<void> captureAndGeneratePDF() async {
-  try {
-    final image = await screenshotController.capture(delay: Duration(milliseconds: 300));
-    if (image == null) return;
+    try {
+      final image = await screenshotController.capture(
+          delay: Duration(milliseconds: 300));
+      if (image == null) return;
 
-    final pdf = pw.Document();
-    final imageProvider = pw.MemoryImage(image);
+      final pdf = pw.Document();
+      final imageProvider = pw.MemoryImage(image);
 
-    // Ukuran kertas sedikit lebih tinggi dari A4
-    final customPageFormat = PdfPageFormat.a4.copyWith(
-      height: PdfPageFormat.a4.height * 1.1,
-    );
+      // Ukuran kertas sedikit lebih tinggi dari A4
+      final customPageFormat = PdfPageFormat.a4.copyWith(
+        height: PdfPageFormat.a4.height * 1.1,
+      );
 
-    pdf.addPage(
-      pw.Page(
-        pageFormat: customPageFormat,
-        margin: const pw.EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Center(child: pw.Image(imageProvider)),
-              pw.SizedBox(height: 10),
-              pw.Text(
-                'Pembayaran dapat dilakukan melalui rekening:',
-                style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
-              ),
-              pw.SizedBox(height: 10),
-              pw.Text('• BCA     a.n. Candra Puput Hapsari, Rek: 0331797811',
-                  style: pw.TextStyle(fontSize: 13)),
-              pw.Text('• Mandiri a.n. Candra Puput Hapsari, Rek: 9000033904781',
-                  style: pw.TextStyle(fontSize: 13)),
-              pw.Text('• BRI     a.n. Candra Puput Hapsari, Rek: 050801000243567',
-                  style: pw.TextStyle(fontSize: 13)),
-            ],
-          );
-        },
-      ),
-    );
+      pdf.addPage(
+        pw.Page(
+          pageFormat: customPageFormat,
+          margin: const pw.EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Center(child: pw.Image(imageProvider)),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Pembayaran dapat dilakukan melalui rekening:',
+                  style: pw.TextStyle(
+                      fontSize: 14, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(' BCA       a.n. Candra Puput Hapsari, Rek: 0331797811',
+                    style: pw.TextStyle(fontSize: 13)),
+                pw.Text(
+                    ' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781',
+                    style: pw.TextStyle(fontSize: 13)),
+                pw.Text(
+                    ' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567',
+                    style: pw.TextStyle(fontSize: 13)),
+              ],
+            );
+          },
+        ),
+      );
 
-    await Printing.sharePdf(
-      bytes: await pdf.save(),
-      filename: 'invoice_kitchen_straight_$nama.pdf',
-    );
-  } catch (e) {
-    print("Error saat membuat PDF: $e");
+      await Printing.sharePdf(
+        bytes: await pdf.save(),
+        filename: 'invoice_kitchen_straight_$nama.pdf',
+      );
+    } catch (e) {
+      print("Error saat membuat PDF: $e");
+    }
   }
-}
-
-
 
   double getResponsiveFontSize(BuildContext context, {double factor = 0.05}) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -158,7 +160,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
 
     bool isTablet = MediaQuery.of(context).size.width > 600;
 
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
@@ -180,198 +182,210 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
             // tanpa RepaintBoundary
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-               child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "INVOICE",
-                    style: GoogleFonts.roboto(
-                      fontSize: getResponsiveFontSize(context, factor: 0.065),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Image.asset(
-                    "assets/images/logo_inv2.png",
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    fit: BoxFit.contain,
-                  ),
-                ],
-              ),
-              Divider(thickness: 1),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Kepada :",
+                          "INVOICE",
+                          style: GoogleFonts.roboto(
+                            fontSize:
+                                getResponsiveFontSize(context, factor: 0.065),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Image.asset(
+                          "assets/images/logo_inv2.png",
+                          width: MediaQuery.of(context).size.width * 0.35,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
+                    ),
+                    Divider(thickness: 1),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Kepada :",
+                                style: TextStyle(
+                                  fontSize: getResponsiveFontSize(context,
+                                      factor: 0.0355),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                nama,
+                                style: TextStyle(
+                                  fontSize: getResponsiveFontSize(context,
+                                      factor: 0.03),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                alamat,
+                                style: TextStyle(
+                                  fontSize: getResponsiveFontSize(context,
+                                      factor: 0.03),
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 16), // Jarak antara dua bagian
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Tanggal :",
+                              style: TextStyle(
+                                fontSize: getResponsiveFontSize(context,
+                                    factor: 0.0355),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              todayDate,
+                              style: TextStyle(
+                                fontSize: getResponsiveFontSize(context,
+                                    factor: 0.03),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                      ),
+                      child: Table(
+                        columnWidths: const {
+                          0: FlexColumnWidth(1.8),
+                          1: FlexColumnWidth(2),
+                          2: FlexColumnWidth(1),
+                          3: FlexColumnWidth(2),
+                        },
+                        border: TableBorder.all(color: Colors.black),
+                        children: [
+                          _buildTableRow(
+                              ["Keterangan", "Harga", "Jml (m)", "Total"],
+                              isHeader: true, context: context),
+                          _buildTableRow([
+                            "Kitchen atas",
+                            hargaAtas,
+                            jumlahAtas,
+                            hasilJumlahAtas
+                          ], context: context),
+                          _buildTableRow([
+                            "Kitchen bawah",
+                            hargaBawah,
+                            jumlahBawah,
+                            hasilJumlahBawah
+                          ], context: context),
+                          _buildTableRow(["Top Table", topTable, "-", topTable],
+                              context: context),
+                          _buildTableRow(
+                              ["Backsplash", backsplash, "-", backsplash],
+                              context: context),
+                          _buildTableRow(
+                              ["Aksesoris", aksesoris, "-", aksesoris],
+                              context: context),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Pembayaran : ${isTablet ? "Kitchen Straight" : "Straight"}",
                           style: TextStyle(
                             fontSize:
                                 getResponsiveFontSize(context, factor: 0.0355),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          nama,
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          alamat,
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.03),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 16), // Jarak antara dua bagian
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Tanggal :",
-                        style: TextStyle(
-                          fontSize:
-                              getResponsiveFontSize(context, factor: 0.0355),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        todayDate,
-                        style: TextStyle(
-                          fontSize:
-                              getResponsiveFontSize(context, factor: 0.03),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                ),
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.8),
-                    1: FlexColumnWidth(2),
-                    2: FlexColumnWidth(1),
-                    3: FlexColumnWidth(2),
-                  },
-                  border: TableBorder.all(color: Colors.black),
-                  children: [
-                    _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
-                        isHeader: true, context: context),
-                    _buildTableRow([
-                      "Kitchen atas",
-                      hargaAtas,
-                      jumlahAtas,
-                      hasilJumlahAtas
-                    ], context: context),
-                    _buildTableRow([
-                      "Kitchen bawah",
-                      hargaBawah,
-                      jumlahBawah,
-                      hasilJumlahBawah
-                    ], context: context),
-                    _buildTableRow(["Top Table", topTable, "-", topTable],
-                        context: context),
-                    _buildTableRow(["Backsplash", backsplash, "-", backsplash],
-                        context: context),
-                    _buildTableRow(["Aksesoris", aksesoris, "-", aksesoris],
-                        context: context),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Pembayaran : ${isTablet ? "Kitchen Straight" : "Straight"}",
-                    style: TextStyle(
-                      fontSize: getResponsiveFontSize(context, factor: 0.0355),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      "Sub Total : $subTotal",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 0.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Uang Muka : $uangMuka",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                    Text(
-                      "Biaya Survey : $biayaSurvey",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 2,
-                            color: Colors.black,
-                            indent: MediaQuery.of(context).size.width * 0.7,
-                            endIndent: 5,
-                          ),
-                        ),
-                        Text(
-                          "-",
-                          style: TextStyle(
-                            fontSize:
-                                getResponsiveFontSize(context, factor: 0.04),
-                            fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: Text(
+                            "Sub Total : $subTotal",
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    Text(
-                      "Pelunasan : $pelunasan",
-                      style: TextStyle(
-                        fontSize: getResponsiveFontSize(context, factor: 0.03),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Uang Muka : $uangMuka",
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                          ),
+                          Text(
+                            "Biaya Survey : $biayaSurvey",
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  thickness: 2,
+                                  color: Colors.black,
+                                  indent:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  endIndent: 5,
+                                ),
+                              ),
+                              Text(
+                                "-",
+                                style: TextStyle(
+                                  fontSize: getResponsiveFontSize(context,
+                                      factor: 0.04),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            "Pelunasan : $pelunasan",
+                            style: TextStyle(
+                              fontSize:
+                                  getResponsiveFontSize(context, factor: 0.03),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
-          ),),),
     );
   }
 

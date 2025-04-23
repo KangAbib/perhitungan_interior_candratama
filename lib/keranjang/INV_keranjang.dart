@@ -95,14 +95,9 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                       fontSize: 14, fontWeight: pw.FontWeight.bold),
                 ),
                 pw.SizedBox(height: 10),
-                pw.Text('• BCA     a.n. Candra Puput Hapsari, Rek: 0331797811',
-                    style: pw.TextStyle(fontSize: 13)),
-                pw.Text(
-                    '• Mandiri a.n. Candra Puput Hapsari, Rek: 9000033904781',
-                    style: pw.TextStyle(fontSize: 13)),
-                pw.Text(
-                    '• BRI     a.n. Candra Puput Hapsari, Rek: 050801000243567',
-                    style: pw.TextStyle(fontSize: 13)),
+              pw.Text(' BCA       a.n. Candra Puput Hapsari, Rek: 0331797811',style: pw.TextStyle(fontSize: 13)),
+              pw.Text(' Mandiri   a.n. Candra Puput Hapsari, Rek: 9000033904781',style: pw.TextStyle(fontSize: 13)),
+              pw.Text(' BRI         a.n. Candra Puput Hapsari, Rek: 050801000243567',style: pw.TextStyle(fontSize: 13)),
               ],
             );
           },
@@ -320,7 +315,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
                                     ),
                                   ),
                                   Text(
-                                    "Biaya Survey : $biayaSurvey",
+                                    "Biaya Survei : $biayaSurvey",
                                     style: TextStyle(
                                       fontSize: getResponsiveFontSize(context,
                                           factor: 0.03),

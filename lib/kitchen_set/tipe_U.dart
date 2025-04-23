@@ -329,7 +329,7 @@ class _Tipe_UState extends State<Tipe_U> {
        String biayaSurveyText = biayaSurveyController.text.trim();
       double biayaSurvey = biayaSurveyText.isEmpty
     ? 0
-    : parseValue(biayaSurveyText);
+    : parseValue(biayaSurveyText) * 1000;
       double pelunasan = subTotal - uangMuka - biayaSurvey;
 
       Map<String, dynamic> data = {
@@ -1416,7 +1416,7 @@ class _Tipe_UState extends State<Tipe_U> {
                                             MediaQuery.of(context).size.width *
                                                 0.005),
                                     child: Text(
-                                      "Biaya Survey",
+                                      "Biaya Survei",
                                       style: GoogleFonts.lato(
                                         fontWeight: FontWeight.normal,
                                         fontSize:

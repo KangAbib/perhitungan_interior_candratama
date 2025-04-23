@@ -730,7 +730,7 @@ class _MinibarState extends State<Minibar> {
                                             MediaQuery.of(context).size.width *
                                                 0.005),
                                     child: Text(
-                                      "Biaya Survey",
+                                      "Biaya Survei",
                                       style: GoogleFonts.lato(
                                         fontWeight: FontWeight.normal,
                                         fontSize:
