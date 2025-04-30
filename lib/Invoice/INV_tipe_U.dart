@@ -15,7 +15,6 @@ class INV_Tipe_U extends StatefulWidget {
   @override
   State<INV_Tipe_U> createState() => _INV_TipeU();
 }
-
 class _INV_TipeU extends State<INV_Tipe_U> {
   ScreenshotController screenshotController = ScreenshotController();
   String nama = "Memuat...";

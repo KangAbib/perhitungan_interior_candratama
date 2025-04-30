@@ -16,7 +16,6 @@ class Tipe_U extends StatefulWidget {
   @override
   State<Tipe_U> createState() => _Tipe_UState();
 }
-
 class _Tipe_UState extends State<Tipe_U> {
   TextEditingController hargaAtasController =
       TextEditingController(text: "Rp ");

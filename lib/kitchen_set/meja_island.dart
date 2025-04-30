@@ -187,7 +187,7 @@ class _MejaIslandState extends State<MejaIsland> {
       "alamat": alamatController.text,
       "ukuranMejaisland": ukuranmejaislandController.text,
       "hargaMejaisland": mejaislandController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
        "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

@@ -21,7 +21,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
   String nama = "Memuat...";
   String alamat = "";
   String hargaMejaRias = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranMejaRias = "";
   String uangMuka = "";
   String subTotal = "";
@@ -44,18 +44,18 @@ class _INV_Partsi extends State<INV_MejaRias> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaMejaRias = data["hargaMejaRias"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranMejaRias = data["ukuranMejaRias"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -71,7 +71,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
           nama = "Data tidak tersedia";
           alamat = "";
           hargaMejaRias = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranMejaRias = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -84,7 +84,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
         nama = "Gagal memuat data";
         alamat = "";
         hargaMejaRias = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranMejaRias = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -279,7 +279,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
                       "Meja Rias",
                       hargaMejaRias,
                       ukuranMejaRias,
-                      jumlahAtas
+                      jumlah
                     ], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),

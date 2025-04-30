@@ -25,7 +25,6 @@ class _PartisiScreenState extends State<PartisiScreen> {
   TextEditingController panjangPartisiController = TextEditingController();
   TextEditingController tinggiPartisiController = TextEditingController();
   TextEditingController biayaSurveyController = TextEditingController(text: "Rp");
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
 
@@ -204,7 +203,7 @@ class _PartisiScreenState extends State<PartisiScreen> {
       "panjangPartisi": panjangPartisiController.text,
       "tinggiPartisi": tinggiPartisiController.text,
       "hargaPartisi": partisiController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
        "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

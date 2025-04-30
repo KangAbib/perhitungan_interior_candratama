@@ -205,7 +205,7 @@ class _LemariScreenState extends State<LemariScreen> {
       "panjangLemari": panjangLemariController.text,
       "tinggiLemari": tinggiLemariController.text,
       "hargaLemari": LemariController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

@@ -22,7 +22,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
   String alamat = "";
   String namainterior = "";
   String hargaInteriorCustom = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranInteriorCustom = "";
   String uangMuka = "";
   String subTotal = "";
@@ -45,7 +45,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
@@ -53,12 +53,12 @@ class _INV_Custom extends State<INV_InteriorCustom> {
           namainterior =
               data["NamaInterior"] ?? "Nama Interior tidak ditemukan";
           hargaInteriorCustom = data["hargaInteriorCustom"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranInteriorCustom = data["ukuranInteriorCustom"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -75,7 +75,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
           alamat = "";
           namainterior = "";
           hargaInteriorCustom = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranInteriorCustom = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -89,7 +89,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
         alamat = "";
         namainterior = "";
         hargaInteriorCustom = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranInteriorCustom = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -284,7 +284,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
                       namainterior,
                       hargaInteriorCustom,
                       ukuranInteriorCustom,
-                      jumlahAtas
+                      jumlah
                     ], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),

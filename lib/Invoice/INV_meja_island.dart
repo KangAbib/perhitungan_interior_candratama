@@ -21,7 +21,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
   String nama = "Memuat...";
   String alamat = "";
   String hargaMejaIsland = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranMejaIsland = "";
   String uangMuka = "";
   String subTotal = "";
@@ -44,18 +44,18 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaMejaIsland = data["hargaMejaisland"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranMejaIsland = data["ukuranMejaisland"] ?? "0";
           biayaSurvey = data["biayaSurvey"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -71,7 +71,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
           nama = "Data tidak tersedia";
           alamat = "";
           hargaMejaIsland = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranMejaIsland = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -84,7 +84,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
         nama = "Gagal memuat data";
         alamat = "";
         hargaMejaIsland = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranMejaIsland = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -278,7 +278,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
                       "Meja Island",
                       hargaMejaIsland,
                       ukuranMejaIsland,
-                      jumlahAtas
+                      jumlah
                     ], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),

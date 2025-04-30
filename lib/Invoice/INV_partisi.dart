@@ -23,7 +23,7 @@ class _INV_Partsi extends State<INV_Partisi> {
   String nama = "Memuat...";
   String alamat = "";
   String hargaPartisi = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranPartisi = "";
   String uangMuka = "";
   String subTotal = "";
@@ -47,18 +47,18 @@ class _INV_Partsi extends State<INV_Partisi> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaPartisi = data["hargaPartisi"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranPartisi = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -74,7 +74,7 @@ class _INV_Partsi extends State<INV_Partisi> {
           nama = "Data tidak tersedia";
           alamat = "";
           hargaPartisi = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranPartisi = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -87,7 +87,7 @@ class _INV_Partsi extends State<INV_Partisi> {
         nama = "Gagal memuat data";
         alamat = "";
         hargaPartisi = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranPartisi = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -284,7 +284,7 @@ class _INV_Partsi extends State<INV_Partisi> {
                           "Partisi",
                           hargaPartisi,
                           ukuranPartisi,
-                          jumlahAtas
+                          jumlah
                         ], context: context),
                         _buildTableRow(["", "", "", ""], context: context),
                         _buildTableRow(["", "", "", ""], context: context),

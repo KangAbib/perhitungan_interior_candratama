@@ -21,7 +21,7 @@ class _INV_Minibar extends State<INV_Minibar> {
   String nama = "Memuat...";
   String alamat = "";
   String hargaMinibar = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranMinibar = "";
   String uangMuka = "";
   String subTotal = "";
@@ -45,18 +45,18 @@ class _INV_Minibar extends State<INV_Minibar> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaMinibar = data["hargaMinibar"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranMinibar = data["ukuranMinibar"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -72,7 +72,7 @@ class _INV_Minibar extends State<INV_Minibar> {
           nama = "Data tidak tersedia";
           alamat = "";
           hargaMinibar = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranMinibar = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -85,7 +85,7 @@ class _INV_Minibar extends State<INV_Minibar> {
         nama = "Gagal memuat data";
         alamat = "";
         hargaMinibar = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranMinibar = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -279,7 +279,7 @@ class _INV_Minibar extends State<INV_Minibar> {
                       "Minibar",
                       hargaMinibar,
                       ukuranMinibar,
-                      jumlahAtas
+                      jumlah
                     ], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),

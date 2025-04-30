@@ -189,7 +189,7 @@ class _MejaScreenState extends State<MejaScreen> {
       "alamat": alamatController.text,
       "ukuranMejaRias": ukuranMejaRiasController.text,
       "hargaMejaRias": MejaRiasController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

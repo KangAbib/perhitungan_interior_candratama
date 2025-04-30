@@ -185,7 +185,7 @@ class _MinibarState extends State<Minibar> {
       "alamat": alamatController.text,
       "ukuranMinibar": ukuranminibarController.text,
       "hargaMinibar": minibarController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
        "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

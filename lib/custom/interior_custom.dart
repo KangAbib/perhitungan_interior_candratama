@@ -189,7 +189,7 @@ class _InteriorCustomScreenState extends State<InteriorCustomScreen> {
       "ukuranInteriorCustom": ukuranInteriorCustomController.text,
       "hargaInteriorCustom": InteriorCustomController.text,
       "NamaInterior": namacustomController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

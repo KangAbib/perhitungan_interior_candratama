@@ -20,7 +20,7 @@ class _INV_Partsi extends State<INV_Lemari> {
   String nama = "Memuat...";
   String alamat = "";
   String hargaLemari = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranLemari = "";
   String uangMuka = "";
   String subTotal = "";
@@ -43,18 +43,18 @@ class _INV_Partsi extends State<INV_Lemari> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaLemari = data["hargaLemari"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranLemari = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -70,7 +70,7 @@ class _INV_Partsi extends State<INV_Lemari> {
           nama = "Data tidak tersedia";
           alamat = "";
           hargaLemari = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranLemari = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -82,7 +82,7 @@ class _INV_Partsi extends State<INV_Lemari> {
         nama = "Gagal memuat data";
         alamat = "";
         hargaLemari = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranLemari = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -274,7 +274,7 @@ class _INV_Partsi extends State<INV_Lemari> {
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
                     _buildTableRow(
-                        ["Lemari", hargaLemari, ukuranLemari, jumlahAtas],
+                        ["Lemari", hargaLemari, ukuranLemari, jumlah],
                         context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),

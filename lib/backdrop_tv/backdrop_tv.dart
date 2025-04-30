@@ -201,7 +201,7 @@ class _BackdropState extends State<BackdropTV> {
       "panjangBackdropTV": panjangBackdropTVController.text,
       "tinggiBackdropTV": tinggiBackdropTVController.text,
       "hargaBackdropTV": BackdropTVController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

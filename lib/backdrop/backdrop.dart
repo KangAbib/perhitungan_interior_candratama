@@ -201,7 +201,7 @@ class _BackdropState extends State<Backdrop> {
       "panjangBackdrop": panjangBackdropController.text,
       "tinggiBackdrop": tinggiBackdropController.text,
       "hargaBackdrop": BackdropController.text,
-      "jumlahAtas": jumlahController.text,
+      "jumlah": jumlahController.text,
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",

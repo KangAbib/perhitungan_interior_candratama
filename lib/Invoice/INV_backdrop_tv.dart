@@ -21,7 +21,7 @@ class _INV_Partsi extends State<INV_BackdropTV> {
   String nama = "Memuat...";
   String alamat = "";
   String hargaBackdropTV = "";
-  String jumlahAtas = "";
+  String jumlah = "";
   String ukuranBackdropTV = "";
   String uangMuka = "";
   String subTotal = "";
@@ -44,18 +44,18 @@ class _INV_Partsi extends State<INV_BackdropTV> {
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
 
-        double jumlahAtasValue = parseCurrency(data["jumlahAtas"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
           hargaBackdropTV = data["hargaBackdropTV"] ?? "Rp 0";
-          jumlahAtas = data["jumlahAtas"] ?? "Rp 0";
+          jumlah = data["jumlah"] ?? "Rp 0";
           ukuranBackdropTV = data["jumlahKali"] ?? "0";
           uangMuka = data["uangMuka"] ?? "Rp 0";
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
           subTotal =
-              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahAtasValue)}";
+              "Rp ${NumberFormat("#,###", "id_ID").format(jumlahValue)}";
           pelunasan = data["pelunasan"] ?? "Rp 0";
 
           var timestamp = data["tanggal"];
@@ -71,7 +71,7 @@ class _INV_Partsi extends State<INV_BackdropTV> {
           nama = "Data tidak tersedia";
           alamat = "";
           hargaBackdropTV = "Rp 0";
-          jumlahAtas = "Rp 0";
+          jumlah = "Rp 0";
           ukuranBackdropTV = "0";
           uangMuka = "Rp 0";
           subTotal = "Rp 0";
@@ -84,7 +84,7 @@ class _INV_Partsi extends State<INV_BackdropTV> {
         nama = "Gagal memuat data";
         alamat = "";
         hargaBackdropTV = "Rp 0";
-        jumlahAtas = "Rp 0";
+        jumlah = "Rp 0";
         ukuranBackdropTV = "0";
         uangMuka = "Rp 0";
         subTotal = "Rp 0";
@@ -278,7 +278,7 @@ class _INV_Partsi extends State<INV_BackdropTV> {
                       "Backdrop TV",
                       hargaBackdropTV,
                       ukuranBackdropTV,
-                      jumlahAtas
+                      jumlah
                     ], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
                     _buildTableRow(["", "", "", ""], context: context),
