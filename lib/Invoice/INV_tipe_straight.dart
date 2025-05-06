@@ -141,7 +141,7 @@ class _INV_TipeStraightState extends State<INV_TipeStraight> {
 
       await Printing.sharePdf(
         bytes: await pdf.save(),
-        filename: 'invoice_kitchen_straight_$nama.pdf',
+        filename: 'Inv_kitchen_straight_$nama.pdf',
       );
     } catch (e) {
       print("Error saat membuat PDF: $e");

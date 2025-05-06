@@ -126,7 +126,7 @@ class _INV_TipeL extends State<INV_Tipe_L> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_kitchen_letter L_$nama.pdf',
+      filename: 'Inv_kitchen_letter L_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");

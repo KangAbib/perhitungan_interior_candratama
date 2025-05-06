@@ -128,7 +128,7 @@ class _INV_Minibar extends State<INV_Minibar> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_minibar_$nama.pdf',
+      filename: 'Inv_minibar_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");

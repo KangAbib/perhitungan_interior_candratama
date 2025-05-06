@@ -127,7 +127,7 @@ class _INV_Partsi extends State<INV_MejaRias> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_meja rias_$nama.pdf',
+      filename: 'Inv_meja rias_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");

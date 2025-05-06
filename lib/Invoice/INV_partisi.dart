@@ -143,7 +143,7 @@ class _INV_Partsi extends State<INV_Partisi> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_partisi_$nama.pdf',
+      filename: 'Inv_partisi_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");

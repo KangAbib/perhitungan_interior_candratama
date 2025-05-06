@@ -106,7 +106,7 @@ class _INV_Keranjang extends State<INV_Keranjang> {
 
       await Printing.sharePdf(
         bytes: await pdf.save(),
-        filename: 'invoice_$nama.pdf',
+        filename: 'Inv_$nama.pdf',
       );
     } catch (e) {
       print("Error saat membuat PDF: $e");

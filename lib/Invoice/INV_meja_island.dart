@@ -126,7 +126,7 @@ class _INV_MejaIsland extends State<INV_MejaIsland> {
 
     await Printing.sharePdf(
       bytes: await pdf.save(),
-      filename: 'invoice_meja island_$nama.pdf',
+      filename: 'Inv_meja island_$nama.pdf',
     );
   } catch (e) {
     print("Error saat membuat PDF: $e");
