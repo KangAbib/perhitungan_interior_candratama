@@ -29,6 +29,7 @@ class _INV_Custom extends State<INV_InteriorCustom> {
   String pelunasan = "";
   String tanggal = "";
   String biayaSurvey = "";
+  List<Map<String, dynamic>> detailItems = [];
   double parseCurrency(String text) {
     String cleanedText = text.replaceAll("Rp ", "").replaceAll(".", "").trim();
     return double.tryParse(cleanedText) ?? 0.0;
@@ -44,8 +45,17 @@ class _INV_Custom extends State<INV_InteriorCustom> {
 
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
+        if (data["detailItems"] != null) {
+          List<dynamic> itemsRaw = data["detailItems"];
+          detailItems = itemsRaw.map<Map<String, dynamic>>((item) {
+            return {
+              "namaItem": item["namaItem"] ?? "",
+              "hargaItem": item["hargaItem"] ?? 0,
+            };
+          }).toList();
+        }
 
-        double jumlahValue = parseCurrency(data["jumlah"] ?? "Rp 0");
+        double jumlahValue = parseCurrency(data["Total"] ?? "Rp 0");
 
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
@@ -280,18 +290,34 @@ class _INV_Custom extends State<INV_InteriorCustom> {
                   children: [
                     _buildTableRow(["Keterangan", "Harga", "Jml (m)", "Total"],
                         isHeader: true, context: context),
-                    _buildTableRow([
-                      namainterior,
-                      hargaInteriorCustom,
-                      ukuranInteriorCustom,
-                      jumlah
-                    ], context: context),
-                    _buildTableRow(["", "", "", ""], context: context),
-                    _buildTableRow(["", "", "", ""], context: context),
-                    _buildTableRow(["", "", "", ""], context: context),
-                  ],
-                ),
-              ),
+                    _buildTableRow(
+                            [namainterior, hargaInteriorCustom, ukuranInteriorCustom, jumlah],
+                            context: context,
+                          ),
+
+                          // Cek apakah detailItems kosong
+                          if (detailItems.isEmpty)
+                            ...List.generate(
+                                3,
+                                (_) => _buildTableRow(["", "", "", ""],
+                                    context: context))
+                          else
+                            ...detailItems.map((item) {
+                              String hargaFormatted =
+                                  "Rp ${NumberFormat("#,###", "id_ID").format(item["hargaItem"])}";
+                              return _buildTableRow(
+                                [
+                                  item["namaItem"],
+                                  hargaFormatted,
+                                  "",
+                                  hargaFormatted
+                                ],
+                                context: context,
+                              );
+                            }).toList(),
+                        ],
+                      ),
+                    ),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

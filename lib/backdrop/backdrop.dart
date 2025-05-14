@@ -23,7 +23,13 @@ class _BackdropState extends State<Backdrop> {
   TextEditingController alamatController = TextEditingController();
   TextEditingController panjangBackdropController = TextEditingController();
   TextEditingController tinggiBackdropController = TextEditingController();
-  TextEditingController biayaSurveyController = TextEditingController(text : "Rp ");
+  TextEditingController biayaSurveyController =
+      TextEditingController(text: "Rp ");
+  List<TextEditingController> namaItemControllers = [];
+  List<TextEditingController> hargaItemControllers = [
+    TextEditingController(text: "Rp ")
+  ];
+  bool showItemForm = false;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -39,10 +45,44 @@ class _BackdropState extends State<Backdrop> {
     _setupControllerListener(BackdropController);
     _setupControllerListener(panjangBackdropController);
     _setupControllerListener(tinggiBackdropController);
+    for (var controller in hargaItemControllers) {
+      controller.addListener(() {
+        _hitungBackdrop();
+      });
+    }
   }
 
   void _setupControllerListener(TextEditingController controller) {
     controller.addListener(() {
+      _hitungBackdrop();
+    });
+  }
+
+  void tambahItemField() {
+    final namaController = TextEditingController();
+    final hargaController = TextEditingController(text: "Rp ");
+
+    // Tambahkan listener langsung di sini
+    hargaController.addListener(() {
+      _hitungBackdrop();
+    });
+
+    setState(() {
+      namaItemControllers.add(namaController);
+      hargaItemControllers.add(hargaController);
+      showItemForm = true;
+    });
+
+    _hitungBackdrop(); // hitung ulang setelah penambahan
+  }
+
+  void _hapusItem(int index) {
+    setState(() {
+      namaItemControllers[index].dispose();
+      hargaItemControllers[index].dispose();
+      namaItemControllers.removeAt(index);
+      hargaItemControllers.removeAt(index);
+      // Panggil _hitungPartisi setelah menghapus item
       _hitungBackdrop();
     });
   }
@@ -65,9 +105,13 @@ class _BackdropState extends State<Backdrop> {
     double panjangBackdrop = parseUkuran(panjangBackdropController.text);
     double tinggiBackdrop = parseUkuran(tinggiBackdropController.text);
     double hargaBackdrop = parseHarga(BackdropController.text);
-
+    double totalHargaItem = 0;
+    for (var controller in hargaItemControllers) {
+      totalHargaItem += parseHarga(controller.text);
+    }
     double totalHarga = panjangBackdrop * tinggiBackdrop * hargaBackdrop;
-    double uangMuka = totalHarga * 0.6;
+    double total = totalHarga + totalHargaItem;
+    double uangMuka = total * 0.6;
 
     print(
         "panjang: $panjangBackdrop, tinggi: $tinggiBackdrop, Harga: $hargaBackdrop, Total: $totalHarga");
@@ -79,12 +123,28 @@ class _BackdropState extends State<Backdrop> {
   }
 
   double hitungSubTotal() {
-    double parseValue(String text) {
-      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-    }
-
-    return parseValue(jumlahController.text);
+  double parseUkuran(String text) {
+    String cleanedText = text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+    return double.tryParse(cleanedText) ?? 0.0;
   }
+
+  double parseHarga(String text) {
+    String cleanedText = text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+    return double.tryParse(cleanedText) ?? 0.0;
+  }
+
+  double panjang = parseUkuran(panjangBackdropController.text);
+  double tinggi = parseUkuran(tinggiBackdropController.text);
+  double harga = parseHarga(BackdropController.text);
+
+  double totalHargaItem = 0;
+  for (var controller in hargaItemControllers) {
+    totalHargaItem += parseHarga(controller.text);
+  }
+
+  return (panjang * tinggi * harga) + totalHargaItem;
+}
+
 
   void tambahKeKeranjang(String namaInterior, double harga) async {
     try {
@@ -125,7 +185,11 @@ class _BackdropState extends State<Backdrop> {
         String barangKey = "barang$nomorBarang";
 
         await keranjangRef.set({
-          barangKey: {"nama": namaInterior, "harga": harga, "timestamp": timestamp}
+          barangKey: {
+            "nama": namaInterior,
+            "harga": harga,
+            "timestamp": timestamp
+          }
         }, SetOptions(merge: true));
 
         _showSnackBar("$namaInterior ditambahkan ke keranjang", Colors.green);
@@ -161,7 +225,7 @@ class _BackdropState extends State<Backdrop> {
         panjangBackdropController.text.isEmpty ||
         tinggiBackdropController.text.isEmpty ||
         BackdropController.text.isEmpty) {
-       _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
+      _showSnackBar("Harap isi semua kolom sebelum menyimpan.", Colors.red);
       return;
     }
 
@@ -187,13 +251,38 @@ class _BackdropState extends State<Backdrop> {
     double tinggiBackdrop = parseUkuran(tinggiBackdropController.text);
     double hargaBackdrop = parseValue(BackdropController.text);
     double subTotal = parseValue(jumlahController.text);
+
     double uangMuka = parseValue(uangMukaController.text);
     String biayaSurveyText = biayaSurveyController.text.trim();
-      double biayaSurvey = biayaSurveyText.isEmpty
-    ? 0
-    : parseValue(biayaSurveyText);
-    double pelunasan = subTotal - uangMuka - biayaSurvey;
+    double biayaSurvey =
+        biayaSurveyText.isEmpty ? 0 : parseValue(biayaSurveyText);
+    double totalHargaItem = 0;
+    for (var controller in hargaItemControllers) {
+      totalHargaItem += parseValue(controller.text);
+    }
+    List<Map<String, dynamic>> detailItems = [];
+
+    for (int i = 0; i < namaItemControllers.length; i++) {
+      String nama = namaItemControllers[i].text.trim();
+      String hargaText = hargaItemControllers[i].text.trim();
+      double harga = double.tryParse(hargaText
+              .replaceAll("Rp ", "")
+              .replaceAll(RegExp(r'[^0-9]'), '')) ??
+          0;
+
+      if (nama.isNotEmpty && harga > 0) {
+        detailItems.add({
+          "namaItem": nama,
+          "hargaItem": harga,
+        });
+      }
+    }
+
     double jumlahKali = panjangBackdrop * tinggiBackdrop;
+
+    double totalHarga = panjangBackdrop * tinggiBackdrop * hargaBackdrop;
+    double total = totalHarga + totalHargaItem;
+    double pelunasan = total - uangMuka - biayaSurvey;
 
     Map<String, dynamic> data = {
       "nama": namaController.text,
@@ -205,58 +294,60 @@ class _BackdropState extends State<Backdrop> {
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
-      "jumlahKali": jumlahKali % 1 == 0 ? jumlahKali.toInt().toString() : jumlahKali.toStringAsFixed(2),// 🔥 Simpan dengan format yang benar
+      "Total": "Rp ${_formatter.format(total)}",
+      "detailItems": detailItems,
+      "jumlahKali": jumlahKali % 1 == 0
+          ? jumlahKali.toInt().toString()
+          : jumlahKali.toStringAsFixed(2), // 🔥 Simpan dengan format yang benar
       "tanggal": Timestamp.now(),
     };
 
     try {
-      await FirebaseFirestore.instance
-      .collection("pesanan Backdrop")
-      .add(data);
+      await FirebaseFirestore.instance.collection("pesanan Backdrop").add(data);
 
-  double screenWidth = MediaQuery.of(context).size.width;
+      double screenWidth = MediaQuery.of(context).size.width;
 
       ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth > 600 ? 50 : 20,
-        vertical: 20,
-      ),
-      content: SizedBox(
-        height: screenWidth > 600 ? 50 : 30,
-        child: Center(
-          child: Text(
-            "Data berhasil disimpan!",
-            style: TextStyle(
-              fontSize: screenWidth > 600 ? 20 : 14,
-              fontWeight: FontWeight.bold,
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.symmetric(
+            horizontal: screenWidth > 600 ? 50 : 20,
+            vertical: 20,
+          ),
+          content: SizedBox(
+            height: screenWidth > 600 ? 50 : 30,
+            child: Center(
+              child: Text(
+                "Data berhasil disimpan!",
+                style: TextStyle(
+                  fontSize: screenWidth > 600 ? 20 : 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
         ),
-      ),
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 1),
-    ),
-  );
+      );
 
       Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const INV_Backdrop(),
-    ),
-  );
-} catch (e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Gagal menyimpan data: $e"),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
+        context,
+        MaterialPageRoute(
+          builder: (context) => const INV_Backdrop(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -328,7 +419,7 @@ class _BackdropState extends State<Backdrop> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                         Text(
+                        Text(
                           "Estimasi Harga",
                           style: TextStyle(
                             color: Color(0xFFFF5252),
@@ -692,7 +783,6 @@ class _BackdropState extends State<Backdrop> {
                                                 EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 12),
-                                          
                                           ),
                                           keyboardType: TextInputType.number,
                                           onChanged: (value) {
@@ -761,6 +851,181 @@ class _BackdropState extends State<Backdrop> {
                                     keyboardType: TextInputType.none,
                                   ),
                                   SizedBox(height: 10),
+                                  Stack(
+                                    children: [
+                                      SizedBox(height: 5),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.01,
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              tambahItemField();
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(7),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.blue,
+                                              ),
+                                              child: Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                                size: 14,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Visibility(
+                                    visible: showItemForm,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: List.generate(
+                                          namaItemControllers.length, (index) {
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Label Nama Item
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.005,
+                                              ),
+                                              child: Text(
+                                                "Nama Item ${index + 1}",
+                                                style: GoogleFonts.lato(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.035,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            // TextField Nama Item
+                                            TextField(
+                                              controller:
+                                                  namaItemControllers[index],
+                                              style: GoogleFonts.manrope(
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical: 10,
+                                                  horizontal: 12,
+                                                ),
+                                                suffixIcon: IconButton(
+                                                  icon: Icon(Icons.close,
+                                                      color: Colors.red),
+                                                  onPressed: () =>
+                                                      _hapusItem(index),
+                                                ),
+                                              ),
+                                              keyboardType: TextInputType.text,
+                                            ),
+                                            SizedBox(height: 10),
+
+                                            // Label Harga Item
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.005,
+                                              ),
+                                              child: Text(
+                                                "Harga Item ${index + 1}",
+                                                style: GoogleFonts.lato(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.035,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+
+                                            // TextField Harga Item
+                                            TextField(
+                                              controller:
+                                                  hargaItemControllers[index],
+                                              style: GoogleFonts.manrope(
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical: 10,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              onChanged: (value) {
+                                                String cleanedText =
+                                                    value.replaceAll(
+                                                        RegExp(r'[^0-9]'), '');
+                                                if (cleanedText.isNotEmpty) {
+                                                  double parsedValue =
+                                                      double.tryParse(
+                                                              cleanedText) ??
+                                                          0;
+                                                  String formattedValue =
+                                                      _formatter
+                                                          .format(parsedValue);
+                                                  hargaItemControllers[index]
+                                                      .value = TextEditingValue(
+                                                    text: "Rp $formattedValue",
+                                                    selection:
+                                                        TextSelection.collapsed(
+                                                      offset:
+                                                          "Rp $formattedValue"
+                                                              .length,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  hargaItemControllers[index]
+                                                      .text = "Rp ";
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
                                   Padding(
                                     padding: EdgeInsets.only(
                                         left:
@@ -812,59 +1077,49 @@ class _BackdropState extends State<Backdrop> {
                                     ),
                                   ),
                                   SizedBox(height: 5),
-                                  
-                                      Expanded(
-                                        flex : 2,
-                                        child: TextField(
-                                          controller: biayaSurveyController,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 12),
-                                           
-                                          ),
-                                          keyboardType: TextInputType.number,
-                                          onChanged: (value) {
-                                            String cleanedText =
-                                                value.replaceAll(
-                                                    RegExp(r'[^0-9]'), '');
-
-                                            if (cleanedText.isNotEmpty) {
-                                              double parsedValue =
-                                                  double.tryParse(
-                                                          cleanedText) ??
-                                                      0;
-                                              String formattedValue = _formatter
-                                                  .format(parsedValue);
-
-                                              biayaSurveyController.value =
-                                                  TextEditingValue(
-                                                text: "Rp $formattedValue",
-                                                selection:
-                                                    TextSelection.collapsed(
-                                                        offset:
-                                                            "Rp $formattedValue"
-                                                                .length),
-                                              );
-                                            } else {
-                                              biayaSurveyController.text = "Rp ";
-                                            }
-                                          },
-                                        ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: TextField(
+                                      controller: biayaSurveyController,
+                                      style: GoogleFonts.manrope(
+                                        fontSize: screenWidth * 0.04,
+                                        fontWeight: FontWeight.w400,
                                       ),
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 12),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      onChanged: (value) {
+                                        String cleanedText = value.replaceAll(
+                                            RegExp(r'[^0-9]'), '');
+
+                                        if (cleanedText.isNotEmpty) {
+                                          double parsedValue =
+                                              double.tryParse(cleanedText) ?? 0;
+                                          String formattedValue =
+                                              _formatter.format(parsedValue);
+
+                                          biayaSurveyController.value =
+                                              TextEditingValue(
+                                            text: "Rp $formattedValue",
+                                            selection: TextSelection.collapsed(
+                                                offset: "Rp $formattedValue"
+                                                    .length),
+                                          );
+                                        } else {
+                                          biayaSurveyController.text = "Rp ";
+                                        }
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                            
                             Positioned(
                               top: screenHeight * 0.025,
                               right: screenHeight * 0.025,
@@ -914,27 +1169,27 @@ class _BackdropState extends State<Backdrop> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              if (MediaQuery.of(context).size.width > 600) // Jika tablet
-                Text(
-                  "Keranjang",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: MediaQuery.of(context).size.width * 0.045,
-                  ),
-                )
-              else // Jika mobile, pakai gambar
-                Image.asset(
-                            "assets/images/keranjang_putih.png",
-                            height: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            width: MediaQuery.of(context).size.height <= 700
-                                ? MediaQuery.of(context).size.height * 0.035
-                                : MediaQuery.of(context).size.height * 0.03,
-                            fit: BoxFit.contain,
-                          ),
-            ],
+                    if (MediaQuery.of(context).size.width > 600) // Jika tablet
+                      Text(
+                        "Keranjang",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.045,
+                        ),
+                      )
+                    else // Jika mobile, pakai gambar
+                      Image.asset(
+                        "assets/images/keranjang_putih.png",
+                        height: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        width: MediaQuery.of(context).size.height <= 700
+                            ? MediaQuery.of(context).size.height * 0.035
+                            : MediaQuery.of(context).size.height * 0.03,
+                        fit: BoxFit.contain,
+                      ),
+                  ],
                 ),
               ),
             ),

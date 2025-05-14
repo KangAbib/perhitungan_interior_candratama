@@ -31,6 +31,7 @@ class _INV_TipeU extends State<INV_Tipe_U> {
   String subTotal = "";
   String pelunasan = "";
   String biayaSurvey = "";
+  List<Map<String, dynamic>> detailItems = [];
 
   @override
   void initState() {
@@ -50,6 +51,15 @@ class _INV_TipeU extends State<INV_Tipe_U> {
 
       if (snapshot.docs.isNotEmpty) {
         var data = snapshot.docs.first.data();
+        if (data["detailItems"] != null) {
+          List<dynamic> itemsRaw = data["detailItems"];
+          detailItems = itemsRaw.map<Map<String, dynamic>>((item) {
+            return {
+              "namaItem": item["namaItem"] ?? "",
+              "hargaItem": item["hargaItem"] ?? 0,
+            };
+          }).toList();
+        }
         setState(() {
           nama = data["nama"] ?? "Nama tidak ditemukan";
           alamat = data["alamat"] ?? "Alamat tidak ditemukan";
@@ -67,7 +77,7 @@ class _INV_TipeU extends State<INV_Tipe_U> {
           biayaSurvey = data["biayaSurvey"] ?? "Rp 0";
 
           uangMuka = data["uangMuka"] ?? "Rp 0";
-          subTotal = data["subTotal"] ?? "Rp 0";
+          subTotal = data["Total"] ?? "Rp 0";
           pelunasan = data["pelunasan"] ?? "Rp 0";
         });
       } else {
@@ -280,9 +290,28 @@ class _INV_TipeU extends State<INV_Tipe_U> {
                         context: context),
                     _buildTableRow(["Aksesoris", aksesoris, "-", aksesoris],
                         context: context),
-                  ],
-                ),
-              ),
+                  if (detailItems.isEmpty)
+                            ...List.generate(
+                                3,
+                                (_) => _buildTableRow(["", "", "", ""],
+                                    context: context))
+                          else
+                            ...detailItems.map((item) {
+                              String hargaFormatted =
+                                  "Rp ${NumberFormat("#,###", "id_ID").format(item["hargaItem"])}";
+                              return _buildTableRow(
+                                [
+                                  item["namaItem"],
+                                  hargaFormatted,
+                                  "",
+                                  hargaFormatted
+                                ],
+                                context: context,
+                              );
+                            }).toList(),
+                        ],
+                      ),
+                    ),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

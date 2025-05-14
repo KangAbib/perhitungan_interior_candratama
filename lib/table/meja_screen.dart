@@ -23,6 +23,11 @@ class _MejaScreenState extends State<MejaScreen> {
   TextEditingController alamatController = TextEditingController();
   TextEditingController ukuranMejaRiasController = TextEditingController();
   TextEditingController biayaSurveyController = TextEditingController(text: "Rp ");
+  List<TextEditingController> namaItemControllers = [];
+  List<TextEditingController> hargaItemControllers = [
+    TextEditingController(text: "Rp ")
+  ];
+  bool showItemForm = false;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NumberFormat _formatter = NumberFormat("#,###", "id_ID");
@@ -37,6 +42,40 @@ class _MejaScreenState extends State<MejaScreen> {
 
     _setupControllerListener(MejaRiasController);
     _setupControllerListener(ukuranMejaRiasController);
+    for (var controller in hargaItemControllers) {
+      controller.addListener(() {
+        _hitungMejaRias();
+      });
+    }
+  }
+
+  void tambahItemField() {
+    final namaController = TextEditingController();
+    final hargaController = TextEditingController(text: "Rp ");
+
+    // Tambahkan listener langsung di sini
+    hargaController.addListener(() {
+      _hitungMejaRias();
+    });
+
+    setState(() {
+      namaItemControllers.add(namaController);
+      hargaItemControllers.add(hargaController);
+      showItemForm = true;
+    });
+
+    _hitungMejaRias(); // hitung ulang setelah penambahan
+  }
+
+  void _hapusItem(int index) {
+    setState(() {
+      namaItemControllers[index].dispose();
+      hargaItemControllers[index].dispose();
+      namaItemControllers.removeAt(index);
+      hargaItemControllers.removeAt(index);
+      // Panggil _hitungPartisi setelah menghapus item
+      _hitungMejaRias();
+    });
   }
 
   void _setupControllerListener(TextEditingController controller) {
@@ -62,9 +101,14 @@ class _MejaScreenState extends State<MejaScreen> {
 
     double ukuranMejaRias = parseUkuran(ukuranMejaRiasController.text);
     double hargaMejaRias = parseHarga(MejaRiasController.text);
+    double totalHargaItem = 0;
+    for (var controller in hargaItemControllers) {
+      totalHargaItem += parseHarga(controller.text);
+    }
 
     double totalHarga = ukuranMejaRias * hargaMejaRias;
-    double uangMuka = totalHarga * 0.6;
+    double total = totalHarga + totalHargaItem;
+    double uangMuka = total * 0.6;
 
     print("Ukuran: $ukuranMejaRias, Harga: $hargaMejaRias, Total: $totalHarga");
 
@@ -74,13 +118,29 @@ class _MejaScreenState extends State<MejaScreen> {
     });
   }
 
-  double hitungSubTotal() {
-    double parseValue(String text) {
-      return double.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+   double hitungSubTotal() {
+    double parseUkuran(String text) {
+      String cleanedText = text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.');
+      return double.tryParse(cleanedText) ?? 0.0;
     }
 
-    return parseValue(jumlahController.text);
+    double parseHarga(String text) {
+      String cleanedText = text.replaceAll("Rp ", "").replaceAll(RegExp(r'[^0-9]'), '');
+      return double.tryParse(cleanedText) ?? 0.0;
+    }
+
+    double ukuranMejaRias = parseUkuran(ukuranMejaRiasController.text);
+    double hargaMejaRias = parseHarga(MejaRiasController.text);
+
+    double totalHargaItem = 0;
+    for (var controller in hargaItemControllers) {
+      totalHargaItem += parseHarga(controller.text);
+    }
+
+    // Menggunakan variabel ukuranMejaRias dan hargaMejaRias yang sudah didefinisikan
+    return (ukuranMejaRias * hargaMejaRias) + totalHargaItem;
   }
+
 
   void tambahKeKeranjang(String namaInterior, double harga) async {
     try {
@@ -178,11 +238,36 @@ class _MejaScreenState extends State<MejaScreen> {
 
     double subTotal = parseValue(jumlahController.text);
     double uangMuka = parseValue(uangMukaController.text);
+    double ukuranMejaRias = parseValue(ukuranMejaRiasController.text);
+   double hargaMejaRias = parseValue(MejaRiasController.text);
     String biayaSurveyText = biayaSurveyController.text.trim();
       double biayaSurvey = biayaSurveyText.isEmpty
     ? 0
     : parseValue(biayaSurveyText);
-    double pelunasan = subTotal - uangMuka - biayaSurvey;
+    double totalHargaItem = 0;
+    for (var controller in hargaItemControllers) {
+      totalHargaItem += parseValue(controller.text);
+    }
+     double totalHarga = ukuranMejaRias * hargaMejaRias;
+    double total = totalHarga + totalHargaItem;
+    double pelunasan = total - uangMuka - biayaSurvey;
+    List<Map<String, dynamic>> detailItems = [];
+
+    for (int i = 0; i < namaItemControllers.length; i++) {
+      String nama = namaItemControllers[i].text.trim();
+      String hargaText = hargaItemControllers[i].text.trim();
+      double harga = double.tryParse(hargaText
+              .replaceAll("Rp ", "")
+              .replaceAll(RegExp(r'[^0-9]'), '')) ??
+          0;
+
+      if (nama.isNotEmpty && harga > 0) {
+        detailItems.add({
+          "namaItem": nama,
+          "hargaItem": harga,
+        });
+      }
+    }
 
     Map<String, dynamic> data = {
       "nama": namaController.text,
@@ -193,6 +278,8 @@ class _MejaScreenState extends State<MejaScreen> {
       "uangMuka": uangMukaController.text,
       "biayaSurvey": "Rp ${_formatter.format(biayaSurvey.round())}",
       "pelunasan": "Rp ${_formatter.format(pelunasan)}",
+      "Total": "Rp ${_formatter.format(total)}",
+      "detailItems": detailItems,
       "tanggal": Timestamp.now(),
     };
 
@@ -690,6 +777,181 @@ class _MejaScreenState extends State<MejaScreen> {
                                       fillColor: Colors.grey[200],
                                     ),
                                     keyboardType: TextInputType.none,
+                                  ),
+                                  SizedBox(height: 10),
+                                  Stack(
+                                    children: [
+                                      SizedBox(height: 5),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.01,
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              tambahItemField();
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(7),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.blue,
+                                              ),
+                                              child: Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                                size: 14,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Visibility(
+                                    visible: showItemForm,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: List.generate(
+                                          namaItemControllers.length, (index) {
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Label Nama Item
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.005,
+                                              ),
+                                              child: Text(
+                                                "Nama Item ${index + 1}",
+                                                style: GoogleFonts.lato(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.035,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            // TextField Nama Item
+                                            TextField(
+                                              controller:
+                                                  namaItemControllers[index],
+                                              style: GoogleFonts.manrope(
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical: 10,
+                                                  horizontal: 12,
+                                                ),
+                                                suffixIcon: IconButton(
+                                                  icon: Icon(Icons.close,
+                                                      color: Colors.red),
+                                                  onPressed: () =>
+                                                      _hapusItem(index),
+                                                ),
+                                              ),
+                                              keyboardType: TextInputType.text,
+                                            ),
+                                            SizedBox(height: 10),
+
+                                            // Label Harga Item
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.005,
+                                              ),
+                                              child: Text(
+                                                "Harga Item ${index + 1}",
+                                                style: GoogleFonts.lato(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.035,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+
+                                            // TextField Harga Item
+                                            TextField(
+                                              controller:
+                                                  hargaItemControllers[index],
+                                              style: GoogleFonts.manrope(
+                                                fontSize: screenWidth * 0.04,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical: 10,
+                                                  horizontal: 12,
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              onChanged: (value) {
+                                                String cleanedText =
+                                                    value.replaceAll(
+                                                        RegExp(r'[^0-9]'), '');
+                                                if (cleanedText.isNotEmpty) {
+                                                  double parsedValue =
+                                                      double.tryParse(
+                                                              cleanedText) ??
+                                                          0;
+                                                  String formattedValue =
+                                                      _formatter
+                                                          .format(parsedValue);
+                                                  hargaItemControllers[index]
+                                                      .value = TextEditingValue(
+                                                    text: "Rp $formattedValue",
+                                                    selection:
+                                                        TextSelection.collapsed(
+                                                      offset:
+                                                          "Rp $formattedValue"
+                                                              .length,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  hargaItemControllers[index]
+                                                      .text = "Rp ";
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Padding(
